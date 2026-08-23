@@ -29,7 +29,7 @@
          "name":"pedras",
          "objects":[
                 {
-                 "gid":710,
+                 "gid":709,
                  "height":32,
                  "id":1,
                  "name":"",
@@ -38,11 +38,11 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":27,
-                 "y":143
+                 "x":33.3333333333333,
+                 "y":146.666666666667
                 }, 
                 {
-                 "gid":710,
+                 "gid":709,
                  "height":32,
                  "id":2,
                  "name":"",
@@ -51,8 +51,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":1230,
-                 "y":159
+                 "x":1219.33333333333,
+                 "y":161
                 }, 
                 {
                  "gid":1709,
@@ -1060,43 +1060,6 @@
                  "width":0,
                  "x":1245,
                  "y":145
-                }, 
-                {
-                 "height":0,
-                 "id":84,
-                 "name":"",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":741,
-                 "y":-107
-                }, 
-                {
-                 "height":28,
-                 "id":85,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":22,
-                 "x":32,
-                 "y":114
-                }, 
-                {
-                 "height":29,
-                 "id":86,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":28,
-                 "x":1233,
-                 "y":129
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1135,7 +1098,7 @@
         {
          "columns":16,
          "firstgid":1,
-         "image":"..\/Downloads\/otsp_tiles_01.png",
+         "image":"..\/tiles\/tibia-tiles\/otsp_tiles_01.png",
          "imageheight":2016,
          "imagewidth":512,
          "margin":0,
@@ -1149,7 +1112,7 @@
         {
          "columns":16,
          "firstgid":1009,
-         "image":"..\/Downloads\/otsp_nature_01.png",
+         "image":"..\/tiles\/tibia-tiles\/otsp_nature_01.png",
          "imageheight":1536,
          "imagewidth":512,
          "margin":0,

@@ -24,7 +24,7 @@ export class ParticleSystem {
 
   public init(count = 35) {
     this.particles = [];
-    const isCave = this.mapId === 'caverna-zona-1';
+    const isCave = this.mapId.startsWith('caverna');
 
     for (let i = 0; i < count; i++) {
       const isFirefly = !isCave && Math.random() < 0.6;

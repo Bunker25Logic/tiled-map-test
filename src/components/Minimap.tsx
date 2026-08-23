@@ -36,7 +36,7 @@ export default function Minimap({
     ctx.clearRect(0, 0, mapW, mapH);
 
     // Deep background
-    ctx.fillStyle = mapId === 'caverna-zona-1' ? '#090a0f' : '#0d1d3a';
+    ctx.fillStyle = mapId.startsWith('caverna') ? '#090a0f' : '#0d1d3a';
     ctx.fillRect(0, 0, mapW, mapH);
 
     const centerX = mapW / 2;

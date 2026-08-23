@@ -11,8 +11,6 @@ interface SettingsModalProps {
   onToggleGrid: () => void;
   debugColliders: boolean;
   onToggleDebugColliders: () => void;
-  zoomLevel: number;
-  onSelectZoomLevel: (zoom: number) => void;
   hasWings?: boolean;
   onToggleWings?: () => void;
   onReloadMap: () => void;
@@ -31,8 +29,6 @@ export default function SettingsModal({
   onToggleGrid,
   debugColliders,
   onToggleDebugColliders,
-  zoomLevel,
-  onSelectZoomLevel,
   hasWings = true,
   onToggleWings,
   onReloadMap,
@@ -50,7 +46,7 @@ export default function SettingsModal({
             <span className="modal-header-icon">⚙️</span>
             <div>
               <h2>Configurações do Jogo</h2>
-              <p>Ajuste gráficos, câmera, auxílios visuais e opções de mapa</p>
+              <p>Ajuste gráficos, efeitos, auxílios visuais e opções de mapa</p>
             </div>
           </div>
           <button className="btn-modal-close" onClick={onClose} title="Fechar Configurações">
@@ -110,7 +106,7 @@ export default function SettingsModal({
             </div>
           </div>
 
-          {/* 2. Visual Effects & Camera Zoom */}
+          {/* 2. Visual Effects & Actions */}
           <div className="settings-two-columns">
             {/* Visual Toggles */}
             <div className="settings-column">
@@ -168,25 +164,9 @@ export default function SettingsModal({
               </div>
             </div>
 
-            {/* Camera Zoom Level */}
+            {/* Map & Lobby Actions */}
             <div className="settings-column">
-              <span className="settings-section-title">Zoom da Câmera</span>
-              <div className="zoom-options-row">
-                {[0.75, 1.0, 1.5].map((z) => (
-                  <button
-                    key={z}
-                    className={`btn-zoom-card ${zoomLevel === z ? 'active' : ''}`}
-                    onClick={() => onSelectZoomLevel(z)}
-                  >
-                    <span className="zoom-num">{z}x</span>
-                    <span className="zoom-name">
-                      {z === 0.75 ? 'Amplo' : z === 1.0 ? 'Padrão Tibia' : 'Próximo'}
-                    </span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Map & Lobby Actions */}
+              <span className="settings-section-title">Ações do Mundo</span>
               <div className="settings-quick-actions">
                 <button
                   className={`btn-action-reload ${isReloadingMap ? 'loading' : ''}`}

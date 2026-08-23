@@ -40,7 +40,6 @@ export default function App() {
   const [enableParticles, setEnableParticles] = useState<boolean>(true);
   const [debugColliders, setDebugColliders] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(false);
-  const [zoomLevel, setZoomLevel] = useState<number>(1.0);
   const [hasWings, setHasWings] = useState<boolean>(true); // Equipamento: Asas Trovão (+45% velocidade)
 
   // Modals State
@@ -252,7 +251,6 @@ export default function App() {
           enableParticles={enableParticles}
           debugColliders={debugColliders}
           showGrid={showGrid}
-          zoomLevel={zoomLevel}
           hasWings={hasWings}
           onPlayerPosChange={handlePosChange}
           onZoneTransition={handleZoneTransition}
@@ -359,8 +357,6 @@ export default function App() {
         onToggleGrid={() => setShowGrid((g) => !g)}
         debugColliders={debugColliders}
         onToggleDebugColliders={() => setDebugColliders((d) => !d)}
-        zoomLevel={zoomLevel}
-        onSelectZoomLevel={setZoomLevel}
         hasWings={hasWings}
         onToggleWings={() => setHasWings((w) => !w)}
         onReloadMap={handleReloadClick}

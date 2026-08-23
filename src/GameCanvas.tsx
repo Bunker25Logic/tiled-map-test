@@ -76,6 +76,20 @@ const WINGS_THUNDER_CONFIG: Record<Direction, {
   right: { frame: 0, offX: -23, offY: -16, baseW: 46, baseH: 48, scale: 1.0, behind: true },
 };
 
+/**
+ * Automatically computes responsive camera distance / zoom:
+ * - Mobile / Touch devices / Narrow screens (<=768px or tablet touch): 1.5x zoom
+ * - Desktop / PC: 1.0x (Tibia Standard 1.0)
+ */
+export function getResponsiveCameraZoom(): number {
+  if (typeof window === 'undefined') return 1.0;
+  const isMobile =
+    window.innerWidth <= 768 ||
+    ('ontouchstart' in window && window.innerWidth <= 1024) ||
+    (navigator.maxTouchPoints > 0 && window.innerWidth <= 1024);
+  return isMobile ? 1.5 : 1.0;
+}
+
 interface GameCanvasProps {
   mapId: string;
   mapData: TiledMap;
@@ -85,7 +99,6 @@ interface GameCanvasProps {
   enableParticles: boolean;
   debugColliders: boolean;
   showGrid: boolean;
-  zoomLevel: number;
   hasWings?: boolean;
   onPlayerPosChange?: (x: number, y: number, tileX: number, tileY: number) => void;
   onZoneTransition?: (targetMapId: string, spawnX: number, spawnY: number) => void;
@@ -101,7 +114,6 @@ export default function GameCanvas({
   enableParticles,
   debugColliders,
   showGrid,
-  zoomLevel,
   hasWings = true,
   onPlayerPosChange,
   onZoneTransition,
@@ -145,7 +157,6 @@ export default function GameCanvas({
     enableParticles,
     debugColliders,
     showGrid,
-    zoomLevel,
     hasWings,
     onPlayerPosChange,
     onZoneTransition,
@@ -158,11 +169,10 @@ export default function GameCanvas({
     propsRef.current.enableParticles = enableParticles;
     propsRef.current.debugColliders = debugColliders;
     propsRef.current.showGrid = showGrid;
-    propsRef.current.zoomLevel = zoomLevel;
     propsRef.current.hasWings = hasWings;
     propsRef.current.onPlayerPosChange = onPlayerPosChange;
     propsRef.current.onZoneTransition = onZoneTransition;
-  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, zoomLevel, hasWings, onPlayerPosChange, onZoneTransition]);
+  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, hasWings, onPlayerPosChange, onZoneTransition]);
 
   // Update particles on map change
   useEffect(() => {
@@ -282,7 +292,7 @@ export default function GameCanvas({
             const portals = getMapPortals(mapId, mapData);
             const px = playerRef.current.x + HITBOX_W / 2;
             const py = playerRef.current.y + HITBOX_H / 2;
-            const nearby = portals.find((p) => Math.hypot(px - p.worldX, py - p.worldY) < 55);
+            const nearby = portals.find((p) => Math.hypot(px - p.worldX, py - p.worldY) < 65);
             if (nearby) {
               e.preventDefault();
               executeTransition(nearby.targetMapId, nearby.targetSpawnX, nearby.targetSpawnY);
@@ -482,7 +492,7 @@ export default function GameCanvas({
 
           for (const portal of mapPortals) {
             const dist = Math.hypot(pxFootCenterX - portal.worldX, pyFootCenterY - portal.worldY);
-            if (dist < 55) {
+            if (dist < 65) {
               nearbyPortal = portal;
               break;
             }
@@ -537,7 +547,7 @@ export default function GameCanvas({
             canvas.height = displayH;
           }
 
-          const zoom = propsRef.current.zoomLevel || 1.0;
+          const zoom = getResponsiveCameraZoom();
           const scale = (displayH / BASE_WORLD_H) * zoom;
           const worldViewW = displayW / scale;
           const worldViewH = displayH / scale;
@@ -569,7 +579,7 @@ export default function GameCanvas({
           }
 
           // Pure pitch black background in cave, dark void in surface
-          ctx.fillStyle = mapId === 'caverna-zona-1' ? '#000000' : '#06070a';
+          ctx.fillStyle = mapId.startsWith('caverna') ? '#000000' : '#06070a';
           ctx.fillRect(0, 0, displayW, displayH);
 
           ctx.scale(scale, scale);
@@ -950,7 +960,7 @@ export default function GameCanvas({
           }
 
           // 4. Cave Darkness & Torchlight (Centered directly on the player in screen coords)
-          if (mapId === 'caverna-zona-1') {
+          if (mapId.startsWith('caverna')) {
             ctx.save();
 
             const pScreenX = playerRef.current.x + HITBOX_W / 2 - camX;
@@ -1002,7 +1012,7 @@ export default function GameCanvas({
             propsRef.current.graphicStyle || 'modern-hd',
             worldViewW,
             worldViewH,
-            mapId === 'caverna-zona-1'
+            mapId.startsWith('caverna')
           );
 
           // 6. Smooth Fade-in Transition Overlay
@@ -1097,7 +1107,7 @@ export default function GameCanvas({
 
     const dpr = window.devicePixelRatio || 1;
     const displayH = Math.round(rect.height * dpr);
-    const zoom = propsRef.current.zoomLevel || 1.0;
+    const zoom = getResponsiveCameraZoom();
     const scale = (displayH / BASE_WORLD_H) * zoom;
 
     const clickWorldX = cameraRef.current.x + clickScreenX * (dpr / scale);
@@ -1110,8 +1120,8 @@ export default function GameCanvas({
       const distClick = Math.hypot(clickWorldX - portal.worldX, clickWorldY - portal.worldY);
       const distPlayer = Math.hypot(playerRef.current.x - portal.worldX, playerRef.current.y - portal.worldY);
 
-      // Only enter if clicked on the hole and player is within reasonable reach (<= 60px)
-      if (distClick < portal.radius + 16 && distPlayer < 60) {
+      // Only enter if clicked on the hole and player is within reasonable reach (<= 75px)
+      if (distClick < portal.radius + 24 && distPlayer < 75) {
         propsRef.current.onZoneTransition?.(
           portal.targetMapId,
           portal.targetSpawnX,

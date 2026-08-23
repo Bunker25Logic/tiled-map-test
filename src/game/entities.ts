@@ -54,6 +54,20 @@ export async function loadMonsterSprites(types: string[]): Promise<MonsterImages
   return images;
 }
 
+export interface IslandBounds {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+}
+
+export const SURFACE_ISLAND_BOUNDS: Record<string, IslandBounds> = {
+  ilha1: { minX: -550, maxX: 350, minY: -500, maxY: 350 },     // Floresta & Ruínas
+  ilha2: { minX: 850, maxX: 1550, minY: -500, maxY: 400 },     // Deserto
+  ilha3: { minX: -850, maxX: 50, minY: -2050, maxY: -1450 },   // Montanhas Rochosas
+  ilha4: { minX: 350, maxX: 1450, minY: -2150, maxY: -1450 },  // Santuário Místico
+};
+
 export class Monster {
   public id: string;
   public type: string;
@@ -64,6 +78,7 @@ export class Monster {
   public frame = 1;
   public isMoving = false;
   public mapId = 'map1';
+  public islandBounds?: IslandBounds;
 
   private stateTimer = 0;
   private stateDuration = 2;
@@ -71,10 +86,11 @@ export class Monster {
   private currentVx = 0;
   private currentVy = 0;
 
-  constructor(id: string, type: string, x: number, y: number, mapId = 'map1') {
+  constructor(id: string, type: string, x: number, y: number, mapId = 'map1', islandBounds?: IslandBounds) {
     this.id = id;
     this.type = type;
     this.mapId = mapId;
+    this.islandBounds = islandBounds;
     this.config = MONSTER_CONFIGS[type] || {
       name: type,
       width: 32,
@@ -87,7 +103,7 @@ export class Monster {
       shadowRadiusY: 4,
       hitboxW: 16,
       hitboxH: 12,
-      speed: 40,
+      speed: 38,
       walkFps: 5,
       frameCount: 3,
     };
@@ -98,10 +114,10 @@ export class Monster {
 
   private pickNextAction() {
     this.stateTimer = 0;
-    // 45% chance to wander, 55% chance to idle/graze
-    if (Math.random() < 0.45) {
+    // 40% chance to wander, 60% chance to idle/graze (like Tibia)
+    if (Math.random() < 0.4) {
       this.isMoving = true;
-      this.stateDuration = 1.0 + Math.random() * 2.5;
+      this.stateDuration = 1.2 + Math.random() * 2.0;
 
       const directions: (1 | 2 | 3 | 4)[] = [1, 2, 3, 4];
       this.dir = directions[Math.floor(Math.random() * directions.length)];
@@ -118,7 +134,7 @@ export class Monster {
       this.currentVx = 0;
       this.currentVy = 0;
       this.frame = 1;
-      this.stateDuration = 1.5 + Math.random() * 3.5;
+      this.stateDuration = 2.0 + Math.random() * 4.0;
     }
   }
 
@@ -201,15 +217,55 @@ export class Monster {
         nearbyObstacles
       );
 
-      this.x = res.x;
-      this.y = res.y;
+      // Strict containment within the monster's island borders
+      if (this.islandBounds) {
+        if (
+          res.x < this.islandBounds.minX ||
+          res.x > this.islandBounds.maxX ||
+          res.y < this.islandBounds.minY ||
+          res.y > this.islandBounds.maxY
+        ) {
+          this.pickNextAction();
+          return;
+        }
+      }
 
-      // Enforce zone boundaries in cave
+      // On surface map, prevent walking into water or coast tiles
+      if (this.mapId === 'map1' && activeWalkableLandSet && activeWalkableLandSet.size > 0) {
+        const centerTileX = Math.floor((res.x + this.config.hitboxW / 2) / 32);
+        const centerTileY = Math.floor((res.y + this.config.hitboxH / 2) / 32);
+        if (activeWalkableLandSet.has(`${centerTileX},${centerTileY}`)) {
+          this.x = res.x;
+          this.y = res.y;
+        } else {
+          // Revert: cannot step into ocean water or void
+          this.pickNextAction();
+        }
+      } else {
+        this.x = res.x;
+        this.y = res.y;
+      }
+
+      // Enforce zone boundaries in cave 1
       if (this.mapId === 'caverna-zona-1') {
         const minX = 64;
         const maxX = 1200;
         const minY = 70;
         const maxY = 210;
+
+        if (this.x < minX || this.x > maxX || this.y < minY || this.y > maxY) {
+          this.x = Math.max(minX, Math.min(maxX, this.x));
+          this.y = Math.max(minY, Math.min(maxY, this.y));
+          this.pickNextAction();
+        }
+      }
+
+      // Enforce zone boundaries in cave 2
+      if (this.mapId === 'caverna2') {
+        const minX = 45;
+        const maxX = 435;
+        const minY = 45;
+        const maxY = 205;
 
         if (this.x < minX || this.x > maxX || this.y < minY || this.y > maxY) {
           this.x = Math.max(minX, Math.min(maxX, this.x));
@@ -247,23 +303,107 @@ export class Monster {
   }
 }
 
-// Biome-based Monster Pools
-const FOREST_SURFACE_POOL = [
-  'hiena', 'drago', 'anao', 'elf', 'pirata', 'golen', 'whitewolf', 'dog', 'pand', 'centon',
-  'orc', 'duende', 'lizardman', 'tiguersabre', 'trolol', 'esquilo', 'dodo'
+// Global active walkable land tiles index for current surface map
+let activeWalkableLandSet: Set<string> | null = null;
+
+function isWaterTileGid(gid: number): boolean {
+  const clean = gid & 0x1fffffff;
+  if (clean === 0) return true;
+  // OTServ animated water sequences and coast borders
+  if (clean >= 736 && clean <= 743) return true;
+  if (clean >= 750 && clean <= 800) return true;
+  return false;
+}
+
+/**
+ * Builds an ultra-fast O(1) set of all solid walkable land tile coordinates (`col,row`)
+ * across all map tile layers, strictly excluding ocean water and void.
+ */
+export function buildWalkableLandSet(mapData: TiledMap): Set<string> {
+  const landSet = new Set<string>();
+
+  for (const layer of mapData.layers) {
+    if (layer.type !== 'tilelayer') continue;
+
+    if (layer.chunks) {
+      for (const chunk of layer.chunks) {
+        for (let r = 0; r < chunk.height; r++) {
+          for (let c = 0; c < chunk.width; c++) {
+            const rawGid = chunk.data[r * chunk.width + c];
+            const clean = rawGid & 0x1fffffff;
+            if (clean === 0) continue;
+            if (isWaterTileGid(clean)) continue;
+
+            const tileX = chunk.x + c;
+            const tileY = chunk.y + r;
+            landSet.add(`${tileX},${tileY}`);
+          }
+        }
+      }
+    } else if (layer.data && layer.width && layer.height) {
+      for (let r = 0; r < layer.height; r++) {
+        for (let c = 0; c < layer.width; c++) {
+          const rawGid = layer.data[r * layer.width + c];
+          const clean = rawGid & 0x1fffffff;
+          if (clean === 0) continue;
+          if (isWaterTileGid(clean)) continue;
+
+          landSet.add(`${c},${r}`);
+        }
+      }
+    }
+  }
+
+  return landSet;
+}
+
+// ── Biome Configurations for Surface Map (Tibia Density: 8-10 mobs per island) ─
+interface BiomeIslandDef {
+  id: string;
+  name: string;
+  bounds: IslandBounds;
+  pool: string[];
+  targetCount: number;
+}
+
+const BIOME_ISLANDS: BiomeIslandDef[] = [
+  {
+    id: 'ilha1',
+    name: 'Ilha 1 (Floresta & Ruínas)',
+    bounds: SURFACE_ISLAND_BOUNDS.ilha1,
+    pool: ['esquilo', 'dog', 'dodo', 'hiena', 'elf', 'anao', 'duende', 'orc', 'pand'],
+    targetCount: 9,
+  },
+  {
+    id: 'ilha2',
+    name: 'Ilha 2 (Deserto de Areia)',
+    bounds: SURFACE_ISLAND_BOUNDS.ilha2,
+    pool: ['skedesert', 'mumia', 'serpent', 'mummi', 'mummi2', 'golen-magma', 'genie'],
+    targetCount: 9,
+  },
+  {
+    id: 'ilha3',
+    name: 'Ilha 3 (Montanhas Rochosas)',
+    bounds: SURFACE_ISLAND_BOUNDS.ilha3,
+    pool: ['tiguersabre', 'centon', 'whitewolf', 'golen', 'trolol', 'drago', 'orc'],
+    targetCount: 9,
+  },
+  {
+    id: 'ilha4',
+    name: 'Ilha 4 (Santuário Místico)',
+    bounds: SURFACE_ISLAND_BOUNDS.ilha4,
+    pool: ['whitewolf', 'aparition', 'thedeath', 'golen', 'magmal', 'drago', 'centon'],
+    targetCount: 9,
+  },
 ];
 
-const DESERT_SURFACE_POOL = [
-  'skedesert', 'golen-magma', 'mumia', 'serpent', 'mummi', 'mummi2', 'genie', 'magmal'
-];
-
-const CAVE_POOL = [
-  'bat', 'zombie', 'aparition', 'goblin', 'soni', 'trolol', 'centostone', 'stonemonster', 'thedeath', 'binger'
+const CAVE1_POOL = [
+  'bat', 'zombie', 'aparition', 'goblin', 'soni', 'trolol', 'centostone', 'stonemonster'
 ];
 
 /**
- * Procedurally populates only solid, walkable land tiles (strictly excluding ocean/water)
- * across any new map areas or northern expansions.
+ * Populates balanced, Tibia-like monster populations cleanly divided by biomes.
+ * Strictly confines spawns and movement to confirmed solid island land.
  */
 export function createMapMonsters(
   mapId = 'map1',
@@ -273,7 +413,7 @@ export function createMapMonsters(
   const monsters: Monster[] = [];
   let monsterIdCounter = 1;
 
-  // 1. Cave Zone Handling
+  // 1. Cave Zone 1 Handling (8 total monsters)
   if (mapId === 'caverna-zona-1') {
     const caveSegments = [
       { minX: 120, maxX: 280, minY: 90, maxY: 180 },
@@ -283,133 +423,121 @@ export function createMapMonsters(
       { minX: 960, maxX: 1120, minY: 90, maxY: 180 },
     ];
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 8; i++) {
       const seg = caveSegments[i % caveSegments.length];
-      const type = CAVE_POOL[i % CAVE_POOL.length];
+      const type = CAVE1_POOL[i % CAVE1_POOL.length];
       const spawnX = Math.round(seg.minX + Math.random() * (seg.maxX - seg.minX));
       const spawnY = Math.round(seg.minY + Math.random() * (seg.maxY - seg.minY));
 
-      monsters.push(new Monster(`cave_mob_${i}_${type}`, type, spawnX, spawnY, 'caverna-zona-1'));
+      monsters.push(new Monster(`cave1_mob_${i}_${type}`, type, spawnX, spawnY, 'caverna-zona-1'));
     }
 
     return monsters;
   }
 
-  // 2. Surface Zone (map1)
+  // 2. Cave Zone 2 Handling (5 total monsters)
+  if (mapId === 'caverna2') {
+    const c2Spawns = [
+      { type: 'bat', x: 130, y: 110 },
+      { type: 'aparition', x: 210, y: 140 },
+      { type: 'soni', x: 280, y: 100 },
+      { type: 'goblin', x: 350, y: 145 },
+      { type: 'stonemonster', x: 230, y: 115 },
+    ];
+
+    for (let i = 0; i < c2Spawns.length; i++) {
+      const s = c2Spawns[i];
+      monsters.push(new Monster(`cave2_mob_${i}_${s.type}`, s.type, s.x, s.y, 'caverna2'));
+    }
+
+    return monsters;
+  }
+
+  // 3. Surface Zone (map1)
   if (!mapData) {
     return monsters;
   }
 
-  // A. Check for explicit Tiled spawn objects
-  for (const layer of mapData.layers) {
-    if (layer.type === 'objectgroup' && layer.objects) {
-      for (const obj of layer.objects) {
-        const objName = (obj.name || '').toLowerCase().trim();
-        const objType = (obj.type || '').toLowerCase().trim();
+  // Index all solid ground tiles
+  activeWalkableLandSet = buildWalkableLandSet(mapData);
 
-        const matchedMonster =
-          MONSTER_CONFIGS[objName] ? objName :
-          MONSTER_CONFIGS[objType] ? objType : null;
+  // Filter interior ground tiles per island
+  const islandEligibleTiles: Record<string, Array<{ x: number; y: number }>> = {
+    ilha1: [],
+    ilha2: [],
+    ilha3: [],
+    ilha4: [],
+  };
 
-        if (matchedMonster) {
-          monsters.push(
-            new Monster(
-              `tiled_spawn_${monsterIdCounter++}_${matchedMonster}`,
-              matchedMonster,
-              Math.round(obj.x),
-              Math.round(obj.y),
-              mapId
-            )
-          );
-        }
+  activeWalkableLandSet.forEach((tileKey) => {
+    const [tx, ty] = tileKey.split(',').map(Number);
+
+    // Filter out coast edges: must have at least 4 solid neighbors
+    let solidNeighbors = 0;
+    for (const [dx, dy] of [[1,0], [-1,0], [0,1], [0,-1], [1,1], [-1,-1], [1,-1], [-1,1]]) {
+      if (activeWalkableLandSet!.has(`${tx + dx},${ty + dy}`)) {
+        solidNeighbors++;
       }
     }
-  }
+    if (solidNeighbors < 4) return;
 
-  // B. Procedural Walkable Sector Spawner
-  // ONLY scan solid ground layers ('chao', 'ground', 'terra', 'floor', etc.) — NEVER water/ocean ('terreno')
-  const walkableTilesBySector: Map<string, Array<{ x: number; y: number; isDesert: boolean }>> = new Map();
-  const tw = mapData.tilewidth || 32;
-  const th = mapData.tileheight || 32;
-  const sectorSize = 256;
+    const wx = tx * 32;
+    const wy = ty * 32;
 
-  for (const layer of mapData.layers) {
-    if (layer.type !== 'tilelayer') continue;
-
-    const layerName = (layer.name || '').toLowerCase().trim();
-    // Exclude water/ocean layers (e.g. 'terreno' is full water)
-    if (layerName.includes('terreno') || layerName.includes('agua') || layerName.includes('water') || layerName.includes('mar')) {
-      continue;
+    // Check collision with walls / obstacles
+    if (colliders) {
+      const hits = colliders.some(
+        (c) =>
+          wx < c.x + c.width &&
+          wx + 16 > c.x &&
+          wy < c.y + c.height &&
+          wy + 12 > c.y
+      );
+      if (hits) return;
     }
 
-    if (layer.chunks) {
-      for (const chunk of layer.chunks) {
-        for (let row = 0; row < chunk.height; row++) {
-          for (let col = 0; col < chunk.width; col++) {
-            const rawGid = chunk.data[row * chunk.width + col];
-            const clean = rawGid & 0x1fffffff;
-            if (clean === 0) continue;
+    // Classify into exact island
+    for (const isl of BIOME_ISLANDS) {
+      if (
+        wx >= isl.bounds.minX + 32 &&
+        wx <= isl.bounds.maxX - 32 &&
+        wy >= isl.bounds.minY + 32 &&
+        wy <= isl.bounds.maxY - 32
+      ) {
+        // Prevent spawning right over initial player start (0, 0)
+        if (isl.id === 'ilha1' && Math.hypot(wx, wy) < 120) return;
 
-            // Water GID exclusion: OTServ water tiles (700 to 1200)
-            if (clean >= 700 && clean <= 1200) continue;
-
-            const worldX = (chunk.x + col) * tw;
-            const worldY = (chunk.y + row) * th;
-
-            // Check if collides with static objects (walls, houses, fences)
-            if (colliders) {
-              const hits = colliders.some(
-                (c) =>
-                  worldX < c.x + c.width &&
-                  worldX + 16 > c.x &&
-                  worldY < c.y + c.height &&
-                  worldY + 12 > c.y
-              );
-              if (hits) continue;
-            }
-
-            // Avoid initial player spawn center
-            if (Math.hypot(worldX, worldY) < 64) continue;
-
-            const sectorKey = `${Math.floor(worldX / sectorSize)},${Math.floor(worldY / sectorSize)}`;
-            const isDesert = worldX > 850 || (clean >= 460 && clean <= 530);
-
-            if (!walkableTilesBySector.has(sectorKey)) {
-              walkableTilesBySector.set(sectorKey, []);
-            }
-            walkableTilesBySector.get(sectorKey)!.push({ x: worldX, y: worldY, isDesert });
-          }
-        }
+        islandEligibleTiles[isl.id].push({ x: wx, y: wy });
+        break;
       }
     }
-  }
+  });
 
-  // Populate each solid ground sector
-  walkableTilesBySector.forEach((tiles) => {
-    // Only spawn if sector has enough solid ground (at least 6 tiles)
-    if (tiles.length < 6) return;
+  // Spawn balanced number of monsters per biome island (9 per island)
+  for (const isl of BIOME_ISLANDS) {
+    const tiles = islandEligibleTiles[isl.id];
+    if (!tiles || tiles.length === 0) continue;
 
-    const count = tiles.length > 20 ? 2 : 1;
+    const count = Math.min(isl.targetCount, tiles.length);
+    const step = Math.max(1, Math.floor(tiles.length / count));
 
-    for (let c = 0; c < count; c++) {
-      const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
-      const pool = randomTile.isDesert ? DESERT_SURFACE_POOL : FOREST_SURFACE_POOL;
-      const type = pool[Math.floor(Math.random() * pool.length)];
-
-      const jitterX = Math.round(randomTile.x + (Math.random() - 0.5) * 14);
-      const jitterY = Math.round(randomTile.y + (Math.random() - 0.5) * 14);
+    for (let i = 0; i < count; i++) {
+      const tileIndex = (i * step + Math.floor(Math.random() * step)) % tiles.length;
+      const tile = tiles[tileIndex];
+      const type = isl.pool[i % isl.pool.length];
 
       monsters.push(
         new Monster(
-          `auto_mob_${monsterIdCounter++}_${type}`,
+          `surf_${isl.id}_${monsterIdCounter++}_${type}`,
           type,
-          jitterX,
-          jitterY,
-          mapId
+          tile.x + 8,
+          tile.y + 8,
+          mapId,
+          isl.bounds
         )
       );
     }
-  });
+  }
 
   return monsters;
 }
