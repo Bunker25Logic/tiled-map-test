@@ -38,7 +38,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 48px;
+  height: 40px;
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(10, 15, 29, 0.85) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -47,11 +47,17 @@ html {
   z-index: 50;
 }
 
-.header-left,
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  margin-right: 6px;
 }
 
 .btn-header-hero {
@@ -143,11 +149,12 @@ html {
   gap: 6px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  padding: 6px 12px;
+  border-radius: 6px;
+  padding: 4px 10px;
   color: #e2e8f0;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
+  height: 28px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -359,7 +366,7 @@ html {
 /* ─── 5-Slot Action Bar (HUD Inferior) ──────────────────────────────────── */
 .action-bar-5slots {
   position: absolute;
-  bottom: 20px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 45;
@@ -369,14 +376,14 @@ html {
 .action-bar-slots-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 0, 0, 0.5);
-  padding: 6px 10px;
-  border-radius: 14px;
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 0, 0, 0.4);
+  padding: 4px 6px;
+  border-radius: 10px;
 }
 
 .btn-action-slot {
@@ -385,11 +392,11 @@ html {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 58px;
-  height: 58px;
+  width: 42px;
+  height: 42px;
   background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
-  border: 2px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.12s ease;
   user-select: none;
@@ -397,47 +404,47 @@ html {
 }
 
 .btn-action-slot:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: var(--slot-glow, #38bdf8);
-  box-shadow: 0 0 14px var(--slot-glow, rgba(56, 189, 248, 0.5));
+  box-shadow: 0 0 12px var(--slot-glow, rgba(56, 189, 248, 0.5));
 }
 
 .btn-action-slot:active,
 .btn-action-slot.casting {
   transform: scale(0.94);
   border-color: #ffffff;
-  box-shadow: 0 0 20px #ffffff;
+  box-shadow: 0 0 16px #ffffff;
 }
 
 .slot-key-hint {
   position: absolute;
-  top: 3px;
-  left: 4px;
-  font-size: 10px;
+  top: 2px;
+  left: 2px;
+  font-size: 8px;
   font-weight: 800;
   color: #94a3b8;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 1px 4px;
-  border-radius: 3px;
-  line-height: 1;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 0 3px;
+  border-radius: 2px;
+  line-height: 1.1;
 }
 
 .slot-spell-icon {
-  font-size: 22px;
+  font-size: 16px;
   line-height: 1;
-  margin-top: 4px;
+  margin-top: 1px;
 }
 
 .slot-spell-title {
-  font-size: 9px;
+  font-size: 7.5px;
   font-weight: 700;
   color: #cbd5e1;
   text-transform: uppercase;
-  max-width: 52px;
+  max-width: 38px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .btn-slot-spellbook {
@@ -1783,8 +1790,18 @@ html {
 /* ─── Mobile & Small Screen Responsive Layout ───────────────────────────── */
 @media (max-width: 960px), (max-height: 620px) {
   .rpg-header-clean {
-    height: 38px;
-    padding: 0 8px;
+    height: 34px;
+    padding-left: max(10px, env(safe-area-inset-left, 10px));
+    padding-right: max(18px, env(safe-area-inset-right, 18px));
+  }
+
+  .header-left {
+    gap: 6px;
+  }
+
+  .header-right {
+    gap: 8px;
+    margin-right: 14px; /* Espaço confortável para afastar o ícone de configurações da borda/canto do celular */
   }
 
   .coord-chip {
@@ -1795,12 +1812,35 @@ html {
     display: none;
   }
 
+  .hero-mini-info strong {
+    font-size: 11px;
+  }
+
+  .zone-indicator-badge {
+    padding: 2px 6px;
+    font-size: 10px;
+    height: 24px;
+  }
+
+  .btn-header-hero {
+    padding: 2px 6px;
+    height: 24px;
+  }
+
   .header-btn-text {
     display: none;
   }
 
   .btn-header-action {
-    padding: 4px 8px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  .header-btn-icon {
+    font-size: 14px;
   }
 
   .rpg-footer-clean {
@@ -1808,19 +1848,46 @@ html {
   }
 
   .action-bar-5slots {
-    bottom: 8px;
-    transform: translateX(-50%) scale(0.85);
-    transform-origin: bottom center;
+    bottom: 6px;
+    transform: translateX(-50%);
+  }
+
+  .action-bar-slots-row {
+    padding: 3px 5px;
+    gap: 4px;
+    border-radius: 8px;
+  }
+
+  .btn-action-slot {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+  }
+
+  .slot-spell-icon {
+    font-size: 15px;
+    margin-top: 0;
+  }
+
+  .slot-spell-title {
+    display: none;
+  }
+
+  .slot-key-hint {
+    font-size: 7px;
+    top: 1px;
+    left: 2px;
+    padding: 0 2px;
   }
 
   .mobile-actions-right {
-    right: 12px;
-    bottom: 15px;
+    right: 14px;
+    bottom: 12px;
   }
 
   .btn-mobile-action {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
   }
 
   .lobby-overlay {

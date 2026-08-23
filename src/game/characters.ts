@@ -1,7 +1,7 @@
 import type { Direction } from './types';
 import { loadChromaKeyImage } from './imageLoader';
 
-export type CharacterId = 'mark' | 'archer' | 'barbarian' | 'magician' | 'necromancer' | 'paladin';
+export type CharacterId = 'archer' | 'luxio' | 'magician' | 'necromancer' | 'paladin';
 
 export interface CharacterDef {
   id: CharacterId;
@@ -17,15 +17,15 @@ export interface CharacterDef {
 
 export const PLAYABLE_CHARACTERS: CharacterDef[] = [
   {
-    id: 'mark',
-    name: 'Mark',
-    className: 'Aventureiro',
-    icon: '🧑',
-    type: 'sheet',
+    id: 'luxio',
+    name: 'Luxio',
+    className: 'Guerreiro da Luz',
+    icon: '⚔️',
+    type: 'ots',
     width: 32,
-    height: 36,
+    height: 32,
     visCenterX: 16,
-    feetY: 36,
+    feetY: 30,
   },
   {
     id: 'archer',
@@ -36,17 +36,6 @@ export const PLAYABLE_CHARACTERS: CharacterDef[] = [
     width: 32,
     height: 32,
     visCenterX: 15,
-    feetY: 30,
-  },
-  {
-    id: 'barbarian',
-    name: 'Barbarian',
-    className: 'Bárbaro',
-    icon: '🪓',
-    type: 'ots',
-    width: 32,
-    height: 32,
-    visCenterX: 18,
     feetY: 30,
   },
   {
@@ -89,23 +78,8 @@ export type CharacterImages = Record<string, HTMLImageElement>;
 export async function loadAllCharacterAssets(): Promise<CharacterImages> {
   const images: CharacterImages = {};
 
-  // 1. Load Mark sheets
-  const markAssets: Record<string, string> = {
-    'mark_walk': '/assets/char/mark/mark-walk.webp',
-    'mark_attack': '/assets/char/mark/mark-attack.webp',
-    'mark_dead': '/assets/char/mark/mark-dead.webp',
-  };
-
-  for (const [k, p] of Object.entries(markAssets)) {
-    try {
-      images[k] = await loadChromaKeyImage(p);
-    } catch (err) {
-      console.warn(`Failed loading mark image: ${p}`, err);
-    }
-  }
-
-  // 2. Load OTServ characters (archer, barbarian, magician, necromancer, paladin)
-  const otsClasses = ['archer', 'barbarian', 'magician', 'necromancer', 'paladin'];
+  // Load all 5 OTServ characters
+  const otsClasses: CharacterId[] = ['archer', 'luxio', 'magician', 'necromancer', 'paladin'];
   const promises: Promise<void>[] = [];
 
   for (const cName of otsClasses) {
@@ -131,16 +105,13 @@ export async function loadAllCharacterAssets(): Promise<CharacterImages> {
   return images;
 }
 
-// Convert direction to OTServ frame number (1: Up, 2: Right, 3: Down, 4: Left)
+// Convert direction to OTServ frame number (1: Up/North, 2: Right/East, 3: Down/South, 4: Left/West)
 export function dirToOtsNum(dir: Direction): number {
   switch (dir) {
-    case 'up':
-      return 1;
-    case 'right':
-      return 2;
-    case 'down':
-      return 3;
-    case 'left':
-      return 4;
+    case 'up':    return 1;
+    case 'right': return 2;
+    case 'down':  return 3;
+    case 'left':  return 4;
+    default:      return 3;
   }
 }

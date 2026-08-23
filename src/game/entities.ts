@@ -1,6 +1,6 @@
 import type { Rect, TiledMap } from './types';
 import { loadChromaKeyImage } from './imageLoader';
-import { moveAndSlide } from './mapUtils';
+import { moveAndSlide, buildCollisionRects } from './mapUtils';
 import rawConfigs from './entitiesConfig.json';
 
 export interface MonsterConfig {
@@ -66,6 +66,7 @@ export const SURFACE_ISLAND_BOUNDS: Record<string, IslandBounds> = {
   ilha2: { minX: 850, maxX: 1550, minY: -500, maxY: 400 },     // Deserto
   ilha3: { minX: -850, maxX: 50, minY: -2050, maxY: -1450 },   // Montanhas Rochosas
   ilha4: { minX: 350, maxX: 1450, minY: -2150, maxY: -1450 },  // Santuário Místico
+  ilha5: { minX: 1650, maxX: 2500, minY: -2200, maxY: -1450 }, // Quinta Ilha
 };
 
 export class Monster {
@@ -371,34 +372,41 @@ const BIOME_ISLANDS: BiomeIslandDef[] = [
     id: 'ilha1',
     name: 'Ilha 1 (Floresta & Ruínas)',
     bounds: SURFACE_ISLAND_BOUNDS.ilha1,
-    pool: ['esquilo', 'dog', 'dodo', 'hiena', 'elf', 'anao', 'duende', 'orc', 'pand'],
-    targetCount: 9,
+    pool: ['esquilo', 'alce', 'vead', 'piggi', 'dog', 'dodo', 'hiena', 'elf', 'anao', 'duende', 'orc', 'pand'],
+    targetCount: 10,
   },
   {
     id: 'ilha2',
     name: 'Ilha 2 (Deserto de Areia)',
     bounds: SURFACE_ISLAND_BOUNDS.ilha2,
-    pool: ['skedesert', 'mumia', 'serpent', 'mummi', 'mummi2', 'golen-magma', 'genie'],
-    targetCount: 9,
+    pool: ['skedesert', 'lacost', 'mumia', 'serpent', 'mummi', 'mummi2', 'golen-magma', 'genie', 'scarnsabre'],
+    targetCount: 10,
   },
   {
     id: 'ilha3',
     name: 'Ilha 3 (Montanhas Rochosas)',
     bounds: SURFACE_ISLAND_BOUNDS.ilha3,
-    pool: ['tiguersabre', 'centon', 'whitewolf', 'golen', 'trolol', 'drago', 'orc'],
-    targetCount: 9,
+    pool: ['tiguersabre', 'bufao', 'centgreen', 'centongg', 'centon', 'whitewolf', 'golen', 'golen2', 'trolol', 'drago', 'orc', 'lobisonem'],
+    targetCount: 10,
   },
   {
     id: 'ilha4',
     name: 'Ilha 4 (Santuário Místico)',
     bounds: SURFACE_ISLAND_BOUNDS.ilha4,
-    pool: ['whitewolf', 'aparition', 'thedeath', 'golen', 'magmal', 'drago', 'centon'],
-    targetCount: 9,
+    pool: ['draertis', 'dragis', 'medusa', 'fantasn', 'aparition', 'thedeath', 'golen', 'magmal', 'drago', 'centon', 'fera'],
+    targetCount: 10,
+  },
+  {
+    id: 'ilha5',
+    name: 'Ilha 5 (Terras Dracônicas)',
+    bounds: SURFACE_ISLAND_BOUNDS.ilha5,
+    pool: ['draertis', 'dragis', 'bat rei', 'medusa', 'triron', 'glacis', 'ins', 'token', 'cavern creature'],
+    targetCount: 10,
   },
 ];
 
 const CAVE1_POOL = [
-  'bat', 'zombie', 'aparition', 'goblin', 'soni', 'trolol', 'centostone', 'stonemonster'
+  'bat', 'bat rei', 'zombie', 'aparition', 'goblin', 'soni', 'trolol', 'centostone', 'stonemonster', 'skeleton', 'cavern creature'
 ];
 
 /**
@@ -453,9 +461,30 @@ export function createMapMonsters(
     return monsters;
   }
 
-  // 3. Surface Zone (map1)
-  if (!mapData) {
+  // 3. Cave Zone 3 Handling (Ilha 4 para Ilha 5)
+  if (mapId === 'caverna3') {
+    const c3Spawns = [
+      { type: 'bat rei', x: 140, y: 120 },
+      { type: 'cavern creature', x: 220, y: 140 },
+      { type: 'skeleton', x: 300, y: 110 },
+      { type: 'draertis', x: 380, y: 150 },
+      { type: 'fantasn', x: 260, y: 130 },
+    ];
+
+    for (let i = 0; i < c3Spawns.length; i++) {
+      const s = c3Spawns[i];
+      monsters.push(new Monster(`cave3_mob_${i}_${s.type}`, s.type, s.x, s.y, 'caverna3'));
+    }
+
     return monsters;
+  }
+
+  if (!mapData) return monsters;
+
+  // 4. Surface Biome Balancing on Map1 (Island 1, 2, 3, 4, 5)
+  let collidersToUse = colliders;
+  if (!collidersToUse) {
+    collidersToUse = buildCollisionRects(mapData);
   }
 
   // Index all solid ground tiles
@@ -467,6 +496,7 @@ export function createMapMonsters(
     ilha2: [],
     ilha3: [],
     ilha4: [],
+    ilha5: [],
   };
 
   activeWalkableLandSet.forEach((tileKey) => {
@@ -485,8 +515,8 @@ export function createMapMonsters(
     const wy = ty * 32;
 
     // Check collision with walls / obstacles
-    if (colliders) {
-      const hits = colliders.some(
+    if (collidersToUse) {
+      const hits = collidersToUse.some(
         (c) =>
           wx < c.x + c.width &&
           wx + 16 > c.x &&

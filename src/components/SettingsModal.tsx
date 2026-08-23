@@ -1,4 +1,5 @@
 import type { GraphicStyle } from '../game/graphics';
+import type { WingType } from '../game/types';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -11,8 +12,8 @@ interface SettingsModalProps {
   onToggleGrid: () => void;
   debugColliders: boolean;
   onToggleDebugColliders: () => void;
-  hasWings?: boolean;
-  onToggleWings?: () => void;
+  equippedWings?: WingType;
+  onSelectWings?: (wings: WingType) => void;
   onReloadMap: () => void;
   isReloadingMap: boolean;
   onReturnToLobby: () => void;
@@ -29,8 +30,8 @@ export default function SettingsModal({
   onToggleGrid,
   debugColliders,
   onToggleDebugColliders,
-  hasWings = true,
-  onToggleWings,
+  equippedWings = 'angelic',
+  onSelectWings,
   onReloadMap,
   isReloadingMap,
   onReturnToLobby,
@@ -108,23 +109,50 @@ export default function SettingsModal({
 
           {/* 2. Visual Effects & Actions */}
           <div className="settings-two-columns">
-            {/* Visual Toggles */}
+            {/* Visual Toggles & Wings */}
             <div className="settings-column">
               <span className="settings-section-title">Efeitos & Equipamento</span>
               <div className="toggle-list">
-                {onToggleWings && (
-                  <label className="settings-toggle-item highlight-wings">
-                    <input
-                      type="checkbox"
-                      checked={hasWings}
-                      onChange={onToggleWings}
-                    />
-                    <div className="toggle-info">
-                      <strong>⚡ Asas Trovão (+45% Vel)</strong>
-                      <small>Asas celestiais animadas nas costas do personagem</small>
-                    </div>
-                  </label>
-                )}
+                {/* 3-Option Wings Selector */}
+                <div className="wings-selector-box">
+                  <div className="wings-selector-grid">
+                    <button
+                      type="button"
+                      className={`btn-wing-select angelic ${equippedWings === 'angelic' ? 'active' : ''}`}
+                      onClick={() => onSelectWings && onSelectWings('angelic')}
+                    >
+                      <span className="wing-ico">🪽</span>
+                      <div className="wing-select-meta">
+                        <strong>Asas Angelicais</strong>
+                        <small>+50% Vel • Sagrado</small>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`btn-wing-select thunder ${equippedWings === 'thunder' ? 'active' : ''}`}
+                      onClick={() => onSelectWings && onSelectWings('thunder')}
+                    >
+                      <span className="wing-ico">⚡</span>
+                      <div className="wing-select-meta">
+                        <strong>Asas Trovão</strong>
+                        <small>+45% Vel • Tempestade</small>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`btn-wing-select none ${equippedWings === 'none' ? 'active' : ''}`}
+                      onClick={() => onSelectWings && onSelectWings('none')}
+                    >
+                      <span className="wing-ico">❌</span>
+                      <div className="wing-select-meta">
+                        <strong>Desequipar</strong>
+                        <small>A pé (Vel Normal)</small>
+                      </div>
+                    </button>
+                  </div>
+                </div>
 
                 <label className="settings-toggle-item">
                   <input

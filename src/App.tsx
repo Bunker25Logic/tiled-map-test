@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import GameCanvas from './GameCanvas';
+import type { WingType } from './game/types';
 import type { TiledMap } from './game/types';
 import { ALL_SPELLS, type SpellDef } from './game/magic';
 import { PLAYABLE_CHARACTERS, type CharacterId } from './game/characters';
@@ -14,14 +15,13 @@ import SettingsModal from './components/SettingsModal';
 import OrientationLockModal from './components/OrientationLockModal';
 import './App.css';
 
-// Default starting 5-slot loadouts per character
+// Default starting 5-slot loadouts per character (featuring classic Tibia spells)
 const DEFAULT_CLASS_SPELLS: Record<CharacterId, string[]> = {
-  mark: ['firelion', 'lightning', 'iceshield', 'whirlwind', 'sparkling'],
-  archer: ['floral', 'lightning', 'sparkling', 'ancient', 'snakebite'],
-  barbarian: ['whirlwind', 'turtleshell', 'stoneleaf', 'firelion', 'iceshield'],
-  magician: ['cosmic', 'arcanenova', 'lightning', 'abyssal', 'firelion'],
-  necromancer: ['snakebite', 'arcanegaze', 'spore', 'abyssal', 'astralshield'],
-  paladin: ['iceshield', 'astralshield', 'emerald', 'turtleshell', 'floral'],
+  luxio: ['tibia_flame_strike', 'tibia_energy_beam', 'tibia_ice_burst', 'tibia_holy_strike', 'tibia_death_strike'],
+  archer: ['tibia_holy_strike', 'tibia_terra_strike', 'tibia_ice_burst', 'tibia_energy_beam', 'snakebite'],
+  magician: ['tibia_energy_beam', 'tibia_flame_strike', 'tibia_ice_burst', 'tibia_thunder_column', 'tibia_whirlwind'],
+  necromancer: ['tibia_death_strike', 'tibia_terra_strike', 'tibia_flame_strike', 'tibia_ice_burst', 'tibia_thunder_column'],
+  paladin: ['tibia_holy_strike', 'tibia_thunder_column', 'tibia_ice_burst', 'tibia_energy_beam', 'tibia_terra_strike'],
 };
 
 export default function App() {
@@ -30,7 +30,7 @@ export default function App() {
 
   // Selected Zone & Character
   const [currentZoneId, setCurrentZoneId] = useState<string>('map1');
-  const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId>('mark');
+  const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId>('luxio');
   const [initialSpawnCoords, setInitialSpawnCoords] = useState<{ x: number; y: number } | null>(null);
   const [mapData, setMapData] = useState<TiledMap | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +40,7 @@ export default function App() {
   const [enableParticles, setEnableParticles] = useState<boolean>(true);
   const [debugColliders, setDebugColliders] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(false);
-  const [hasWings, setHasWings] = useState<boolean>(true); // Equipamento: Asas Trovão (+45% velocidade)
+  const [equippedWings, setEquippedWings] = useState<WingType>('angelic');
 
   // Modals State
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
@@ -48,7 +48,7 @@ export default function App() {
 
   // 5 Active Equipped Spells
   const [equippedSpellIds, setEquippedSpellIds] = useState<string[]>(
-    DEFAULT_CLASS_SPELLS['mark']
+    DEFAULT_CLASS_SPELLS['luxio']
   );
 
   // Player live coords report
@@ -58,9 +58,13 @@ export default function App() {
   const [activeCastId, setActiveCastId] = useState<string | null>(null);
 
   // Update starting spells when character changes in lobby
+  const handleCycleWings = () => {
+    setEquippedWings((cur) => (cur === 'angelic' ? 'thunder' : cur === 'thunder' ? 'none' : 'angelic'));
+  };
+
   const handleSelectCharacter = (charId: CharacterId) => {
     setSelectedCharacterId(charId);
-    setEquippedSpellIds(DEFAULT_CLASS_SPELLS[charId] || DEFAULT_CLASS_SPELLS['mark']);
+    setEquippedSpellIds(DEFAULT_CLASS_SPELLS[charId] || DEFAULT_CLASS_SPELLS['luxio']);
   };
 
   useEffect(() => {
@@ -212,12 +216,16 @@ export default function App() {
         {/* Header Right: Wings, Spellbook & Settings */}
         <div className="header-right">
           <button
-            className={`btn-header-action btn-wings ${hasWings ? 'active' : ''}`}
-            onClick={() => setHasWings(!hasWings)}
-            title="Equipar / Desequipar Asas Trovão (+45% Velocidade)"
+            className={`btn-header-action btn-wings ${equippedWings}`}
+            onClick={handleCycleWings}
+            title="Trocar Equipamento de Asas (Angelicais / Trovão / Desequipar)"
           >
-            <span className="header-btn-icon">⚡</span>
-            <span className="header-btn-text">{hasWings ? 'Asas ON' : 'Asas OFF'}</span>
+            <span className="header-btn-icon">
+              {equippedWings === 'angelic' ? '🪽' : equippedWings === 'thunder' ? '⚡' : '❌'}
+            </span>
+            <span className="header-btn-text">
+              {equippedWings === 'angelic' ? 'Asas Angelicais' : equippedWings === 'thunder' ? 'Asas Trovão' : 'Sem Asas'}
+            </span>
           </button>
 
           <button
@@ -251,7 +259,7 @@ export default function App() {
           enableParticles={enableParticles}
           debugColliders={debugColliders}
           showGrid={showGrid}
-          hasWings={hasWings}
+          equippedWings={equippedWings}
           onPlayerPosChange={handlePosChange}
           onZoneTransition={handleZoneTransition}
         />
@@ -357,8 +365,8 @@ export default function App() {
         onToggleGrid={() => setShowGrid((g) => !g)}
         debugColliders={debugColliders}
         onToggleDebugColliders={() => setDebugColliders((d) => !d)}
-        hasWings={hasWings}
-        onToggleWings={() => setHasWings((w) => !w)}
+        equippedWings={equippedWings}
+        onSelectWings={setEquippedWings}
         onReloadMap={handleReloadClick}
         isReloadingMap={isReloading}
         onReturnToLobby={() => setIsInLobby(true)}

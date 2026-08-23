@@ -17,7 +17,7 @@ export default function SpellbookModal({
   onCastPreview,
 }: SpellbookModalProps) {
   const [selectedSlot, setSelectedSlot] = useState<number>(0);
-  const [activeCategory, setActiveCategory] = useState<'all' | 'elemental' | 'arcane' | 'nature'>('all');
+  const [activeCategory, setActiveCategory] = useState<'all' | 'tibia' | 'elemental' | 'arcane' | 'nature'>('all');
 
   if (!isOpen) return null;
 
@@ -27,6 +27,11 @@ export default function SpellbookModal({
       : ALL_SPELLS.filter((s) => s.category === activeCategory);
 
   const activeSlotSpell = ALL_SPELLS.find((s) => s.id === equippedSpellIds[selectedSlot]);
+
+  const tibiaCount = ALL_SPELLS.filter((s) => s.category === 'tibia').length;
+  const elementalCount = ALL_SPELLS.filter((s) => s.category === 'elemental').length;
+  const arcaneCount = ALL_SPELLS.filter((s) => s.category === 'arcane').length;
+  const natureCount = ALL_SPELLS.filter((s) => s.category === 'nature').length;
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -84,22 +89,28 @@ export default function SpellbookModal({
               ✨ Todas ({ALL_SPELLS.length})
             </button>
             <button
+              className={`btn-cat ${activeCategory === 'tibia' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('tibia')}
+            >
+              ⚔️ Tibia Clássico ({tibiaCount})
+            </button>
+            <button
               className={`btn-cat ${activeCategory === 'elemental' ? 'active' : ''}`}
               onClick={() => setActiveCategory('elemental')}
             >
-              🔥 Elementais (10)
+              🔥 Elementais ({elementalCount})
             </button>
             <button
               className={`btn-cat ${activeCategory === 'arcane' ? 'active' : ''}`}
               onClick={() => setActiveCategory('arcane')}
             >
-              🔮 Arcanas (4)
+              🔮 Arcanas ({arcaneCount})
             </button>
             <button
               className={`btn-cat ${activeCategory === 'nature' ? 'active' : ''}`}
               onClick={() => setActiveCategory('nature')}
             >
-              🌿 Natureza (4)
+              🌿 Natureza ({natureCount})
             </button>
           </div>
         </div>

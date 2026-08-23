@@ -137,65 +137,40 @@ export function drawTileLayer(
  * Returns true if an object is a flat ground decal (flowers, ground moss, pebbles, grass tufts)
  * that should be rendered on the ground under characters.
  */
-function isGroundDecal(obj: TiledObject, layerName: string): boolean {
-  if (layerName === 'muros') return false; // Walls are always vertical standing obstacles
-  const w = obj.width || 32;
-  const h = obj.height || 32;
-  // Multi-tile structures (trees, big rocks, houses) are vertical obstacles
-  if (w > 32 || h > 32) return false;
-  // Single 32x32 tiles in decoracoes are flat ground decor
-  return true;
-}
+function isGroundDecal(obj: TiledObject, layerName: string, map: TiledMap): boolean {
+  if (layerName === 'muros') return false; // Walls layer is always vertical standing obstacles
+  const gid = cleanGid(obj.gid || 0);
+  const ts = getTilesetForGid(gid, map.tilesets);
 
-/**
- * Clusters vertically connected tiles (like a 2-tile tall wall segment: top piece + bottom piece)
- * at the same X column so they share the base sortY of that wall column,
- * while strictly preventing merging the north wall into the south wall across the entire house!
- */
-function clusterWallColumnObjects(objects: TiledObject[]): TiledObject[][] {
-  const clusters: TiledObject[][] = [];
-  const visited = new Set<number>();
-
-  for (let i = 0; i < objects.length; i++) {
-    if (visited.has(i)) continue;
-
-    const cluster: TiledObject[] = [objects[i]];
-    visited.add(i);
-
-    const queue: TiledObject[] = [objects[i]];
-    while (queue.length > 0) {
-      const curr = queue.shift()!;
-      const currMinY = curr.y - curr.height;
-      const currMaxY = curr.y;
-
-      for (let j = 0; j < objects.length; j++) {
-        if (visited.has(j)) continue;
-        const other = objects[j];
-        const otherMinY = other.y - other.height;
-        const otherMaxY = other.y;
-
-        // Only merge vertical column slices (tiles that stack directly on top of each other at same X column)
-        const sameColumn = Math.abs(curr.x - other.x) < 6;
-        const touchesVertically = !(currMaxY < otherMinY - 4 || currMinY > otherMaxY + 4);
-
-        if (sameColumn && touchesVertically) {
-          visited.add(j);
-          cluster.push(other);
-          queue.push(other);
-        }
-      }
-    }
-
-    clusters.push(cluster);
+  // Standing walls, doors, town structures are NEVER flat ground decals
+  if (
+    ts &&
+    (ts.name === 'otsp_walls_01' ||
+      ts.name === 'otsp_walls_02' ||
+      ts.name === 'otsp_doors_01' ||
+      ts.name === 'Nordberg')
+  ) {
+    return false;
   }
 
-  return clusters;
+  const w = obj.width || 32;
+  const h = obj.height || 32;
+  // Multi-tile structures (trees, big rocks, houses) are vertical standing obstacles
+  if (w > 32 || h > 32) return false;
+
+  // Roof / structural nature tiles (like chimney, roof trims) are standing objects
+  if (ts && ts.name === 'otsp_nature_01' && gid >= ts.firstgid + 300) {
+    return false;
+  }
+
+  // Small flowers, grass tufts, pebbles in decoracoes are flat ground decals
+  return true;
 }
 
 /**
  * Collects tile objects from an objectgroup layer to be depth-sorted.
  * - Flat ground decor (flowers, grass tufts, pebbles) has sortY = -Infinity (rendered on ground under player).
- * - Wall/building columns are clustered by vertical column slices so the north wall does not cut off the player inside the house!
+ * - Standing wall/nature/roof objects are sorted by their exact baseline Y (obj.y + offsetY).
  */
 export function getLayerRenderables(
   layer: TiledLayer,
@@ -227,7 +202,7 @@ export function getLayerRenderables(
   const standingObjects: TiledObject[] = [];
 
   for (const obj of validObjects) {
-    if (isGroundDecal(obj, layer.name)) {
+    if (isGroundDecal(obj, layer.name, map)) {
       groundDecals.push(obj);
     } else {
       standingObjects.push(obj);
@@ -267,78 +242,38 @@ export function getLayerRenderables(
     });
   }
 
-  // 2. Render Standing Objects (Walls, roofs, trees, large rocks) with vertical column depth Y-sorting
-  if (standingObjects.length > 1) {
-    const clusters = clusterWallColumnObjects(standingObjects);
-
-    for (const cluster of clusters) {
-      const minX = Math.min(...cluster.map((o) => o.x)) + offsetX;
-      const maxX = Math.max(...cluster.map((o) => o.x + o.width)) + offsetX;
-      const minY = Math.min(...cluster.map((o) => o.y - o.height)) + offsetY;
-      const maxY = Math.max(...cluster.map((o) => o.y)) + offsetY;
-
-      // Viewport culling for entire cluster
-      if (maxX < viewLeft || minX > viewRight || maxY < viewTop || minY > viewBottom) {
-        continue;
-      }
-
-      // Sort tiles within cluster from top to bottom
-      const sortedTiles = [...cluster].sort((a, b) => a.y - b.y);
-
-      // The entire wall column is anchored at its lowest point (ground base of this specific column)
-      const clusterSortY = maxY;
-
-      renderables.push({
-        type: 'tiled-obj',
-        sortY: clusterSortY,
-        draw: (ctx: CanvasRenderingContext2D) => {
-          for (const obj of sortedTiles) {
-            const activeGid = animMap ? getAnimatedGid(obj.gid!, animTimeMs, animMap) : obj.gid!;
-            const tileset = getTilesetForGid(activeGid, map.tilesets);
-            if (!tileset) continue;
-            const img = images[tileset.name];
-            if (!img) continue;
-
-            const worldX = obj.x + offsetX;
-            const worldY = obj.y - obj.height + offsetY;
-            const { sx, sy, sw, sh } = getTileCoords(activeGid, tileset);
-            const screenX = worldX - cameraX;
-            const screenY = worldY - cameraY;
-
-            ctx.drawImage(img, sx, sy, sw, sh, screenX, screenY, obj.width, obj.height);
-          }
-        },
-      });
-    }
-  } else if (standingObjects.length === 1) {
-    const obj = standingObjects[0];
+  // 2. Render Standing Objects (Walls, roofs, trees, large rocks) sorted by their base Y
+  for (const obj of standingObjects) {
     const worldX = obj.x + offsetX;
     const worldY = obj.y - obj.height + offsetY;
     const sortY = obj.y + offsetY;
 
     if (
-      worldX + obj.width >= viewLeft &&
-      worldX <= viewRight &&
-      worldY + obj.height >= viewTop &&
-      worldY <= viewBottom
+      worldX + obj.width < viewLeft ||
+      worldX > viewRight ||
+      worldY + obj.height < viewTop ||
+      worldY > viewBottom
     ) {
-      const activeGid = animMap ? getAnimatedGid(obj.gid!, animTimeMs, animMap) : obj.gid!;
-      const tileset = getTilesetForGid(activeGid, map.tilesets);
-      if (tileset && images[tileset.name]) {
-        const img = images[tileset.name];
-        const { sx, sy, sw, sh } = getTileCoords(activeGid, tileset);
-
-        renderables.push({
-          type: 'tiled-obj',
-          sortY,
-          draw: (ctx: CanvasRenderingContext2D) => {
-            const screenX = worldX - cameraX;
-            const screenY = worldY - cameraY;
-            ctx.drawImage(img, sx, sy, sw, sh, screenX, screenY, obj.width, obj.height);
-          },
-        });
-      }
+      continue;
     }
+
+    const activeGid = animMap ? getAnimatedGid(obj.gid!, animTimeMs, animMap) : obj.gid!;
+    const tileset = getTilesetForGid(activeGid, map.tilesets);
+    if (!tileset) continue;
+    const img = images[tileset.name];
+    if (!img) continue;
+
+    const { sx, sy, sw, sh } = getTileCoords(activeGid, tileset);
+
+    renderables.push({
+      type: 'tiled-obj',
+      sortY,
+      draw: (ctx: CanvasRenderingContext2D) => {
+        const screenX = worldX - cameraX;
+        const screenY = worldY - cameraY;
+        ctx.drawImage(img, sx, sy, sw, sh, screenX, screenY, obj.width, obj.height);
+      },
+    });
   }
 
   return renderables;

@@ -1,11 +1,18 @@
 import type { Direction } from './types';
 
-export type SpellAnimType = 'sheet' | 'sequence';
+export type SpellAnimType = 'sheet' | 'sequence' | 'custom_frames';
+
+export interface SpellFrameCoord {
+  sx: number;
+  sy: number;
+  sw: number;
+  sh: number;
+}
 
 export interface SpellDef {
   id: string;
   name: string;
-  category: 'elemental' | 'arcane' | 'nature';
+  category: 'elemental' | 'arcane' | 'nature' | 'tibia';
   key?: string;
   icon: string;
   color: string;
@@ -19,6 +26,9 @@ export interface SpellDef {
   frameH?: number;
   // For sequence
   frameKeys?: string[];
+  // For custom_frames (e.g. magics t.webp)
+  customFrames?: SpellFrameCoord[];
+  imageKey?: string;
   // Display & sizing
   renderW: number;
   renderH: number;
@@ -39,6 +49,220 @@ export interface SpellDef {
 }
 
 export const ALL_SPELLS: SpellDef[] = [
+  // ─── Clássicas Magias do Tibia (magics t.webp) ──────────────────────────────
+  {
+    id: 'tibia_ice_burst',
+    name: 'Ice Burst (Exevo Frigo)',
+    category: 'tibia',
+    icon: '❄️',
+    color: '#38bdf8',
+    description: 'Explosão esférica pulsante de pura energia gélida e gelo',
+    animType: 'custom_frames',
+    imageKey: 'magics_t',
+    renderW: 72,
+    renderH: 72,
+    fps: 16,
+    spawnOrigin: 'ground',
+    anchorX: () => 0.5,
+    anchorY: () => 0.5,
+    spawnOffsetDist: 34,
+    customFrames: [
+      { sx: 104, sy: 8, sw: 18, sh: 20 },
+      { sx: 132, sy: 6, sw: 22, sh: 24 },
+      { sx: 160, sy: 4, sw: 28, sh: 30 },
+      { sx: 194, sy: 2, sw: 32, sh: 32 },
+      { sx: 228, sy: 0, sw: 36, sh: 36 },
+      { sx: 268, sy: 2, sw: 32, sh: 32 },
+      { sx: 304, sy: 4, sw: 28, sh: 28 },
+      { sx: 336, sy: 6, sw: 22, sh: 24 },
+      { sx: 366, sy: 8, sw: 16, sh: 20 },
+    ],
+  },
+  {
+    id: 'tibia_holy_strike',
+    name: 'Divine Missile (Exori San)',
+    category: 'tibia',
+    icon: '✨',
+    color: '#facc15',
+    description: 'Lança sagrada de luz divina arremessada contra o alvo',
+    animType: 'custom_frames',
+    imageKey: 'magics_t',
+    renderW: 54,
+    renderH: 54,
+    fps: 18,
+    projectileSpeed: 175,
+    spawnOrigin: 'torso',
+    anchorX: () => 0.5,
+    anchorY: () => 0.5,
+    spawnOffsetDist: 18,
+    customFrames: [
+      { sx: 395, sy: 14, sw: 14, sh: 14 },
+      { sx: 426, sy: 12, sw: 16, sh: 16 },
+      { sx: 457, sy: 10, sw: 20, sh: 20 },
+      { sx: 488, sy: 6, sw: 24, sh: 24 },
+      { sx: 480, sy: 32, sw: 32, sh: 32 },
+    ],
+  },
+  {
+    id: 'tibia_whirlwind',
+    name: 'Ice Vortex (Mas Frigo)',
+    category: 'tibia',
+    icon: '🌪️',
+    color: '#67e8f9',
+    description: 'Vórtice ciclônico de ventos congelantes que se expande',
+    animType: 'custom_frames',
+    imageKey: 'magics_t',
+    renderW: 76,
+    renderH: 76,
+    fps: 16,
+    projectileSpeed: 80,
+    spawnOrigin: 'ground',
+    anchorX: () => 0.5,
+    anchorY: () => 0.65,
+    spawnOffsetDist: 22,
+    customFrames: [
+      { sx: 48, sy: 84, sw: 18, sh: 14 },
+      { sx: 108, sy: 74, sw: 18, sh: 18 },
+      { sx: 170, sy: 68, sw: 22, sh: 22 },
+      { sx: 226, sy: 54, sw: 30, sh: 34 },
+      { sx: 282, sy: 52, sw: 36, sh: 38 },
+      { sx: 340, sy: 50, sw: 42, sh: 42 },
+      { sx: 402, sy: 48, sw: 46, sh: 46 },
+    ],
+  },
+  {
+    id: 'tibia_death_strike',
+    name: 'Sudden Death (SD / Exori Mort)',
+    category: 'tibia',
+    icon: '💀',
+    color: '#c084fc',
+    description: 'Projétil devastador de energia sombria com explosão de morte',
+    animType: 'custom_frames',
+    imageKey: 'magics_t',
+    renderW: 60,
+    renderH: 60,
+    fps: 20,
+    projectileSpeed: 160,
+    spawnOrigin: 'torso',
+    anchorX: () => 0.5,
+    anchorY: () => 0.5,
+    spawnOffsetDist: 18,
+    customFrames: [
+      { sx: 10, sy: 105, sw: 18, sh: 18 },
+      { sx: 38, sy: 100, sw: 22, sh: 24 },
+      { sx: 68, sy: 96, sw: 24, sh: 26 },
+      { sx: 98, sy: 92, sw: 28, sh: 30 },
+      { sx: 128, sy: 88, sw: 34, sh: 36 },
+      { sx: 10, sy: 135, sw: 18, sh: 18 },
+      { sx: 42, sy: 135, sw: 20, sh: 20 },
+      { sx: 72, sy: 132, sw: 22, sh: 24 },
+      { sx: 102, sy: 128, sw: 26, sh: 28 },
+      { sx: 132, sy: 124, sw: 32, sh: 34 },
+    ],
+  },
+  {
+    id: 'tibia_flame_strike',
+    name: 'Flame Strike (Exori Flam)',
+    category: 'tibia',
+    icon: '🔥',
+    color: '#f97316',
+    description: 'Erupção instantânea de bolas de fogo e brasas incandescentes',
+    animType: 'custom_frames',
+    imageKey: 'magics_t',
+    renderW: 56,
+    renderH: 56,
+    fps: 18,
+    spawnOrigin: 'ground',
+    anchorX: () => 0.5,
+    anchorY: () => 0.60,
+    spawnOffsetDist: 34,
+    customFrames: [
+      { sx: 165, sy: 100, sw: 20, sh: 22 },
+      { sx: 198, sy: 98, sw: 22, sh: 24 },
+      { sx: 228, sy: 94, sw: 24, sh: 26 },
+      { sx: 260, sy: 92, sw: 26, sh: 28 },
+      { sx: 295, sy: 92, sw: 24, sh: 28 },
+      { sx: 165, sy: 130, sw: 22, sh: 24 },
+      { sx: 198, sy: 132, sw: 20, sh: 20 },
+      { sx: 232, sy: 135, sw: 18, sh: 16 },
+      { sx: 268, sy: 138, sw: 14, sh: 12 },
+    ],
+  },
+  {
+    id: 'tibia_terra_strike',
+    name: 'Terra Monolith (Exori Tera)',
+    category: 'tibia',
+    icon: '🌿',
+    color: '#22c55e',
+    description: 'Pilar maciço de rocha e raízes terrestres que brota do chão',
+    animType: 'custom_frames',
+    imageKey: 'magics_t',
+    renderW: 58,
+    renderH: 80,
+    fps: 15,
+    spawnOrigin: 'ground',
+    anchorX: () => 0.5,
+    anchorY: () => 0.85,
+    spawnOffsetDist: 34,
+    customFrames: [
+      { sx: 364, sy: 102, sw: 18, sh: 22 },
+      { sx: 422, sy: 98, sw: 24, sh: 28 },
+      { sx: 480, sy: 94, sw: 28, sh: 34 },
+      { sx: 348, sy: 136, sw: 34, sh: 48 },
+      { sx: 408, sy: 132, sw: 38, sh: 54 },
+      { sx: 466, sy: 126, sw: 44, sh: 62 },
+    ],
+  },
+  {
+    id: 'tibia_energy_beam',
+    name: 'Energy Wave (Exevo Vis Hur)',
+    category: 'tibia',
+    icon: '⚡',
+    color: '#60a5fa',
+    description: 'Raio perfurante horizontal de pura eletricidade concentrada',
+    animType: 'custom_frames',
+    imageKey: 'magics_t',
+    renderW: 150,
+    renderH: 42,
+    fps: 16,
+    isDirectional: true,
+    flipOnRight: true,
+    spawnOrigin: 'torso',
+    anchorX: (dir) => (dir === 'right' ? 0.1 : dir === 'left' ? 0.9 : 0.5),
+    anchorY: () => 0.5,
+    spawnOffsetDist: 24,
+    customFrames: [
+      { sx: 18, sy: 160, sw: 36, sh: 30 },
+      { sx: 114, sy: 164, sw: 68, sh: 26 },
+      { sx: 90, sy: 194, sw: 92, sh: 28 },
+      { sx: 58, sy: 224, sw: 124, sh: 30 },
+      { sx: 24, sy: 254, sw: 158, sh: 32 },
+    ],
+  },
+  {
+    id: 'tibia_thunder_column',
+    name: 'Thunder Pillar (Exevo Vis Lux)',
+    category: 'tibia',
+    icon: '🌩️',
+    color: '#38bdf8',
+    description: 'Gigantesco relâmpago divino que desce dos céus atingindo o solo',
+    animType: 'custom_frames',
+    imageKey: 'magics_t',
+    renderW: 46,
+    renderH: 140,
+    fps: 18,
+    spawnOrigin: 'ground',
+    anchorX: () => 0.5,
+    anchorY: () => 0.90,
+    spawnOffsetDist: 34,
+    customFrames: [
+      { sx: 195, sy: 240, sw: 26, sh: 44 },
+      { sx: 230, sy: 200, sw: 24, sh: 84 },
+      { sx: 260, sy: 175, sw: 26, sh: 110 },
+      { sx: 290, sy: 150, sw: 28, sh: 135 },
+      { sx: 325, sy: 125, sw: 28, sh: 160 },
+    ],
+  },
   // ─── Elemental Spells ──────────────────────────────────────────────────────
   {
     id: 'firelion',
@@ -466,6 +690,7 @@ export const ALL_SPELLS: SpellDef[] = [
 ];
 
 export const ALL_MAGIC_IMAGE_PATHS: Record<string, string> = {
+  magics_t: '/assets/magic-effects/magics t.webp',
   // Spritesheets
   firelion_up: '/assets/magic-effects/firelion_up.png',
   firelion_right: '/assets/magic-effects/firelion_right.png',
@@ -582,6 +807,8 @@ export class ActiveSpell {
     this.attachToCaster = Boolean(def.attachToCaster);
     if (def.getImageKey) {
       this.imageKey = def.getImageKey(dir);
+    } else if (def.imageKey) {
+      this.imageKey = def.imageKey;
     }
   }
 
@@ -599,7 +826,9 @@ export class ActiveSpell {
     this.timer += dt;
     const frameDuration = 1 / this.def.fps;
     const totalFrames =
-      this.def.animType === 'sequence'
+      this.def.animType === 'custom_frames'
+        ? this.def.customFrames?.length || 1
+        : this.def.animType === 'sequence'
         ? this.def.frameKeys?.length || 1
         : this.def.totalFrames || 1;
 
@@ -621,6 +850,9 @@ export class ActiveSpell {
   }
 
   getCurrentImageKey(): string {
+    if (this.def.animType === 'custom_frames') {
+      return this.def.imageKey || 'magics_t';
+    }
     if (this.def.animType === 'sequence') {
       const keys = this.def.frameKeys || [];
       return keys[Math.min(this.frame, keys.length - 1)] || '';
@@ -634,3 +866,4 @@ export class ActiveSpell {
     return { ax, ay };
   }
 }
+

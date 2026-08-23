@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { TiledMap, Direction, Rect } from './game/types';
+import type { TiledMap, Direction, Rect, WingType } from './game/types';
 import { buildCollisionRects, moveAndSlide, buildTileAnimationMap } from './game/mapUtils';
 import { SpriteAnimator, FRAME_SIZE } from './game/sprite';
 import {
@@ -47,33 +47,55 @@ const HITBOX_H = 12;
 // Walk speed (world pixels per second)
 const MOVE_SPEED = 120;
 
-// ─── CONFIGURAÇÃO DAS ASAS TROVÃO (Ajuste Direto de Posição e Escala) ───────
-// Idêntico ao padrão do projeto survive-rpg-bunker:
+// ─── CONFIGURAÇÃO DAS ASAS (Ajuste Direto de Posição, Escala, Rotação e Recorte) ───
+// - sx, sy, sw, sh: coordenadas exatas do recorte no spritesheet original
 // - offX: deslocamento horizontal (+ = direita, - = esquerda)
 // - offY: deslocamento vertical (+ = desce, - = sobe nas costas)
-// - baseW / baseH: tamanho base da asa em pixels
+// - baseW / baseH: tamanho base da asa em pixels na tela
 // - scale: multiplicador geral de tamanho (1.0 = normal, 1.2 = maior)
-// - frame: índice do spritesheet (0: Direita, 1: Esquerda, 2: Frente/Baixo, 3: Costas/Cima)
-const WINGS_THUNDER_CONFIG: Record<Direction, {
-  frame: number;
+// - rot: ROTAÇÃO EM GRAUS (ex: 0 = reto, 15 = inclina direita, -15 = inclina esquerda)
+// - behind: PROFUNDIDADE DA ASA (true = ATRÁS / false = NA FRENTE)
+interface WingDirectionConfig {
+  sx: number;
+  sy: number;
+  sw: number;
+  sh: number;
   offX: number;
   offY: number;
   baseW: number;
   baseH: number;
   scale: number;
+  rot: number;
   behind: boolean;
-}> = {
+}
+
+const WINGS_ANGELIC_CONFIG: Record<Direction, WingDirectionConfig> = {
+  // 1. Olhando para Frente (Baixo) - Par de Asas Abertas apontadas para baixo (Quadro inferior esquerdo)
+  down:  { sx: 6, sy: 175, sw: 355, sh: 176, offX: -4, offY: -9, baseW: 68, baseH: 34, scale: 1.0, rot: 0, behind: true },
+
+  // 2. Olhando para Cima (Costas) - Par de Asas Abertas majestosas para cima (Quadro superior esquerdo)
+  up:    { sx: 8, sy: -15,   sw: 355, sh: 175, offX: -3, offY: -12, baseW: 68, baseH: 34, scale: 1.0, rot: 0, behind: false },
+
+  // 3. Olhando para Esquerda - Asa de Perfil Esquerda (Coluna 3 superior)
+  left:  { sx: 533, sy: 0, sw: 178, sh: 175, offX: 14, offY: -6, baseW: 56, baseH: 28, scale: 1.0, rot: -13, behind: false },
+
+  // 4. Olhando para Direita - Asa de Perfil Direita (Coluna 4 superior)
+  right: { sx: 355, sy: 0, sw: 178, sh: 175, offX: -21, offY: -6, baseW: 48, baseH: 28, scale: 1.0, rot: 0, behind: true },
+};
+
+// ─── CONFIGURAÇÃO DAS ASAS TROVÃO ───────
+const WINGS_THUNDER_CONFIG: Record<Direction, WingDirectionConfig> = {
   // 1. Olhando para Frente (Baixo)
-  down:  { frame: 2, offX: 3,  offY: -10, baseW: 66, baseH: 38, scale: 1.0, behind: true },
+  down:  { sx: 960,  sy: 0, sw: 480, sh: 509, offX: 3,  offY: -10, baseW: 66, baseH: 38, scale: 1.0, rot: 0, behind: true },
 
   // 2. Olhando para Cima (Costas)
-  up:    { frame: 3, offX: -1,  offY: -8, baseW: 56, baseH: 58, scale: 1.0, behind: false },
+  up:    { sx: 1440, sy: 0, sw: 480, sh: 509, offX: -1, offY: -8,  baseW: 56, baseH: 58, scale: 1.0, rot: 0, behind: false },
 
   // 3. Olhando para a Esquerda
-  left:  { frame: 1, offX: 15,  offY: -14, baseW: 46, baseH: 48, scale: 1.0, behind: true },
+  left:  { sx: 480,  sy: 0, sw: 480, sh: 509, offX: 15, offY: -14, baseW: 46, baseH: 48, scale: 1.0, rot: 0, behind: true },
 
   // 4. Olhando para a Direita
-  right: { frame: 0, offX: -23, offY: -16, baseW: 46, baseH: 48, scale: 1.0, behind: true },
+  right: { sx: 0,    sy: 0, sw: 480, sh: 509, offX: -23, offY: -16, baseW: 46, baseH: 48, scale: 1.0, rot: 0, behind: true },
 };
 
 /**
@@ -81,7 +103,7 @@ const WINGS_THUNDER_CONFIG: Record<Direction, {
  * - Mobile / Touch devices / Narrow screens (<=768px or tablet touch): 1.5x zoom
  * - Desktop / PC: 1.0x (Tibia Standard 1.0)
  */
-export function getResponsiveCameraZoom(): number {
+function getResponsiveCameraZoom(): number {
   if (typeof window === 'undefined') return 1.0;
   const isMobile =
     window.innerWidth <= 768 ||
@@ -100,6 +122,7 @@ interface GameCanvasProps {
   debugColliders: boolean;
   showGrid: boolean;
   hasWings?: boolean;
+  equippedWings?: WingType;
   onPlayerPosChange?: (x: number, y: number, tileX: number, tileY: number) => void;
   onZoneTransition?: (targetMapId: string, spawnX: number, spawnY: number) => void;
   onRequestSpellCast?: (callback: (spellId: string) => void) => void;
@@ -115,6 +138,7 @@ export default function GameCanvas({
   debugColliders,
   showGrid,
   hasWings = true,
+  equippedWings = "angelic",
   onPlayerPosChange,
   onZoneTransition,
 }: GameCanvasProps) {
@@ -158,6 +182,7 @@ export default function GameCanvas({
     debugColliders,
     showGrid,
     hasWings,
+    equippedWings,
     onPlayerPosChange,
     onZoneTransition,
   });
@@ -170,9 +195,10 @@ export default function GameCanvas({
     propsRef.current.debugColliders = debugColliders;
     propsRef.current.showGrid = showGrid;
     propsRef.current.hasWings = hasWings;
+    propsRef.current.equippedWings = equippedWings;
     propsRef.current.onPlayerPosChange = onPlayerPosChange;
     propsRef.current.onZoneTransition = onZoneTransition;
-  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, hasWings, onPlayerPosChange, onZoneTransition]);
+  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, hasWings, equippedWings, onPlayerPosChange, onZoneTransition]);
 
   // Update particles on map change
   useEffect(() => {
@@ -250,7 +276,7 @@ export default function GameCanvas({
           }
 
           if (!spellDef.attachToCaster) {
-            const offset = spellDef.spawnOffsetDist || 0;
+            const offset = spellDef.spawnOffsetDist !== undefined ? spellDef.spawnOffsetDist : 32;
             if (dir === 'up') spawnY -= offset;
             else if (dir === 'down') spawnY += offset;
             else if (dir === 'left') spawnX -= offset;
@@ -441,7 +467,8 @@ export default function GameCanvas({
 
           // ── Player Physics & Collision Resolution ───────────────────────
           if (isMoving && animator.state !== 'dead') {
-            const speedMultiplier = propsRef.current.hasWings ? 1.45 : 1.0;
+            const activeWing = propsRef.current.equippedWings ?? 'none';
+            const speedMultiplier = activeWing === 'angelic' ? 1.50 : activeWing === 'thunder' ? 1.45 : 1.0;
             const dx = moveX * MOVE_SPEED * speedMultiplier * dt;
             const dy = moveY * MOVE_SPEED * speedMultiplier * dt;
 
@@ -728,7 +755,7 @@ export default function GameCanvas({
           }
 
           // Add Player to depth sorting
-          const curCharId = propsRef.current.selectedCharacterId || 'mark';
+          const curCharId = propsRef.current.selectedCharacterId || 'luxio';
           const curCharDef = PLAYABLE_CHARACTERS.find((c) => c.id === curCharId) || PLAYABLE_CHARACTERS[0];
           const playerFeetSortY = playerRef.current.y + HITBOX_H;
 
@@ -757,57 +784,73 @@ export default function GameCanvas({
               renderCtx.fill();
               renderCtx.restore();
 
-              // Helper para desenhar as Asas Trovão
-              const drawWings = () => {
-                const wingsImg = cached.items['wings_thunder'];
-                if (!propsRef.current.hasWings || !wingsImg) return;
+              // Helper para desenhar as Asas Equipadas (Angelicais ou Trovão)
+              const currentEquippedWings = propsRef.current.equippedWings ?? 'none';
+              const isAngelic = currentEquippedWings === 'angelic';
+              const isThunder = currentEquippedWings === 'thunder';
+              const wingsImg = isAngelic ? cached.items['wings_angelic'] : isThunder ? cached.items['wings_thunder'] : null;
 
-                const dir = animator.direction;
-                const cfg = WINGS_THUNDER_CONFIG[dir] || WINGS_THUNDER_CONFIG.down;
+              const currentDirection = animator.direction;
+              const wingCfg = isAngelic
+                ? (WINGS_ANGELIC_CONFIG[currentDirection] || WINGS_ANGELIC_CONFIG.down)
+                : (WINGS_THUNDER_CONFIG[currentDirection] || WINGS_THUNDER_CONFIG.down);
+
+              const drawWings = () => {
+                if (!wingsImg || currentEquippedWings === 'none') return;
+
+                const cfg = wingCfg;
 
                 // Animação de bater asas (flap) e flutuação (bob)
                 const isPlayerMoving = animator.state === 'walk';
-                const flap = Math.sin(now * (isPlayerMoving ? 0.022 : 0.006)) * (isPlayerMoving ? 0.14 : 0.04);
+                const flap = Math.sin(now * (isPlayerMoving ? 0.020 : 0.005)) * (isPlayerMoving ? 0.14 : 0.04);
                 const bob = isPlayerMoving ? Math.abs(Math.cos(now * 0.012)) * 2 : Math.sin(now * 0.004) * 1.5;
 
-                // Dimensões do spritesheet original (4 frames de 480x509)
-                const frameW = 480;
-                const frameH = 509;
-                const sx = cfg.frame * frameW;
-                const sy = 0;
+                // Dimensões e coordenadas do spritesheet original
+                const sx = cfg.sx;
+                const sy = cfg.sy;
+                const sw = cfg.sw;
+                const sh = cfg.sh;
 
                 // Tamanho final na tela (aplicando escala e flap)
                 const wingDestW = cfg.baseW * cfg.scale * (1 + flap);
                 const wingDestH = cfg.baseH * cfg.scale;
 
-                // Posição final na tela (Eixo X e Eixo Y)
-                const wingCenterX = px + HITBOX_W / 2 - camX;
-                const wingDrawX = wingCenterX - wingDestW / 2 + cfg.offX;
-                const wingTopY = py + HITBOX_H - curCharDef.feetY + cfg.offY - bob - camY;
+                // Posição final e Centro de Rotação (Eixo X e Eixo Y)
+                const wingCenterX = px + HITBOX_W / 2 - camX + cfg.offX;
+                const wingCenterY = py + HITBOX_H - curCharDef.feetY + cfg.offY - bob - camY + wingDestH / 2;
 
                 renderCtx.save();
-                // Aura celestial sutil
-                renderCtx.shadowColor = 'rgba(56, 189, 248, 0.6)';
-                renderCtx.shadowBlur = 6;
+                renderCtx.translate(wingCenterX, wingCenterY);
+                if (cfg.rot) {
+                  renderCtx.rotate((cfg.rot * Math.PI) / 180);
+                }
+
+                if (isAngelic) {
+                  // Aura Divina Sagrada Dourada
+                  renderCtx.shadowColor = 'rgba(250, 204, 21, 0.75)';
+                  renderCtx.shadowBlur = 8;
+                } else {
+                  // Aura Elétrica Tempestuosa Azul
+                  renderCtx.shadowColor = 'rgba(56, 189, 248, 0.65)';
+                  renderCtx.shadowBlur = 6;
+                }
+
                 renderCtx.drawImage(
                   wingsImg,
                   sx,
                   sy,
-                  frameW,
-                  frameH,
-                  wingDrawX,
-                  wingTopY,
+                  sw,
+                  sh,
+                  -wingDestW / 2,
+                  -wingDestH / 2,
                   wingDestW,
                   wingDestH
                 );
                 renderCtx.restore();
               };
 
-              const currentDirection = animator.direction;
-              const wingCfg = WINGS_THUNDER_CONFIG[currentDirection] || WINGS_THUNDER_CONFIG.down;
-
               // PROFUNDIDADE: Se behind for TRUE -> Desenha a asa ATRÁS do corpo do personagem
-              if (wingCfg.behind) {
+              if (wingCfg.behind && currentEquippedWings !== 'none') {
                 drawWings();
               }
 
@@ -864,7 +907,7 @@ export default function GameCanvas({
               }
 
               // PROFUNDIDADE: Se behind for FALSE -> Desenha a asa NA FRENTE do corpo do personagem
-              if (!wingCfg.behind) {
+              if (!wingCfg.behind && currentEquippedWings !== 'none') {
                 drawWings();
               }
 
@@ -909,7 +952,21 @@ export default function GameCanvas({
                 const localDrawX = -spell.def.renderW * ax;
                 const localDrawY = -spell.def.renderH * ay;
 
-                if (spell.def.animType === 'sheet') {
+                if (spell.def.animType === 'custom_frames' && spell.def.customFrames) {
+                  const frameIdx = Math.min(spell.frame, spell.def.customFrames.length - 1);
+                  const f = spell.def.customFrames[frameIdx];
+                  renderCtx.drawImage(
+                    sprImg,
+                    f.sx,
+                    f.sy,
+                    f.sw,
+                    f.sh,
+                    localDrawX,
+                    localDrawY,
+                    spell.def.renderW,
+                    spell.def.renderH
+                  );
+                } else if (spell.def.animType === 'sheet') {
                   const { col, row } = spell.getFrameCoords();
                   const frameW = spell.def.frameW || 128;
                   const frameH = spell.def.frameH || 128;

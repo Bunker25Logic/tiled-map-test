@@ -10,6 +10,16 @@ export const TILESET_ASSETS: Record<string, string> = {
   otsp_walls_01: '/assets/tiles/otsp_walls_01.png',
   otsp_walls_02: '/assets/tiles/otsp_walls_02.png',
   otsp_doors_01: '/assets/tiles/otsp_doors_01.png',
+  otsp_town_01: '/assets/tiles/otsp_town_01.png',
+  otsp_misc_01: '/assets/tiles/otsp_misc_01.png',
+  Daniel: '/assets/tiles/Daniel.png',
+  Leshrot: '/assets/tiles/Leshrot.png',
+  ElderDark: '/assets/tiles/ElderDark.png',
+  Madarada: '/assets/tiles/Madarada.png',
+  Nordberg: '/assets/tiles/Nordberg.png',
+  Somni: '/assets/tiles/Somni.png',
+  Way20: '/assets/tiles/Way20.png',
+  wesleyt10: '/assets/tiles/wesleyt10.png',
 };
 
 export interface GameAssetCache {
@@ -73,21 +83,30 @@ export async function preloadAllGameAssets(): Promise<GameAssetCache> {
       }
     });
 
-    // 5. Load equipment item textures (Thunder Wings)
-    const itemPromise = loadChromaKeyImage('/assets/itens/asas trovao.webp')
-      .then((img) => {
-        globalCache.items['wings_thunder'] = img;
-      })
-      .catch((err) => {
-        console.warn('Failed loading thunder wings:', err);
-      });
+    // 5. Load equipment item textures (Thunder Wings + Angelic Wings)
+    const itemPromises = [
+      loadChromaKeyImage('/assets/itens/asas trovao.webp')
+        .then((img) => {
+          globalCache.items['wings_thunder'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading thunder wings:', err);
+        }),
+      loadChromaKeyImage('/assets/itens/asas angelicais.webp')
+        .then((img) => {
+          globalCache.items['wings_angelic'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading angelic wings:', err);
+        }),
+    ];
 
     await Promise.all([
       ...tilesetPromises,
       charPromise,
       monsterPromise,
       ...magicPromises,
-      itemPromise,
+      ...itemPromises,
     ]);
 
     globalCache.isLoaded = true;

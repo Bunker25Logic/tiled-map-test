@@ -21,47 +21,40 @@ interface HeroLore {
 }
 
 const HERO_LORE_MAP: Record<CharacterId, HeroLore> = {
-  mark: {
-    title: 'Guerreiro da Espada',
-    role: 'Corpo a Corpo / Versátil',
+  luxio: {
+    title: 'Guerreiro da Luz',
+    role: 'Espadachim / Versátil',
     difficulty: 'Fácil',
-    stats: { hp: 140, mp: 60, atk: 120, spd: 120 },
-    startingSpells: ['🔥 Fire Lion', '⚡ Lightning', '🌪️ Whirlwind', '🛡️ Ice Shield', '✨ Sparkling'],
+    stats: { hp: 150, mp: 80, atk: 130, spd: 125 },
+    startingSpells: ['🔥 Flame Strike', '⚡ Energy Wave', '❄️ Ice Burst', '✨ Divine Missile', '💀 Sudden Death'],
   },
   archer: {
     title: 'Arqueira Élfica',
     role: 'Distância / Agilidade',
     difficulty: 'Médio',
     stats: { hp: 110, mp: 90, atk: 135, spd: 135 },
-    startingSpells: ['🌱 Floral Ent.', '⚡ Lightning', '✨ Sparkling', '🌿 Ancient Roots', '🐍 Snake Bite'],
-  },
-  barbarian: {
-    title: 'Fúria Bárbara',
-    role: 'Tanque / Dano Pesado',
-    difficulty: 'Fácil',
-    stats: { hp: 180, mp: 40, atk: 150, spd: 110 },
-    startingSpells: ['🌪️ Whirlwind', '🐢 Turtle Shell', '🪨 Stone & Leaves', '🔥 Fire Lion', '🛡️ Ice Shield'],
+    startingSpells: ['✨ Divine Missile', '🌿 Terra Monolith', '❄️ Ice Burst', '⚡ Energy Wave', '🐍 Snake Bite'],
   },
   magician: {
     title: 'Arquimago Elemental',
     role: 'Mago / Área',
     difficulty: 'Médio',
     stats: { hp: 95, mp: 200, atk: 160, spd: 115 },
-    startingSpells: ['🌌 Cosmic Vortex', '🔮 Arcane Nova', '⚡ Lightning', '🌊 Abyssal Vortex', '🔥 Fire Lion'],
+    startingSpells: ['⚡ Energy Wave', '🔥 Flame Strike', '❄️ Ice Burst', '🌩️ Thunder Pillar', '🌪️ Ice Vortex'],
   },
   necromancer: {
     title: 'Mestre das Sombras',
     role: 'Magia Negra / Controle',
     difficulty: 'Avançado',
     stats: { hp: 105, mp: 180, atk: 145, spd: 120 },
-    startingSpells: ['🐍 Snake Bite', '👁️ Arcane Gaze', '🍄 Spore Eruption', '🌊 Abyssal Vortex', '✨ Astral Shield'],
+    startingSpells: ['💀 Sudden Death', '🌿 Terra Monolith', '🔥 Flame Strike', '❄️ Ice Burst', '🌩️ Thunder Pillar'],
   },
   paladin: {
     title: 'Cavaleiro Sagrado',
     role: 'Defensor / Suporte',
     difficulty: 'Fácil',
     stats: { hp: 160, mp: 120, atk: 115, spd: 115 },
-    startingSpells: ['🛡️ Ice Shield', '✨ Astral Shield', '💎 Emerald Crystal', '🐢 Turtle Shell', '🌱 Floral Ent.'],
+    startingSpells: ['✨ Divine Missile', '🌩️ Thunder Pillar', '❄️ Ice Burst', '⚡ Energy Wave', '🌿 Terra Monolith'],
   },
 };
 
@@ -87,7 +80,7 @@ export default function CharacterLobby({
             </div>
           </div>
           <div className="lobby-header-badge">
-            <span>6 Classes</span>
+            <span>5 Classes</span>
           </div>
         </header>
 
