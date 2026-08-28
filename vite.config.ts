@@ -89,8 +89,7 @@ export default defineConfig({
       ],
       manifest: false, // Usando manifest.webmanifest externo
       devOptions: {
-        enabled: true,
-        type: 'module',
+        enabled: false, // SW apenas em produção — em dev interfere com HMR WebSocket
       },
     }),
     {

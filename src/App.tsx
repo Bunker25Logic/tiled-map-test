@@ -341,7 +341,29 @@ export default function App() {
 
     // 3. Restore last location & zone
     const zone = char.lastZone || 'map1';
-    const pos = char.lastPos || (ZONES[zone]?.defaultSpawn ?? { x: 0, y: 0 });
+    const zoneDef = ZONES[zone] || ZONES['map1'];
+
+    // Validate saved position against known zone bounds.
+    // If out of bounds (e.g. bug from old coordinates), reset to defaultSpawn.
+    const ZONE_BOUNDS: Record<string, { minX: number; maxX: number; minY: number; maxY: number }> = {
+      'map1':          { minX: -1200, maxX: 4000,  minY: -3200, maxY: 1200  },
+      'caverna-zona-1':{ minX: -200,  maxX: 1000,  minY: -200,  maxY: 1000  },
+      'caverna2':      { minX: -200,  maxX: 1000,  minY: -200,  maxY: 1000  },
+      'caverna3':      { minX: -200,  maxX: 1000,  minY: -200,  maxY: 1000  },
+    };
+    const bounds = ZONE_BOUNDS[zone];
+    let pos = char.lastPos || zoneDef.defaultSpawn;
+    if (char.lastPos && bounds) {
+      const { x, y } = char.lastPos;
+      const outOfBounds = x < bounds.minX || x > bounds.maxX || y < bounds.minY || y > bounds.maxY;
+      if (outOfBounds) {
+        console.warn(`[App] Saved position (${x}, ${y}) is out of map bounds for zone "${zone}". Resetting to defaultSpawn.`);
+        pos = zoneDef.defaultSpawn;
+        // Also clear the bad saved position
+        if (resolvedAcc) savePlayerPosition(resolvedAcc, charIndex, zone, pos);
+      }
+    }
+
     setCurrentZoneId(zone);
     currentZoneRef.current = zone;
     setInitialSpawnCoords({ x: pos.x, y: pos.y });

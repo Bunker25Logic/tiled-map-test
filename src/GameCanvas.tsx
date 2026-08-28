@@ -1480,16 +1480,19 @@ export default function GameCanvas({
           }
 
           const zoom = getResponsiveCameraZoom();
-          const scale = (displayH / BASE_WORLD_H) * zoom;
+          const rawScale = (displayH / BASE_WORLD_H) * zoom;
+          // Escala inteira (ex: 2x, 3x, 4x) garante que cada pixel do pixel-art tem tamanho uniforme
+          // e elimina 100% das brechas/serrilhados de subpixel entre tiles adjacentes
+          const scale = Math.max(1, Math.round(rawScale));
           const worldViewW = displayW / scale;
           const worldViewH = displayH / scale;
 
           const pCenterX = playerRef.current.x + HITBOX_W / 2;
           const pCenterY = playerRef.current.y + HITBOX_H / 2;
 
-          // Continuous camera coordinates for buttery smooth 60fps tracking
-          const camX = pCenterX - worldViewW / 2;
-          const camY = pCenterY - worldViewH / 2;
+          // Snap da câmera para coordenadas inteiras de mundo para alinhamento pixel-perfect dos tiles
+          const camX = Math.round(pCenterX - worldViewW / 2);
+          const camY = Math.round(pCenterY - worldViewH / 2);
 
           cameraRef.current = { x: camX, y: camY, scale };
 
@@ -1507,17 +1510,12 @@ export default function GameCanvas({
           // ── Rendering ──────────────────────────────────────────────────
           ctx.save();
 
-          // Intelligent antialiasing based on active graphic style (sem serrilhado no modern-hd e bloom-glow)
-          const currentStyle = propsRef.current.graphicStyle || 'modern-hd';
-          if (currentStyle === 'modern-hd' || currentStyle === 'bloom-glow') {
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-          } else {
-            ctx.imageSmoothingEnabled = false;
-          }
+          // Pixel art tiles: sempre nearest-neighbor (sem suavização)
+          // imageSmoothingEnabled=false evita borrão e brechas por interpolação bilinear
+          ctx.imageSmoothingEnabled = false;
 
-          // Pure pitch black background in cave, dark void in surface
-          ctx.fillStyle = mapId.startsWith('caverna') ? '#000000' : '#06070a';
+          // Fundo escuro terroso natural para superfície e breu total para caverna
+          ctx.fillStyle = mapId.startsWith('caverna') ? '#000000' : '#182b13';
           ctx.fillRect(0, 0, displayW, displayH);
 
           ctx.scale(scale, scale);

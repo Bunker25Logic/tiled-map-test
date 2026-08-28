@@ -40,8 +40,8 @@ export const NPCS_CONFIG: Record<NPCId, NPCDef> = {
     dialogue:
       'Forjo lâminas e armaduras afiadas com o mais nobre aço do continente. Se você trouxe espadas, escudos ou troféus encontrados nas masmorras, pago um preço justo em moedas de prata e ouro!',
     mapId: 'map1',
-    x: 1536 - 80,   // tile X:45, Y:-642 (à esquerda do spawn)
-    y: -20544,
+    x: 23 - 96,   // à esquerda do spawn
+    y: -32,
     width: 32,
     height: 32,
     hitboxW: 16,
@@ -68,8 +68,8 @@ export const NPCS_CONFIG: Record<NPCId, NPCDef> = {
     dialogue:
       'Aventureiro prudente jamais desce às profundezas sem poções revigorantes! Meus elixires fecham as piores feridas e saciam a sede mágica instantaneamente.',
     mapId: 'map1',
-    x: 1536 + 80,   // tile X:51, Y:-642 (à direita do spawn)
-    y: -20544,
+    x: 23 + 96,   // à direita do spawn
+    y: -32,
     width: 64,
     height: 64,
     hitboxW: 18,
@@ -92,8 +92,8 @@ export const NPCS_CONFIG: Record<NPCId, NPCDef> = {
     dialogue:
       'A morte neste mundo drena a alma e arranca 10% de toda a sua experiência acumulada. Como Sacerdote do Templo, posso conceder a Bênção Sagrada por 10 Moedas de Ouro. Com ela, a perda de XP ao cair em combate cai de 10% para meros 2%!',
     mapId: 'map1',
-    x: 1536,         // tile X:48, Y:-644 (acima do spawn — templo)
-    y: -20544 - 64,
+    x: 23,         // acima do spawn
+    y: -32 - 80,
     width: 64,
     height: 64,
     hitboxW: 20,

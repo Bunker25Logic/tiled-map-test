@@ -34,12 +34,10 @@ export default function OrientationLockModal() {
     window.addEventListener('resize', checkOrientation);
     window.addEventListener('orientationchange', checkOrientation);
 
-    // Also try the API-based lock where it's supported (Android Chrome PWA)
+    // Try orientation lock API (Android Chrome PWA) — doesn't require user gesture
+    // requestFullscreen() is NOT called here because it requires a user gesture
     const tryApiLock = async () => {
       try {
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
-        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const screenAny = screen as any;
         if (screenAny.orientation?.lock) {

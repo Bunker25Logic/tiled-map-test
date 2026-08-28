@@ -26,7 +26,7 @@ export const ZONES: Record<string, ZoneDef> = {
     id: 'map1',
     name: 'Superfície de Tibia',
     file: '/map1.tmj',
-    defaultSpawn: { x: 1536, y: -20544 }, // tile X:48, Y:-642
+    defaultSpawn: { x: 23, y: -32 }, // posição confirmada pelo usuário na screenshot
   },
   'caverna-zona-1': {
     id: 'caverna-zona-1',
