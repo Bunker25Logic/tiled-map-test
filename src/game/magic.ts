@@ -1,4 +1,5 @@
 import type { Direction } from './types';
+import type { CharacterId } from './characters';
 
 export type SpellAnimType = 'sheet' | 'sequence' | 'custom_frames';
 
@@ -12,7 +13,9 @@ export interface SpellFrameCoord {
 export interface SpellDef {
   id: string;
   name: string;
-  category: 'elemental' | 'arcane' | 'nature' | 'tibia';
+  category: 'elemental' | 'arcane' | 'nature';
+  classRestriction?: CharacterId;
+  allowedClasses?: CharacterId[];
   key?: string;
   icon: string;
   color: string;
@@ -46,226 +49,21 @@ export interface SpellDef {
   anchorY?: (dir: Direction) => number;
   spawnOffsetDist?: number;
   getImageKey?: (dir: Direction) => string;
+  // Combat stats & Mana cost
+  manaCost?: number;
+  damage?: number;
+  damageRadius?: number;
+  isHoming?: boolean;
 }
 
 export const ALL_SPELLS: SpellDef[] = [
-  // ─── Clássicas Magias do Tibia (magics t.webp) ──────────────────────────────
-  {
-    id: 'tibia_ice_burst',
-    name: 'Ice Burst (Exevo Frigo)',
-    category: 'tibia',
-    icon: '❄️',
-    color: '#38bdf8',
-    description: 'Explosão esférica pulsante de pura energia gélida e gelo',
-    animType: 'custom_frames',
-    imageKey: 'magics_t',
-    renderW: 72,
-    renderH: 72,
-    fps: 16,
-    spawnOrigin: 'ground',
-    anchorX: () => 0.5,
-    anchorY: () => 0.5,
-    spawnOffsetDist: 34,
-    customFrames: [
-      { sx: 104, sy: 8, sw: 18, sh: 20 },
-      { sx: 132, sy: 6, sw: 22, sh: 24 },
-      { sx: 160, sy: 4, sw: 28, sh: 30 },
-      { sx: 194, sy: 2, sw: 32, sh: 32 },
-      { sx: 228, sy: 0, sw: 36, sh: 36 },
-      { sx: 268, sy: 2, sw: 32, sh: 32 },
-      { sx: 304, sy: 4, sw: 28, sh: 28 },
-      { sx: 336, sy: 6, sw: 22, sh: 24 },
-      { sx: 366, sy: 8, sw: 16, sh: 20 },
-    ],
-  },
-  {
-    id: 'tibia_holy_strike',
-    name: 'Divine Missile (Exori San)',
-    category: 'tibia',
-    icon: '✨',
-    color: '#facc15',
-    description: 'Lança sagrada de luz divina arremessada contra o alvo',
-    animType: 'custom_frames',
-    imageKey: 'magics_t',
-    renderW: 54,
-    renderH: 54,
-    fps: 18,
-    projectileSpeed: 175,
-    spawnOrigin: 'torso',
-    anchorX: () => 0.5,
-    anchorY: () => 0.5,
-    spawnOffsetDist: 18,
-    customFrames: [
-      { sx: 395, sy: 14, sw: 14, sh: 14 },
-      { sx: 426, sy: 12, sw: 16, sh: 16 },
-      { sx: 457, sy: 10, sw: 20, sh: 20 },
-      { sx: 488, sy: 6, sw: 24, sh: 24 },
-      { sx: 480, sy: 32, sw: 32, sh: 32 },
-    ],
-  },
-  {
-    id: 'tibia_whirlwind',
-    name: 'Ice Vortex (Mas Frigo)',
-    category: 'tibia',
-    icon: '🌪️',
-    color: '#67e8f9',
-    description: 'Vórtice ciclônico de ventos congelantes que se expande',
-    animType: 'custom_frames',
-    imageKey: 'magics_t',
-    renderW: 76,
-    renderH: 76,
-    fps: 16,
-    projectileSpeed: 80,
-    spawnOrigin: 'ground',
-    anchorX: () => 0.5,
-    anchorY: () => 0.65,
-    spawnOffsetDist: 22,
-    customFrames: [
-      { sx: 48, sy: 84, sw: 18, sh: 14 },
-      { sx: 108, sy: 74, sw: 18, sh: 18 },
-      { sx: 170, sy: 68, sw: 22, sh: 22 },
-      { sx: 226, sy: 54, sw: 30, sh: 34 },
-      { sx: 282, sy: 52, sw: 36, sh: 38 },
-      { sx: 340, sy: 50, sw: 42, sh: 42 },
-      { sx: 402, sy: 48, sw: 46, sh: 46 },
-    ],
-  },
-  {
-    id: 'tibia_death_strike',
-    name: 'Sudden Death (SD / Exori Mort)',
-    category: 'tibia',
-    icon: '💀',
-    color: '#c084fc',
-    description: 'Projétil devastador de energia sombria com explosão de morte',
-    animType: 'custom_frames',
-    imageKey: 'magics_t',
-    renderW: 60,
-    renderH: 60,
-    fps: 20,
-    projectileSpeed: 160,
-    spawnOrigin: 'torso',
-    anchorX: () => 0.5,
-    anchorY: () => 0.5,
-    spawnOffsetDist: 18,
-    customFrames: [
-      { sx: 10, sy: 105, sw: 18, sh: 18 },
-      { sx: 38, sy: 100, sw: 22, sh: 24 },
-      { sx: 68, sy: 96, sw: 24, sh: 26 },
-      { sx: 98, sy: 92, sw: 28, sh: 30 },
-      { sx: 128, sy: 88, sw: 34, sh: 36 },
-      { sx: 10, sy: 135, sw: 18, sh: 18 },
-      { sx: 42, sy: 135, sw: 20, sh: 20 },
-      { sx: 72, sy: 132, sw: 22, sh: 24 },
-      { sx: 102, sy: 128, sw: 26, sh: 28 },
-      { sx: 132, sy: 124, sw: 32, sh: 34 },
-    ],
-  },
-  {
-    id: 'tibia_flame_strike',
-    name: 'Flame Strike (Exori Flam)',
-    category: 'tibia',
-    icon: '🔥',
-    color: '#f97316',
-    description: 'Erupção instantânea de bolas de fogo e brasas incandescentes',
-    animType: 'custom_frames',
-    imageKey: 'magics_t',
-    renderW: 56,
-    renderH: 56,
-    fps: 18,
-    spawnOrigin: 'ground',
-    anchorX: () => 0.5,
-    anchorY: () => 0.60,
-    spawnOffsetDist: 34,
-    customFrames: [
-      { sx: 165, sy: 100, sw: 20, sh: 22 },
-      { sx: 198, sy: 98, sw: 22, sh: 24 },
-      { sx: 228, sy: 94, sw: 24, sh: 26 },
-      { sx: 260, sy: 92, sw: 26, sh: 28 },
-      { sx: 295, sy: 92, sw: 24, sh: 28 },
-      { sx: 165, sy: 130, sw: 22, sh: 24 },
-      { sx: 198, sy: 132, sw: 20, sh: 20 },
-      { sx: 232, sy: 135, sw: 18, sh: 16 },
-      { sx: 268, sy: 138, sw: 14, sh: 12 },
-    ],
-  },
-  {
-    id: 'tibia_terra_strike',
-    name: 'Terra Monolith (Exori Tera)',
-    category: 'tibia',
-    icon: '🌿',
-    color: '#22c55e',
-    description: 'Pilar maciço de rocha e raízes terrestres que brota do chão',
-    animType: 'custom_frames',
-    imageKey: 'magics_t',
-    renderW: 58,
-    renderH: 80,
-    fps: 15,
-    spawnOrigin: 'ground',
-    anchorX: () => 0.5,
-    anchorY: () => 0.85,
-    spawnOffsetDist: 34,
-    customFrames: [
-      { sx: 364, sy: 102, sw: 18, sh: 22 },
-      { sx: 422, sy: 98, sw: 24, sh: 28 },
-      { sx: 480, sy: 94, sw: 28, sh: 34 },
-      { sx: 348, sy: 136, sw: 34, sh: 48 },
-      { sx: 408, sy: 132, sw: 38, sh: 54 },
-      { sx: 466, sy: 126, sw: 44, sh: 62 },
-    ],
-  },
-  {
-    id: 'tibia_energy_beam',
-    name: 'Energy Wave (Exevo Vis Hur)',
-    category: 'tibia',
-    icon: '⚡',
-    color: '#60a5fa',
-    description: 'Raio perfurante horizontal de pura eletricidade concentrada',
-    animType: 'custom_frames',
-    imageKey: 'magics_t',
-    renderW: 150,
-    renderH: 42,
-    fps: 16,
-    isDirectional: true,
-    flipOnRight: true,
-    spawnOrigin: 'torso',
-    anchorX: (dir) => (dir === 'right' ? 0.1 : dir === 'left' ? 0.9 : 0.5),
-    anchorY: () => 0.5,
-    spawnOffsetDist: 24,
-    customFrames: [
-      { sx: 18, sy: 160, sw: 36, sh: 30 },
-      { sx: 114, sy: 164, sw: 68, sh: 26 },
-      { sx: 90, sy: 194, sw: 92, sh: 28 },
-      { sx: 58, sy: 224, sw: 124, sh: 30 },
-      { sx: 24, sy: 254, sw: 158, sh: 32 },
-    ],
-  },
-  {
-    id: 'tibia_thunder_column',
-    name: 'Thunder Pillar (Exevo Vis Lux)',
-    category: 'tibia',
-    icon: '🌩️',
-    color: '#38bdf8',
-    description: 'Gigantesco relâmpago divino que desce dos céus atingindo o solo',
-    animType: 'custom_frames',
-    imageKey: 'magics_t',
-    renderW: 46,
-    renderH: 140,
-    fps: 18,
-    spawnOrigin: 'ground',
-    anchorX: () => 0.5,
-    anchorY: () => 0.90,
-    spawnOffsetDist: 34,
-    customFrames: [
-      { sx: 195, sy: 240, sw: 26, sh: 44 },
-      { sx: 230, sy: 200, sw: 24, sh: 84 },
-      { sx: 260, sy: 175, sw: 26, sh: 110 },
-      { sx: 290, sy: 150, sw: 28, sh: 135 },
-      { sx: 325, sy: 125, sw: 28, sh: 160 },
-    ],
-  },
   // ─── Elemental Spells ──────────────────────────────────────────────────────
   {
     id: 'firelion',
+    allowedClasses: ["luxio","magician"],
+    damage: 70,
+    manaCost: 30,
+    damageRadius: 40,
     name: 'Fire Lion Wave',
     category: 'elemental',
     key: '1',
@@ -299,6 +97,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'lightningclaw',
+    allowedClasses: ["luxio","paladin"],
+    damage: 65,
+    manaCost: 25,
+    damageRadius: 35,
     name: 'Lightning Claw',
     category: 'elemental',
     key: '2',
@@ -322,6 +124,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'iceshield',
+    allowedClasses: ["paladin","magician"],
+    damage: 30,
+    manaCost: 20,
+    damageRadius: 35,
     name: 'Ice Shield',
     category: 'elemental',
     key: '3',
@@ -346,6 +152,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'tornado',
+    allowedClasses: ["luxio","archer","magician"],
+    damage: 70,
+    manaCost: 30,
+    damageRadius: 45,
     name: 'Whirlwind Tornado',
     category: 'elemental',
     key: '4',
@@ -370,6 +180,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'torrentacle',
+    allowedClasses: ["paladin","magician"],
+    damage: 75,
+    manaCost: 32,
+    damageRadius: 40,
     name: 'Abyssal Torrentacle',
     category: 'elemental',
     key: '5',
@@ -393,6 +207,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'spikes',
+    allowedClasses: ["necromancer","luxio","paladin"],
+    damage: 65,
+    manaCost: 24,
+    damageRadius: 38,
     name: 'Stone & Ice Spikes',
     category: 'elemental',
     key: '6',
@@ -416,6 +234,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'turtleshell',
+    allowedClasses: ["paladin","luxio"],
+    damage: 25,
+    manaCost: 18,
+    damageRadius: 35,
     name: 'Turtle Shell Guard',
     category: 'elemental',
     key: '7',
@@ -442,6 +264,11 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'snakebite',
+    allowedClasses: ["archer","necromancer"],
+    damage: 50,
+    manaCost: 22,
+    damageRadius: 30,
+    isHoming: true,
     name: 'Snake Bite',
     category: 'elemental',
     key: '8',
@@ -476,6 +303,10 @@ export const ALL_SPELLS: SpellDef[] = [
   // ─── Fireball & Particle Blasts ───────────────────────────────────────────
   {
     id: 'sparkling_fireball',
+    allowedClasses: ["luxio","magician","paladin"],
+    damage: 55,
+    manaCost: 20,
+    damageRadius: 32,
     name: 'Sparkling Fireball',
     category: 'elemental',
     key: '9',
@@ -501,6 +332,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'wind_fireball',
+    allowedClasses: ["archer","magician"],
+    damage: 60,
+    manaCost: 22,
+    damageRadius: 34,
     name: 'Flaming Tempest',
     category: 'elemental',
     key: '0',
@@ -525,9 +360,73 @@ export const ALL_SPELLS: SpellDef[] = [
     getImageKey: () => 'sparkling_fireball_wind',
   },
 
+  // ─── Magias Exclusivas do Necromante ────────────────────────────────────────
+  {
+    id: 'necro_orb',
+    allowedClasses: ["necromancer"],
+    name: 'Miasma Sombrio',
+    category: 'arcane',
+    classRestriction: 'necromancer',
+    damage: 105,
+    manaCost: 35,
+    damageRadius: 44,
+    isHoming: true,
+    projectileSpeed: 215,
+    icon: '🔮',
+    color: '#c026d3',
+    description: 'Disparo de energia necromântica que persegue o alvo e explode em um denso miasma cadavérico',
+    animType: 'sheet',
+    imageKey: 'attack_necro',
+    cols: 11,
+    rows: 1,
+    totalFrames: 11,
+    frameW: 64,
+    frameH: 64,
+    renderW: 76,
+    renderH: 76,
+    fps: 15,
+    spawnOrigin: 'torso',
+    anchorX: () => 0.5,
+    anchorY: () => 0.5,
+    spawnOffsetDist: 18,
+    getImageKey: () => 'attack_necro',
+  },
+  {
+    id: 'necro_reaper',
+    allowedClasses: ["necromancer"],
+    name: 'Ceifador Espectral',
+    category: 'arcane',
+    classRestriction: 'necromancer',
+    damage: 145,
+    manaCost: 55,
+    damageRadius: 56,
+    icon: '💀',
+    color: '#ef4444',
+    description: 'Invoca a aparição do Ceifador com foice e olhos escarlates que ceifa as almas dos inimigos em área',
+    animType: 'sheet',
+    imageKey: 'attack_summon',
+    cols: 11,
+    rows: 1,
+    totalFrames: 11,
+    frameW: 64,
+    frameH: 64,
+    renderW: 92,
+    renderH: 92,
+    fps: 14,
+    spawnOrigin: 'ground',
+    anchorX: () => 0.5,
+    anchorY: () => 0.65,
+    spawnOffsetDist: 26,
+    getImageKey: () => 'attack_summon',
+  },
+
   // ─── Arcane Magic ────────────────────────────────────────────────────────
   {
     id: 'arcane_nova',
+    allowedClasses: ["magician","luxio"],
+    damage: 85,
+    manaCost: 38,
+    damageRadius: 48,
     name: 'Arcane Nova',
     category: 'arcane',
     icon: '🔮',
@@ -548,6 +447,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'arcane_astral',
+    allowedClasses: ["magician","necromancer"],
+    damage: 90,
+    manaCost: 40,
+    damageRadius: 46,
     name: 'Astral Shockwave',
     category: 'arcane',
     icon: '🌌',
@@ -568,6 +471,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'arcane_sanctuary',
+    allowedClasses: ["paladin"],
+    damage: 40,
+    manaCost: 25,
+    damageRadius: 40,
     name: 'Arcane Glyph Ring',
     category: 'arcane',
     icon: '🧿',
@@ -589,6 +496,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'arcane_vortex',
+    allowedClasses: ["magician"],
+    damage: 95,
+    manaCost: 42,
+    damageRadius: 50,
     name: 'Cosmic Vortex',
     category: 'arcane',
     icon: '✨',
@@ -611,6 +522,10 @@ export const ALL_SPELLS: SpellDef[] = [
   // ─── Nature Magic ────────────────────────────────────────────────────────
   {
     id: 'nature_roots',
+    allowedClasses: ["archer"],
+    damage: 55,
+    manaCost: 22,
+    damageRadius: 38,
     name: 'Ancient Roots',
     category: 'nature',
     icon: '🌿',
@@ -630,6 +545,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'nature_vines',
+    allowedClasses: ["archer"],
+    damage: 65,
+    manaCost: 26,
+    damageRadius: 40,
     name: 'Floral Entangle',
     category: 'nature',
     icon: '🌱',
@@ -650,6 +569,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'leaf_tempest',
+    allowedClasses: ["archer"],
+    damage: 70,
+    manaCost: 28,
+    damageRadius: 42,
     name: 'Emerald Gale',
     category: 'nature',
     icon: '🍃',
@@ -670,6 +593,10 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'nature_spores',
+    allowedClasses: ["necromancer","archer"],
+    damage: 80,
+    manaCost: 32,
+    damageRadius: 45,
     name: 'Spore Eruption',
     category: 'nature',
     icon: '🍄',
@@ -690,7 +617,9 @@ export const ALL_SPELLS: SpellDef[] = [
 ];
 
 export const ALL_MAGIC_IMAGE_PATHS: Record<string, string> = {
-  magics_t: '/assets/magic-effects/magics t.webp',
+  // Necromancer Exclusive Spells
+  attack_necro: '/assets/magic-effects/attack_necro.png',
+  attack_summon: '/assets/magic-effects/attack_summon.png',
   // Spritesheets
   firelion_up: '/assets/magic-effects/firelion_up.png',
   firelion_right: '/assets/magic-effects/firelion_right.png',
@@ -785,6 +714,8 @@ export class ActiveSpell {
   public isFinished = false;
   public imageKey?: string;
   public attachToCaster = false;
+  public targetMonsterId?: string;
+  public hitMonsterIds: Set<string> = new Set();
 
   private timer = 0;
 
@@ -795,7 +726,8 @@ export class ActiveSpell {
     y: number,
     dir: Direction,
     vx = 0,
-    vy = 0
+    vy = 0,
+    targetMonsterId?: string
   ) {
     this.id = id;
     this.def = def;
@@ -804,6 +736,7 @@ export class ActiveSpell {
     this.dir = dir;
     this.vx = vx;
     this.vy = vy;
+    this.targetMonsterId = targetMonsterId;
     this.attachToCaster = Boolean(def.attachToCaster);
     if (def.getImageKey) {
       this.imageKey = def.getImageKey(dir);
@@ -812,12 +745,28 @@ export class ActiveSpell {
     }
   }
 
-  update(dt: number, casterX?: number, casterY?: number): void {
+  update(
+    dt: number,
+    casterX?: number,
+    casterY?: number,
+    targetPos?: { x: number; y: number }
+  ): void {
     if (this.isFinished) return;
 
     if (this.attachToCaster && casterX !== undefined && casterY !== undefined) {
       this.x = casterX;
       this.y = casterY;
+    } else if (this.def.isHoming && targetPos) {
+      const dx = targetPos.x - this.x;
+      const dy = targetPos.y - this.y;
+      const dist = Math.hypot(dx, dy);
+      const speed = this.def.projectileSpeed || 190;
+      if (dist > 6) {
+        this.vx = (dx / dist) * speed;
+        this.vy = (dy / dist) * speed;
+      }
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
     } else {
       this.x += this.vx * dt;
       this.y += this.vy * dt;
@@ -851,7 +800,7 @@ export class ActiveSpell {
 
   getCurrentImageKey(): string {
     if (this.def.animType === 'custom_frames') {
-      return this.def.imageKey || 'magics_t';
+      return this.def.imageKey || '';
     }
     if (this.def.animType === 'sequence') {
       const keys = this.def.frameKeys || [];

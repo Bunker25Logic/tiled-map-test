@@ -12,6 +12,8 @@ import {
 import {
   Monster,
   createMapMonsters,
+  updateCorpse,
+  type MonsterCorpse,
 } from './game/entities';
 import {
   PLAYABLE_CHARACTERS,
@@ -31,6 +33,7 @@ import {
   type GraphicStyle,
 } from './game/graphics';
 import VirtualJoystick from './components/VirtualJoystick';
+import WorldLoadingScreen from './components/WorldLoadingScreen';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -47,14 +50,7 @@ const HITBOX_H = 12;
 // Walk speed (world pixels per second)
 const MOVE_SPEED = 120;
 
-// ─── CONFIGURAÇÃO DAS ASAS (Ajuste Direto de Posição, Escala, Rotação e Recorte) ───
-// - sx, sy, sw, sh: coordenadas exatas do recorte no spritesheet original
-// - offX: deslocamento horizontal (+ = direita, - = esquerda)
-// - offY: deslocamento vertical (+ = desce, - = sobe nas costas)
-// - baseW / baseH: tamanho base da asa em pixels na tela
-// - scale: multiplicador geral de tamanho (1.0 = normal, 1.2 = maior)
-// - rot: ROTAÇÃO EM GRAUS (ex: 0 = reto, 15 = inclina direita, -15 = inclina esquerda)
-// - behind: PROFUNDIDADE DA ASA (true = ATRÁS / false = NA FRENTE)
+// ─── CONFIGURAÇÃO DE ASAS ─────────────────────────────────────────────────────
 interface WingDirectionConfig {
   sx: number;
   sy: number;
@@ -70,32 +66,17 @@ interface WingDirectionConfig {
 }
 
 const WINGS_ANGELIC_CONFIG: Record<Direction, WingDirectionConfig> = {
-  // 1. Olhando para Frente (Baixo) - Par de Asas Abertas apontadas para baixo (Quadro inferior esquerdo)
   down:  { sx: 6, sy: 175, sw: 355, sh: 176, offX: -4, offY: -9, baseW: 68, baseH: 34, scale: 1.0, rot: 0, behind: true },
-
-  // 2. Olhando para Cima (Costas) - Par de Asas Abertas majestosas para cima (Quadro superior esquerdo)
   up:    { sx: 8, sy: -15,   sw: 355, sh: 175, offX: -3, offY: -12, baseW: 68, baseH: 34, scale: 1.0, rot: 0, behind: false },
-
-  // 3. Olhando para Esquerda - Asa de Perfil Esquerda (Coluna 3 superior)
   left:  { sx: 533, sy: 0, sw: 178, sh: 175, offX: 14, offY: -6, baseW: 56, baseH: 28, scale: 1.0, rot: -13, behind: false },
-
-  // 4. Olhando para Direita - Asa de Perfil Direita (Coluna 4 superior)
   right: { sx: 355, sy: 0, sw: 178, sh: 175, offX: -21, offY: -6, baseW: 48, baseH: 28, scale: 1.0, rot: 0, behind: true },
 };
 
-// ─── CONFIGURAÇÃO DAS ASAS TROVÃO ───────
 const WINGS_THUNDER_CONFIG: Record<Direction, WingDirectionConfig> = {
-  // 1. Olhando para Frente (Baixo)
   down:  { sx: 960,  sy: 0, sw: 480, sh: 509, offX: 3,  offY: -10, baseW: 66, baseH: 38, scale: 1.0, rot: 0, behind: true },
-
-  // 2. Olhando para Cima (Costas)
   up:    { sx: 1440, sy: 0, sw: 480, sh: 509, offX: -1, offY: -8,  baseW: 56, baseH: 58, scale: 1.0, rot: 0, behind: false },
-
-  // 3. Olhando para a Esquerda
   left:  { sx: 480,  sy: 0, sw: 480, sh: 509, offX: 15, offY: -14, baseW: 46, baseH: 48, scale: 1.0, rot: 0, behind: true },
-
-  // 4. Olhando para a Direita
-  right: { sx: 0,    sy: 0, sw: 480, sh: 509, offX: -23, offY: -16, baseW: 46, baseH: 48, scale: 1.0, rot: 0, behind: true },
+  right: { sx: 0,    sy: 0, sw: 480, sh: 509, offX: -23,offY: -16, baseW: 46, baseH: 48, scale: 1.0, rot: 0, behind: true },
 };
 
 /**
@@ -112,6 +93,19 @@ function getResponsiveCameraZoom(): number {
   return isMobile ? 1.5 : 1.0;
 }
 
+// Floating number (damage / XP) displayed above monster on kill/hit
+interface FloatingNumber {
+  id: string;
+  x: number;
+  y: number;
+  text: string;
+  color: string;
+  alpha: number;
+  vy: number;  // upward velocity in world px/s
+  timer: number;
+  duration: number;
+}
+
 interface GameCanvasProps {
   mapId: string;
   mapData: TiledMap;
@@ -121,11 +115,29 @@ interface GameCanvasProps {
   enableParticles: boolean;
   debugColliders: boolean;
   showGrid: boolean;
-  hasWings?: boolean;
   equippedWings?: WingType;
+  /** Currently equipped spell IDs (5 slots) */
+  equippedSpellIds?: string[];
+  /** Current player HP (from account) */
+  playerHp?: number;
+  /** Max player HP (from account) */
+  playerMaxHp?: number;
+  /** Current player MP (from account) */
+  playerMp?: number;
+  /** Max player MP (from account) */
+  playerMaxMp?: number;
+  /** Called when a spell is cast to consume mana. Returns false if not enough mana */
+  onConsumeMana?: (amount: number) => boolean;
   onPlayerPosChange?: (x: number, y: number, tileX: number, tileY: number) => void;
   onZoneTransition?: (targetMapId: string, spawnX: number, spawnY: number) => void;
-  onRequestSpellCast?: (callback: (spellId: string) => void) => void;
+  /** Called when a monster attacks the player */
+  onPlayerDamage?: (amount: number) => void;
+  /** Called when a monster is killed (for XP) */
+  onMonsterKill?: (xpReward: number) => void;
+  /** Called when player HP drops to 0 */
+  onPlayerDeath?: () => void;
+  /** Called to open the Inventory / Bag modal */
+  onOpenInventory?: () => void;
 }
 
 export default function GameCanvas({
@@ -137,10 +149,19 @@ export default function GameCanvas({
   enableParticles,
   debugColliders,
   showGrid,
-  hasWings = true,
-  equippedWings = "angelic",
+  equippedWings = 'angelic',
+  equippedSpellIds = [],
+  playerHp,
+  playerMaxHp,
+  playerMp,
+  playerMaxMp,
+  onConsumeMana,
   onPlayerPosChange,
   onZoneTransition,
+  onPlayerDamage,
+  onMonsterKill,
+  onPlayerDeath,
+  onOpenInventory,
 }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [assetsLoaded, setAssetsLoaded] = useState(false);
@@ -163,9 +184,23 @@ export default function GameCanvas({
   // Keep camera coords in ref for mouse/touch raycasting
   const cameraRef = useRef({ x: 0, y: 0, scale: 1.0 });
 
-  // Persistent monsters and active spells
+  // Persistent monsters, corpses, spells, floating numbers, slashes, targeted mob
   const monstersRef = useRef<Monster[]>([]);
+  const corpsesRef = useRef<MonsterCorpse[]>([]);
   const activeSpellsRef = useRef<ActiveSpell[]>([]);
+  const floatingNumbersRef = useRef<FloatingNumber[]>([]);
+  const slashEffectsRef = useRef<Array<{ x: number; y: number; dir: Direction; timer: number; duration: number }>>([]);
+  const selectedTargetIdRef = useRef<string | null>(null);
+
+  // Refs so callbacks inside the game loop always get fresh values
+  const onPlayerDamageRef = useRef(onPlayerDamage);
+  const onMonsterKillRef = useRef(onMonsterKill);
+  const onPlayerDeathRef = useRef(onPlayerDeath);
+  useEffect(() => {
+    onPlayerDamageRef.current = onPlayerDamage;
+    onMonsterKillRef.current = onMonsterKill;
+    onPlayerDeathRef.current = onPlayerDeath;
+  }, [onPlayerDamage, onMonsterKill, onPlayerDeath]);
 
   // Ambient atmospheric particle system
   const particleSystemRef = useRef<ParticleSystem>(new ParticleSystem(35, mapId));
@@ -181,10 +216,17 @@ export default function GameCanvas({
     enableParticles,
     debugColliders,
     showGrid,
-    hasWings,
     equippedWings,
+    equippedSpellIds,
+    playerHp,
+    playerMaxHp,
+    playerMp,
+    playerMaxMp,
+    onConsumeMana,
     onPlayerPosChange,
     onZoneTransition,
+    onPlayerDeath,
+    onOpenInventory,
   });
 
   useEffect(() => {
@@ -194,11 +236,18 @@ export default function GameCanvas({
     propsRef.current.enableParticles = enableParticles;
     propsRef.current.debugColliders = debugColliders;
     propsRef.current.showGrid = showGrid;
-    propsRef.current.hasWings = hasWings;
     propsRef.current.equippedWings = equippedWings;
+    propsRef.current.equippedSpellIds = equippedSpellIds;
+    propsRef.current.playerHp = playerHp;
+    propsRef.current.playerMaxHp = playerMaxHp;
+    propsRef.current.playerMp = playerMp;
+    propsRef.current.playerMaxMp = playerMaxMp;
+    propsRef.current.onConsumeMana = onConsumeMana;
     propsRef.current.onPlayerPosChange = onPlayerPosChange;
     propsRef.current.onZoneTransition = onZoneTransition;
-  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, hasWings, equippedWings, onPlayerPosChange, onZoneTransition]);
+    propsRef.current.onPlayerDeath = onPlayerDeath;
+    propsRef.current.onOpenInventory = onOpenInventory;
+  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory]);
 
   // Update particles on map change
   useEffect(() => {
@@ -231,7 +280,56 @@ export default function GameCanvas({
         const animMap = buildTileAnimationMap(mapData.tilesets);
 
         // 4. Initialize monsters for this specific zone (procedural map-wide spawner)
-        monstersRef.current = createMapMonsters(mapId, mapData, colliders);
+        corpsesRef.current = [];
+        floatingNumbersRef.current = [];
+        const spawnMonsters = () => {
+          const mobs = createMapMonsters(mapId, mapData, colliders);
+          for (const mob of mobs) {
+            mob.onDeath = (xpReward, deathX, deathY) => {
+              // Spawn corpse
+              corpsesRef.current.push({
+                x: mob.x,
+                y: mob.y,
+                type: mob.type,
+                config: mob.config,
+                dir: mob.dir,
+                alpha: 1.0,
+                timer: 0,
+                totalDuration: 5.0,
+              });
+              // Floating XP number
+              floatingNumbersRef.current.push({
+                id: `xp_${Date.now()}_${Math.random()}`,
+                x: deathX,
+                y: deathY - 16,
+                text: `+${xpReward} XP`,
+                color: '#facc15',
+                alpha: 1,
+                vy: -28,
+                timer: 0,
+                duration: 2.0,
+              });
+              onMonsterKillRef.current?.(xpReward);
+            };
+            mob.onAttackPlayer = (damage: number) => {
+              // Floating damage number on player
+              floatingNumbersRef.current.push({
+                id: `dmg_p_${Date.now()}`,
+                x: playerRef.current.x + HITBOX_W / 2,
+                y: playerRef.current.y - 8,
+                text: `-${damage}`,
+                color: '#ef4444',
+                alpha: 1,
+                vy: -32,
+                timer: 0,
+                duration: 1.5,
+              });
+              onPlayerDamageRef.current?.(damage);
+            };
+          }
+          return mobs;
+        };
+        monstersRef.current = spawnMonsters();
 
         setAssetsLoaded(true);
         isTransitioningRef.current = false;
@@ -244,15 +342,123 @@ export default function GameCanvas({
         const animator = new SpriteAnimator();
         animator.setState('idle', 'down');
 
-        triggerAttackRef.current = () => {
+        const executeMeleeAttack = () => {
+          if (animator.state === 'dead' || (propsRef.current.playerHp !== undefined && propsRef.current.playerHp <= 0)) return;
           animator.triggerAttack();
+
+          const px = playerRef.current.x + HITBOX_W / 2;
+          const py = playerRef.current.y + HITBOX_H / 2;
+          const curDir = animator.direction;
+          const curCharId = propsRef.current.selectedCharacterId || 'luxio';
+
+          // Base damage by class
+          let baseDamage = 32 + Math.floor(Math.random() * 18);
+          if (curCharId === 'luxio') baseDamage = 45 + Math.floor(Math.random() * 20);
+          else if (curCharId === 'archer') baseDamage = 38 + Math.floor(Math.random() * 18);
+          else if (curCharId === 'magician' || curCharId === 'necromancer') baseDamage = 26 + Math.floor(Math.random() * 14);
+          else if (curCharId === 'paladin') baseDamage = 35 + Math.floor(Math.random() * 18);
+
+          // Add slash effect in front of player
+          let slashX = px;
+          let slashY = py;
+          if (curDir === 'up') slashY -= 22;
+          else if (curDir === 'down') slashY += 22;
+          else if (curDir === 'left') slashX -= 22;
+          else if (curDir === 'right') slashX += 22;
+
+          slashEffectsRef.current.push({
+            x: slashX,
+            y: slashY,
+            dir: curDir,
+            timer: 0,
+            duration: 0.22,
+          });
+
+          // Check if explicit target is in range
+          const targetMob = selectedTargetIdRef.current
+            ? monstersRef.current.find((m) => m.id === selectedTargetIdRef.current && !m.isDead)
+            : null;
+
+          let hitAny = false;
+
+          if (targetMob) {
+            const mx = targetMob.x + targetMob.config.hitboxW / 2;
+            const my = targetMob.y + targetMob.config.hitboxH / 2;
+            if (Math.hypot(px - mx, py - my) <= 65) {
+              hitAny = true;
+              targetMob.takeDamage(baseDamage);
+              floatingNumbersRef.current.push({
+                id: `dmg_${targetMob.id}_${Date.now()}`,
+                x: mx,
+                y: targetMob.y - 12,
+                text: `-${baseDamage}`,
+                color: '#ffffff',
+                alpha: 1,
+                vy: -32,
+                timer: 0,
+                duration: 1.5,
+              });
+            }
+          }
+
+          if (!hitAny) {
+            for (const mob of monstersRef.current) {
+              if (mob.isDead) continue;
+              const mx = mob.x + mob.config.hitboxW / 2;
+              const my = mob.y + mob.config.hitboxH / 2;
+              const dist = Math.hypot(px - mx, py - my);
+              if (dist <= 56) {
+                mob.takeDamage(baseDamage);
+                floatingNumbersRef.current.push({
+                  id: `dmg_${mob.id}_${Date.now()}_${Math.random()}`,
+                  x: mx,
+                  y: mob.y - 12,
+                  text: `-${baseDamage}`,
+                  color: '#ffffff',
+                  alpha: 1,
+                  vy: -32,
+                  timer: 0,
+                  duration: 1.5,
+                });
+                if (!selectedTargetIdRef.current) {
+                  selectedTargetIdRef.current = mob.id;
+                }
+                break;
+              }
+            }
+          }
         };
 
-        // Function to cast a spell perfectly centered from player
+        triggerAttackRef.current = executeMeleeAttack;
+
+        // Function to cast a spell with target tracking & homing
         const castSpell = (spellDef: SpellDef) => {
+          if (animator.state === 'dead' || (propsRef.current.playerHp !== undefined && propsRef.current.playerHp <= 0)) return;
+
+          const manaCost = spellDef.manaCost || 0;
+          if (manaCost > 0) {
+            const currentMp = propsRef.current.playerMp ?? 100;
+            if (currentMp < manaCost) {
+              floatingNumbersRef.current.push({
+                id: `nomana_${Date.now()}`,
+                x: playerRef.current.x + HITBOX_W / 2,
+                y: playerRef.current.y - 14,
+                text: 'Sem mana!',
+                color: '#38bdf8',
+                alpha: 1,
+                vy: -28,
+                timer: 0,
+                duration: 1.2,
+              });
+              return;
+            }
+
+            propsRef.current.onConsumeMana?.(manaCost);
+          }
+
           animator.triggerAttack();
 
-          const dir = animator.direction;
+          let dir = animator.direction;
           const px = playerRef.current.x;
           const py = playerRef.current.y;
 
@@ -261,26 +467,92 @@ export default function GameCanvas({
           const pTorsoY = py + HITBOX_H - 18;
           const pFeetY = py + HITBOX_H;
 
+          // Find targeted monster or closest monster in range (340px)
+          let targetMob = selectedTargetIdRef.current
+            ? monstersRef.current.find((m) => m.id === selectedTargetIdRef.current && !m.isDead)
+            : null;
+
+          if (!targetMob) {
+            let closestDist = 340;
+            for (const mob of monstersRef.current) {
+              if (mob.isDead) continue;
+              const d = Math.hypot(pTorsoX - (mob.x + mob.config.hitboxW / 2), pTorsoY - (mob.y + mob.config.hitboxH / 2));
+              if (d < closestDist) {
+                closestDist = d;
+                targetMob = mob;
+              }
+            }
+            if (targetMob) {
+              selectedTargetIdRef.current = targetMob.id;
+            }
+          }
+
+          // Orient caster towards target
+          if (targetMob) {
+            const dx = (targetMob.x + targetMob.config.hitboxW / 2) - pTorsoX;
+            const dy = (targetMob.y + targetMob.config.hitboxH / 2) - pTorsoY;
+            if (Math.abs(dx) > Math.abs(dy)) {
+              animator.direction = dx > 0 ? 'right' : 'left';
+            } else {
+              animator.direction = dy > 0 ? 'down' : 'up';
+            }
+            dir = animator.direction;
+          }
+
           let spawnX = pTorsoX;
           let spawnY = spellDef.spawnOrigin === 'ground' ? pFeetY : pTorsoY;
           let vx = 0;
           let vy = 0;
 
           const speed = spellDef.projectileSpeed || 0;
+          const isProjectile = speed > 0;
+          const isAttached = Boolean(spellDef.attachToCaster);
 
-          if (speed > 0) {
-            if (dir === 'up') vy = -speed;
-            else if (dir === 'down') vy = speed;
-            else if (dir === 'left') vx = -speed;
-            else if (dir === 'right') vx = speed;
+          let targetX: number | undefined;
+          let targetY: number | undefined;
+
+          if (targetMob) {
+            targetX = targetMob.x + targetMob.config.hitboxW / 2;
+            targetY = targetMob.y + targetMob.config.hitboxH / 2;
           }
 
-          if (!spellDef.attachToCaster) {
-            const offset = spellDef.spawnOffsetDist !== undefined ? spellDef.spawnOffsetDist : 32;
-            if (dir === 'up') spawnY -= offset;
-            else if (dir === 'down') spawnY += offset;
-            else if (dir === 'left') spawnX -= offset;
-            else if (dir === 'right') spawnX += offset;
+          if (isAttached) {
+            // Attached buff/shield (e.g. Ice Shield)
+            spawnX = pTorsoX;
+            spawnY = spellDef.spawnOrigin === 'ground' ? pFeetY : pTorsoY;
+          } else if (isProjectile) {
+            // Projectile launches from caster towards target
+            spawnX = pTorsoX;
+            spawnY = spellDef.spawnOrigin === 'ground' ? pFeetY : pTorsoY;
+
+            if (targetX !== undefined && targetY !== undefined) {
+              const dx = targetX - spawnX;
+              const dy = targetY - spawnY;
+              const dist = Math.hypot(dx, dy);
+              if (dist > 0) {
+                vx = (dx / dist) * speed;
+                vy = (dy / dist) * speed;
+              }
+            } else {
+              if (dir === 'up') vy = -speed;
+              else if (dir === 'down') vy = speed;
+              else if (dir === 'left') vx = -speed;
+              else if (dir === 'right') vx = speed;
+            }
+          } else {
+            // Targeted Manifestation / Strike / Area Burst / Summon (e.g. Ceifador, Flame Strike, Ice Burst, etc.)
+            if (targetMob) {
+              // Manifests directly on the targeted enemy at their location!
+              spawnX = targetMob.x + targetMob.config.hitboxW / 2;
+              spawnY = targetMob.y + targetMob.config.hitboxH / 2;
+            } else {
+              // If no target, manifests in front of player in facing direction
+              const forwardDist = spellDef.spawnOffsetDist || 45;
+              if (dir === 'up') spawnY -= forwardDist;
+              else if (dir === 'down') spawnY += forwardDist;
+              else if (dir === 'left') spawnX -= forwardDist;
+              else if (dir === 'right') spawnX += forwardDist;
+            }
           }
 
           const spell = new ActiveSpell(
@@ -290,7 +562,8 @@ export default function GameCanvas({
             spawnY,
             dir,
             vx,
-            vy
+            vy,
+            targetMob?.id
           );
 
           activeSpellsRef.current.push(spell);
@@ -329,14 +602,29 @@ export default function GameCanvas({
           // Space or J to trigger basic melee attack
           if (key === ' ' || key === 'j') {
             e.preventDefault();
-            animator.triggerAttack();
+            executeMeleeAttack();
           }
 
-          // Number keys 1..9, 0 for Spells
-          const spellByKey = ALL_SPELLS.find((s) => s.key === key);
-          if (spellByKey) {
+          // Number keys 1..3 for Equipped Spells
+          if (['1', '2', '3'].includes(key)) {
             e.preventDefault();
-            castSpell(spellByKey);
+            const slotIdx = parseInt(key, 10) - 1;
+            const equippedIds = propsRef.current.equippedSpellIds || [];
+            const spellId = equippedIds[slotIdx];
+            if (spellId) {
+              const def = ALL_SPELLS.find((s) => s.id === spellId);
+              if (def) {
+                castSpell(def);
+              }
+            }
+            return;
+          }
+
+          // B or I to open Bag / Inventory
+          if (key === 'b' || key === 'i') {
+            e.preventDefault();
+            propsRef.current.onOpenInventory?.();
+            return;
           }
 
           // R to respawn at start
@@ -467,8 +755,7 @@ export default function GameCanvas({
 
           // ── Player Physics & Collision Resolution ───────────────────────
           if (isMoving && animator.state !== 'dead') {
-            const activeWing = propsRef.current.equippedWings ?? 'none';
-            const speedMultiplier = activeWing === 'angelic' ? 1.50 : activeWing === 'thunder' ? 1.45 : 1.0;
+            const speedMultiplier = propsRef.current.equippedWings !== 'none' ? 1.45 : 1.0;
             const dx = moveX * MOVE_SPEED * speedMultiplier * dt;
             const dy = moveY * MOVE_SPEED * speedMultiplier * dt;
 
@@ -526,7 +813,7 @@ export default function GameCanvas({
           }
           setActiveNearbyPortal(nearbyPortal);
 
-          // ── Update Monsters (Wandering AI with multi-entity & player collisions) ──────
+          // ── Update Monsters (AI with combat) ─────────────────────────────
           const playerHitbox: Rect = {
             x: playerRef.current.x,
             y: playerRef.current.y,
@@ -537,17 +824,89 @@ export default function GameCanvas({
           for (const mob of monstersRef.current) {
             mob.update(dt, colliders, playerHitbox, monstersRef.current);
           }
+          // Remove dead monsters after a brief delay (corpse already spawned)
+          monstersRef.current = monstersRef.current.filter((m) => !m.isDead);
 
-          // ── Update Active Spells ────────────────────────────────────────
+          // ── Update Corpses ────────────────────────────────────────────────
+          corpsesRef.current = corpsesRef.current.filter(
+            (corpse) => !updateCorpse(corpse, dt)
+          );
+
+          // ── Update Floating Numbers ───────────────────────────────────────
+          for (const fn of floatingNumbersRef.current) {
+            fn.timer += dt;
+            fn.y += fn.vy * dt;
+            fn.alpha = Math.max(0, 1 - fn.timer / fn.duration);
+          }
+          floatingNumbersRef.current = floatingNumbersRef.current.filter((fn) => fn.timer < fn.duration);
+
+          // ── Update Slashes ───────────────────────────────────────────────
+          for (const slash of slashEffectsRef.current) {
+            slash.timer += dt;
+          }
+          slashEffectsRef.current = slashEffectsRef.current.filter((s) => s.timer < s.duration);
+
+          // ── Update Active Spells & Collision ─────────────────────────────
           const pTorsoX = playerRef.current.x + HITBOX_W / 2;
           const pTorsoY = playerRef.current.y + HITBOX_H - 18;
           const pFeetY = playerRef.current.y + HITBOX_H;
 
           for (const spell of activeSpellsRef.current) {
+            let targetPos: { x: number; y: number } | undefined;
+            if (spell.targetMonsterId) {
+              const targetMob = monstersRef.current.find((m) => m.id === spell.targetMonsterId && !m.isDead);
+              if (targetMob) {
+                targetPos = {
+                  x: targetMob.x + targetMob.config.hitboxW / 2,
+                  y: targetMob.y + targetMob.config.hitboxH / 2,
+                };
+              }
+            }
             const casterY = spell.def.spawnOrigin === 'ground' ? pFeetY : pTorsoY;
-            spell.update(dt, pTorsoX, casterY);
+            spell.update(dt, pTorsoX, casterY, targetPos);
+
+            // Check collision with monsters
+            const hitRadius = spell.def.damageRadius || 42;
+            const spellDmg = spell.def.damage || (40 + Math.floor(Math.random() * 25));
+
+            for (const mob of monstersRef.current) {
+              if (mob.isDead) continue;
+              const mobCenterX = mob.x + mob.config.hitboxW / 2;
+              const mobCenterY = mob.y + mob.config.hitboxH / 2;
+              const dist = Math.hypot(spell.x - mobCenterX, spell.y - mobCenterY);
+
+              if (dist <= hitRadius && !spell.hitMonsterIds.has(mob.id)) {
+                spell.hitMonsterIds.add(mob.id);
+                mob.takeDamage(spellDmg);
+
+                // Floating damage number in spell color
+                floatingNumbersRef.current.push({
+                  id: `dmg_${mob.id}_${Date.now()}_${Math.random()}`,
+                  x: mobCenterX,
+                  y: mob.y - 12,
+                  text: `-${spellDmg}`,
+                  color: spell.def.color || '#facc15',
+                  alpha: 1,
+                  vy: -34,
+                  timer: 0,
+                  duration: 1.6,
+                });
+
+                if ((spell.def.projectileSpeed || 0) > 0 && !spell.def.isDirectional) {
+                  spell.isFinished = true;
+                }
+              }
+            }
           }
           activeSpellsRef.current = activeSpellsRef.current.filter((s) => !s.isFinished);
+
+          // Player death check
+          if (propsRef.current.playerHp !== undefined && propsRef.current.playerHp <= 0) {
+            if (animator.state !== 'dead') {
+              animator.setState('dead', animator.direction);
+              propsRef.current.onPlayerDeath?.();
+            }
+          }
 
           // Throttle coordinate callback to ~10Hz
           if (now - lastPosReportTime > 100) {
@@ -675,6 +1034,34 @@ export default function GameCanvas({
             depthObjects.push(...objs);
           }
 
+          // Add Corpses to depth sorting (below living monsters)
+          for (const corpse of corpsesRef.current) {
+            if (corpse.x + corpse.config.width < camX || corpse.x > camX + worldViewW) continue;
+            if (corpse.y + corpse.config.height < camY || corpse.y > camY + worldViewH) continue;
+
+            const corpseBaseY = corpse.y + corpse.config.hitboxH;
+            depthObjects.push({
+              type: 'tiled-obj',
+              sortY: corpseBaseY - 0.5, // render under living entities
+              draw: (renderCtx) => {
+                const spriteKey = `${corpse.type}_1_${corpse.dir}`;
+                const spr = cached.monsters[spriteKey];
+                if (!spr) return;
+
+                const drawX = corpse.x + corpse.config.hitboxW / 2 - corpse.config.visCenterX - camX;
+                const drawY = corpse.y + corpse.config.hitboxH - corpse.config.feetY - camY;
+
+                renderCtx.save();
+                renderCtx.globalAlpha = corpse.alpha;
+                // Red tint for corpse (Tibia-style)
+                renderCtx.filter = 'sepia(1) saturate(3) hue-rotate(-20deg) brightness(0.7)';
+                renderCtx.drawImage(spr, drawX, drawY, corpse.config.width, corpse.config.height);
+                renderCtx.filter = 'none';
+                renderCtx.restore();
+              },
+            });
+          }
+
           // Add Monsters to depth sorting
           for (const mob of monstersRef.current) {
             const mobBaseY = mob.y + mob.config.hitboxH;
@@ -704,9 +1091,7 @@ export default function GameCanvas({
                   mobFootBottomY - 1,
                   mob.config.shadowRadiusX,
                   mob.config.shadowRadiusY,
-                  0,
-                  0,
-                  Math.PI * 2
+                  0, 0, Math.PI * 2
                 );
                 renderCtx.fill();
                 renderCtx.restore();
@@ -719,13 +1104,7 @@ export default function GameCanvas({
                 const drawY = mob.y + mob.config.hitboxH - mob.config.feetY - camY;
 
                 if (spr) {
-                  renderCtx.drawImage(
-                    spr,
-                    drawX,
-                    drawY,
-                    mob.config.width,
-                    mob.config.height
-                  );
+                  renderCtx.drawImage(spr, drawX, drawY, mob.config.width, mob.config.height);
                 }
 
                 // Name Tag & HP Bar
@@ -737,7 +1116,11 @@ export default function GameCanvas({
 
                 renderCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
                 renderCtx.fillText(mob.config.name, mobFootCenterX + 1, textY + 1);
-                renderCtx.fillStyle = '#4ade80';
+                // Name color by behavior
+                const nameColor = mob.combat.behavior === 'aggressive' ? '#f87171'
+                  : mob.combat.behavior === 'animal' ? '#86efac'
+                  : '#fcd34d';
+                renderCtx.fillStyle = nameColor;
                 renderCtx.fillText(mob.config.name, mobFootCenterX, textY);
 
                 const barW = Math.max(22, mob.config.visW * 0.7);
@@ -745,17 +1128,22 @@ export default function GameCanvas({
                 const barX = mobFootCenterX - barW / 2;
                 const barY = textY - 9;
 
+                const hpPct = mob.maxHp > 0 ? mob.hp / mob.maxHp : 0;
+                const hpColor = hpPct > 0.6 ? '#22c55e' : hpPct > 0.3 ? '#f59e0b' : '#ef4444';
+
                 renderCtx.fillStyle = '#000000';
                 renderCtx.fillRect(barX - 1, barY - 1, barW + 2, barH + 2);
-                renderCtx.fillStyle = '#22c55e';
+                renderCtx.fillStyle = '#333';
                 renderCtx.fillRect(barX, barY, barW, barH);
+                renderCtx.fillStyle = hpColor;
+                renderCtx.fillRect(barX, barY, barW * hpPct, barH);
                 renderCtx.restore();
               },
             });
           }
 
           // Add Player to depth sorting
-          const curCharId = propsRef.current.selectedCharacterId || 'luxio';
+          const curCharId = propsRef.current.selectedCharacterId || 'mark';
           const curCharDef = PLAYABLE_CHARACTERS.find((c) => c.id === curCharId) || PLAYABLE_CHARACTERS[0];
           const playerFeetSortY = playerRef.current.y + HITBOX_H;
 
@@ -1011,6 +1399,88 @@ export default function GameCanvas({
             obj.draw(ctx);
           }
 
+          // ── Floating Numbers (damage / XP) ─────────────────────────────
+          ctx.save();
+          for (const fn of floatingNumbersRef.current) {
+            const fnX = fn.x - camX;
+            const fnY = fn.y - camY;
+            ctx.globalAlpha = fn.alpha;
+            ctx.font = 'bold 11px Tahoma, Verdana, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillText(fn.text, fnX + 1, fnY + 1);
+            ctx.fillStyle = fn.color;
+            ctx.fillText(fn.text, fnX, fnY);
+          }
+          ctx.globalAlpha = 1;
+          ctx.restore();
+
+          // ── Sword Slash Effects ──────────────────────────────────────────
+          ctx.save();
+          for (const slash of slashEffectsRef.current) {
+            const sx = slash.x - camX;
+            const sy = slash.y - camY;
+            const progress = slash.timer / slash.duration;
+            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - progress})`;
+            ctx.fillStyle = `rgba(56, 189, 248, ${0.45 * (1 - progress)})`;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(sx, sy, 14 + progress * 10, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.fill();
+          }
+          ctx.restore();
+
+          // ── Tibia Target Lock Indicator ──────────────────────────────────
+          if (selectedTargetIdRef.current) {
+            const targetMob = monstersRef.current.find(
+              (m) => m.id === selectedTargetIdRef.current && !m.isDead
+            );
+            if (targetMob) {
+              const tX = targetMob.x + targetMob.config.hitboxW / 2 - camX;
+              const tY = targetMob.y + targetMob.config.hitboxH / 2 - camY;
+              const tW = targetMob.config.visW + 12;
+              const tH = targetMob.config.visH + 12;
+              const corner = 7;
+
+              ctx.save();
+              ctx.strokeStyle = '#ef4444';
+              ctx.lineWidth = 2;
+
+              // Top-Left corner
+              ctx.beginPath();
+              ctx.moveTo(tX - tW / 2, tY - tH / 2 + corner);
+              ctx.lineTo(tX - tW / 2, tY - tH / 2);
+              ctx.lineTo(tX - tW / 2 + corner, tY - tH / 2);
+              ctx.stroke();
+
+              // Top-Right corner
+              ctx.beginPath();
+              ctx.moveTo(tX + tW / 2 - corner, tY - tH / 2);
+              ctx.lineTo(tX + tW / 2, tY - tH / 2);
+              ctx.lineTo(tX + tW / 2, tY - tH / 2 + corner);
+              ctx.stroke();
+
+              // Bottom-Left corner
+              ctx.beginPath();
+              ctx.moveTo(tX - tW / 2, tY + tH / 2 - corner);
+              ctx.lineTo(tX - tW / 2, tY + tH / 2);
+              ctx.lineTo(tX - tW / 2 + corner, tY + tH / 2);
+              ctx.stroke();
+
+              // Bottom-Right corner
+              ctx.beginPath();
+              ctx.moveTo(tX + tW / 2 - corner, tY + tH / 2);
+              ctx.lineTo(tX + tW / 2, tY + tH / 2);
+              ctx.lineTo(tX + tW / 2, tY + tH / 2 - corner);
+              ctx.stroke();
+
+              ctx.restore();
+            } else {
+              selectedTargetIdRef.current = null;
+            }
+          }
+
           // 3. Ambient Floating Particles (Fireflies / Dungeon Dust)
           if (propsRef.current.enableParticles) {
             particleSystemRef.current.draw(ctx);
@@ -1170,6 +1640,18 @@ export default function GameCanvas({
     const clickWorldX = cameraRef.current.x + clickScreenX * (dpr / scale);
     const clickWorldY = cameraRef.current.y + clickScreenY * (dpr / scale);
 
+    // 1. Check if clicking on a living monster to target it (Tibia Target Lock)
+    for (const mob of monstersRef.current) {
+      if (mob.isDead) continue;
+      const mobCenterX = mob.x + mob.config.hitboxW / 2;
+      const mobCenterY = mob.y + mob.config.hitboxH / 2;
+      if (Math.hypot(clickWorldX - mobCenterX, clickWorldY - mobCenterY) < 32) {
+        selectedTargetIdRef.current = selectedTargetIdRef.current === mob.id ? null : mob.id;
+        tapTargetRef.current = null;
+        return;
+      }
+    }
+
     const mapPortals = getMapPortals(mapId, mapData);
     let enteredPortal = false;
 
@@ -1221,10 +1703,10 @@ export default function GameCanvas({
   return (
     <div className="canvas-container" tabIndex={0}>
       {!assetsLoaded && (
-        <div className="canvas-loading-overlay">
-          <div className="spinner" />
-          <span>Carregando mapa, monstros e heróis...</span>
-        </div>
+        <WorldLoadingScreen
+          zoneName={mapId.startsWith('caverna') ? 'Caverna Subterrânea' : 'Superfície de Tibia'}
+          characterId={selectedCharacterId}
+        />
       )}
 
       {/* Interactive Portal Action Button (Click to Enter/Exit) */}
@@ -1258,6 +1740,7 @@ export default function GameCanvas({
         }}
         onEnterPortal={handlePortalButtonClick}
         hasPortalNearby={Boolean(activeNearbyPortal)}
+        onOpenInventory={onOpenInventory}
       />
     </div>
   );

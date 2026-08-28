@@ -6,6 +6,7 @@ interface VirtualJoystickProps {
   onAttack: () => void;
   onEnterPortal?: () => void;
   hasPortalNearby?: boolean;
+  onOpenInventory?: () => void;
 }
 
 export default function VirtualJoystick({
@@ -14,6 +15,7 @@ export default function VirtualJoystick({
   onAttack,
   onEnterPortal,
   hasPortalNearby,
+  onOpenInventory,
 }: VirtualJoystickProps) {
   const [joystickActive, setJoystickActive] = useState(false);
   const [joystickPos, setJoystickPos] = useState({ startX: 0, startY: 0, currentX: 0, currentY: 0 });
@@ -148,6 +150,21 @@ export default function VirtualJoystick({
           >
             <span className="mobile-action-icon">🕳️</span>
             <span className="mobile-action-text">Entrar</span>
+          </button>
+        )}
+
+        {onOpenInventory && (
+          <button
+            className="btn-mobile-action btn-mobile-bag"
+            onTouchStart={(e) => {
+              e.stopPropagation();
+              onOpenInventory();
+            }}
+            onClick={onOpenInventory}
+            title="Abrir Mochila"
+          >
+            <span className="mobile-action-icon">🎒</span>
+            <span className="mobile-action-text">Bag</span>
           </button>
         )}
 

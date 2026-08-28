@@ -125,7 +125,7 @@
     "hitboxH": 14,
     "speed": 40,
     "walkFps": 5,
-    "frameCount": 3
+    "frameCount": 2
   },
   "biliblili": {
     "name": "Biliblili",
@@ -333,7 +333,7 @@
     "hitboxH": 14,
     "speed": 40,
     "walkFps": 5,
-    "frameCount": 3
+    "frameCount": 4
   },
   "dodo": {
     "name": "Dodo Bird",
@@ -573,7 +573,7 @@
     "hitboxH": 10,
     "speed": 45,
     "walkFps": 5,
-    "frameCount": 3
+    "frameCount": 4
   },
   "fera": {
     "name": "Fera",

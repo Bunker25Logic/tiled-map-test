@@ -5,6 +5,7 @@ interface CharacterLobbyProps {
   selectedCharacterId: CharacterId;
   onSelectCharacter: (id: CharacterId) => void;
   onStartGame: () => void;
+  isFirstTimeChoice?: boolean;
 }
 
 interface HeroLore {
@@ -26,35 +27,35 @@ const HERO_LORE_MAP: Record<CharacterId, HeroLore> = {
     role: 'Espadachim / Versátil',
     difficulty: 'Fácil',
     stats: { hp: 150, mp: 80, atk: 130, spd: 125 },
-    startingSpells: ['🔥 Flame Strike', '⚡ Energy Wave', '❄️ Ice Burst', '✨ Divine Missile', '💀 Sudden Death'],
+    startingSpells: ['🔥 Fire Lion', '⚡ Lightning Claw', '☄️ Fireball'],
   },
   archer: {
     title: 'Arqueira Élfica',
     role: 'Distância / Agilidade',
     difficulty: 'Médio',
     stats: { hp: 110, mp: 90, atk: 135, spd: 135 },
-    startingSpells: ['✨ Divine Missile', '🌿 Terra Monolith', '❄️ Ice Burst', '⚡ Energy Wave', '🐍 Snake Bite'],
+    startingSpells: ['🐍 Snakebite', '💨 Wind Fireball', '🍃 Leaf Tempest'],
   },
   magician: {
     title: 'Arquimago Elemental',
     role: 'Mago / Área',
     difficulty: 'Médio',
     stats: { hp: 95, mp: 200, atk: 160, spd: 115 },
-    startingSpells: ['⚡ Energy Wave', '🔥 Flame Strike', '❄️ Ice Burst', '🌩️ Thunder Pillar', '🌪️ Ice Vortex'],
+    startingSpells: ['🌌 Astral Shockwave', '🔮 Arcane Nova', '✨ Cosmic Vortex'],
   },
   necromancer: {
     title: 'Mestre das Sombras',
     role: 'Magia Negra / Controle',
     difficulty: 'Avançado',
     stats: { hp: 105, mp: 180, atk: 145, spd: 120 },
-    startingSpells: ['💀 Sudden Death', '🌿 Terra Monolith', '🔥 Flame Strike', '❄️ Ice Burst', '🌩️ Thunder Pillar'],
+    startingSpells: ['🔮 Miasma Sombrio', '💀 Ceifador Espectral', '🌌 Astral Shockwave'],
   },
   paladin: {
     title: 'Cavaleiro Sagrado',
     role: 'Defensor / Suporte',
     difficulty: 'Fácil',
     stats: { hp: 160, mp: 120, atk: 115, spd: 115 },
-    startingSpells: ['✨ Divine Missile', '🌩️ Thunder Pillar', '❄️ Ice Burst', '⚡ Energy Wave', '🌿 Terra Monolith'],
+    startingSpells: ['⚡ Lightning Claw', '🧿 Sanctuary Ring', '❄️ Ice Shield'],
   },
 };
 
