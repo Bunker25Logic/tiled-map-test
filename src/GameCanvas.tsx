@@ -12,9 +12,13 @@ import {
 import {
   Monster,
   createMapMonsters,
-  updateCorpse,
   type MonsterCorpse,
+  type LootBox,
+  generateLootBox,
+  drawLootBox,
+  canCollectLootBox,
 } from './game/entities';
+import { ALL_ITEMS } from './game/items';
 import {
   PLAYABLE_CHARACTERS,
   dirToOtsNum,
@@ -138,6 +142,8 @@ interface GameCanvasProps {
   onPlayerDeath?: () => void;
   /** Called to open the Inventory / Bag modal */
   onOpenInventory?: () => void;
+  /** Called when a loot box is collected */
+  onCollectLoot?: (gold: number, itemId?: string) => void;
 }
 
 export default function GameCanvas({
@@ -162,6 +168,7 @@ export default function GameCanvas({
   onMonsterKill,
   onPlayerDeath,
   onOpenInventory,
+  onCollectLoot,
 }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [assetsLoaded, setAssetsLoaded] = useState(false);
@@ -184,9 +191,10 @@ export default function GameCanvas({
   // Keep camera coords in ref for mouse/touch raycasting
   const cameraRef = useRef({ x: 0, y: 0, scale: 1.0 });
 
-  // Persistent monsters, corpses, spells, floating numbers, slashes, targeted mob
+  // Persistent monsters, corpses, loot boxes, spells, floating numbers, slashes, targeted mob
   const monstersRef = useRef<Monster[]>([]);
   const corpsesRef = useRef<MonsterCorpse[]>([]);
+  const lootBoxesRef = useRef<LootBox[]>([]);
   const activeSpellsRef = useRef<ActiveSpell[]>([]);
   const floatingNumbersRef = useRef<FloatingNumber[]>([]);
   const slashEffectsRef = useRef<Array<{ x: number; y: number; dir: Direction; timer: number; duration: number }>>([]);
@@ -196,11 +204,13 @@ export default function GameCanvas({
   const onPlayerDamageRef = useRef(onPlayerDamage);
   const onMonsterKillRef = useRef(onMonsterKill);
   const onPlayerDeathRef = useRef(onPlayerDeath);
+  const onCollectLootRef = useRef(onCollectLoot);
   useEffect(() => {
     onPlayerDamageRef.current = onPlayerDamage;
     onMonsterKillRef.current = onMonsterKill;
     onPlayerDeathRef.current = onPlayerDeath;
-  }, [onPlayerDamage, onMonsterKill, onPlayerDeath]);
+    onCollectLootRef.current = onCollectLoot;
+  }, [onPlayerDamage, onMonsterKill, onPlayerDeath, onCollectLoot]);
 
   // Ambient atmospheric particle system
   const particleSystemRef = useRef<ParticleSystem>(new ParticleSystem(35, mapId));
@@ -227,6 +237,7 @@ export default function GameCanvas({
     onZoneTransition,
     onPlayerDeath,
     onOpenInventory,
+    onCollectLoot,
   });
 
   useEffect(() => {
@@ -247,7 +258,8 @@ export default function GameCanvas({
     propsRef.current.onZoneTransition = onZoneTransition;
     propsRef.current.onPlayerDeath = onPlayerDeath;
     propsRef.current.onOpenInventory = onOpenInventory;
-  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory]);
+    propsRef.current.onCollectLoot = onCollectLoot;
+  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot]);
 
   // Update particles on map change
   useEffect(() => {
@@ -281,22 +293,16 @@ export default function GameCanvas({
 
         // 4. Initialize monsters for this specific zone (procedural map-wide spawner)
         corpsesRef.current = [];
+        lootBoxesRef.current = [];
         floatingNumbersRef.current = [];
         const spawnMonsters = () => {
           const mobs = createMapMonsters(mapId, mapData, colliders);
           for (const mob of mobs) {
             mob.onDeath = (xpReward, deathX, deathY) => {
-              // Spawn corpse
-              corpsesRef.current.push({
-                x: mob.x,
-                y: mob.y,
-                type: mob.type,
-                config: mob.config,
-                dir: mob.dir,
-                alpha: 1.0,
-                timer: 0,
-                totalDuration: 5.0,
-              });
+              // Spawn loot box on the ground (monster disappears immediately and leaves loot)
+              const loot = generateLootBox(mob.id, deathX, deathY, xpReward);
+              lootBoxesRef.current.push(loot);
+
               // Floating XP number
               floatingNumbersRef.current.push({
                 id: `xp_${Date.now()}_${Math.random()}`,
@@ -342,9 +348,13 @@ export default function GameCanvas({
         const animator = new SpriteAnimator();
         animator.setState('idle', 'down');
 
+        let playerAttackAnimTimer = 0;
+        const PLAYER_ATTACK_ANIM_DURATION = 0.26;
+
         const executeMeleeAttack = () => {
           if (animator.state === 'dead' || (propsRef.current.playerHp !== undefined && propsRef.current.playerHp <= 0)) return;
           animator.triggerAttack();
+          playerAttackAnimTimer = PLAYER_ATTACK_ANIM_DURATION;
 
           const px = playerRef.current.x + HITBOX_W / 2;
           const py = playerRef.current.y + HITBOX_H / 2;
@@ -361,17 +371,17 @@ export default function GameCanvas({
           // Add slash effect in front of player
           let slashX = px;
           let slashY = py;
-          if (curDir === 'up') slashY -= 22;
-          else if (curDir === 'down') slashY += 22;
-          else if (curDir === 'left') slashX -= 22;
-          else if (curDir === 'right') slashX += 22;
+          if (curDir === 'up') slashY -= 20;
+          else if (curDir === 'down') slashY += 20;
+          else if (curDir === 'left') slashX -= 20;
+          else if (curDir === 'right') slashX += 20;
 
           slashEffectsRef.current.push({
             x: slashX,
             y: slashY,
             dir: curDir,
             timer: 0,
-            duration: 0.22,
+            duration: 0.26,
           });
 
           // Check if explicit target is in range
@@ -457,6 +467,7 @@ export default function GameCanvas({
           }
 
           animator.triggerAttack();
+          playerAttackAnimTimer = PLAYER_ATTACK_ANIM_DURATION;
 
           let dir = animator.direction;
           const px = playerRef.current.x;
@@ -668,6 +679,10 @@ export default function GameCanvas({
           const dt = Math.min((now - lastTime) / 1000, 0.05);
           lastTime = now;
 
+          if (playerAttackAnimTimer > 0) {
+            playerAttackAnimTimer = Math.max(0, playerAttackAnimTimer - dt);
+          }
+
           // ── Read Player Movement Input (Virtual Joystick / Tap / Keyboard) ────
           let moveX = 0;
           let moveY = 0;
@@ -827,10 +842,57 @@ export default function GameCanvas({
           // Remove dead monsters after a brief delay (corpse already spawned)
           monstersRef.current = monstersRef.current.filter((m) => !m.isDead);
 
-          // ── Update Corpses ────────────────────────────────────────────────
-          corpsesRef.current = corpsesRef.current.filter(
-            (corpse) => !updateCorpse(corpse, dt)
-          );
+          // ── Update Loot Boxes (Collect on player proximity) ──────────────
+          for (const loot of lootBoxesRef.current) {
+            loot.animTimer += dt * 3.0;
+
+            if (!loot.collected) {
+              if (canCollectLootBox(loot, playerRef.current.x, playerRef.current.y, HITBOX_W, HITBOX_H)) {
+                loot.collected = true;
+
+                // Floating gold reward
+                floatingNumbersRef.current.push({
+                  id: `gold_${Date.now()}_${Math.random()}`,
+                  x: loot.x,
+                  y: loot.y - 12,
+                  text: `+${loot.gold} Ouro`,
+                  color: '#facc15',
+                  alpha: 1,
+                  vy: -32,
+                  timer: 0,
+                  duration: 1.8,
+                });
+
+                // Floating item reward if dropped
+                if (loot.itemId && ALL_ITEMS[loot.itemId]) {
+                  const item = ALL_ITEMS[loot.itemId];
+                  const itemColor =
+                    loot.rarity === 'legendary' ? '#f59e0b'
+                    : loot.rarity === 'epic' ? '#c084fc'
+                    : loot.rarity === 'rare' ? '#38bdf8'
+                    : '#e2e8f0';
+
+                  floatingNumbersRef.current.push({
+                    id: `item_${Date.now()}_${Math.random()}`,
+                    x: loot.x,
+                    y: loot.y - 28,
+                    text: `+${item.name}`,
+                    color: itemColor,
+                    alpha: 1,
+                    vy: -24,
+                    timer: 0,
+                    duration: 2.4,
+                  });
+                }
+
+                propsRef.current.onCollectLoot?.(loot.gold, loot.itemId);
+              }
+            } else {
+              loot.collectAnim += dt * 3.5;
+            }
+          }
+          // Remove only collected loot boxes after collection animation completes
+          lootBoxesRef.current = lootBoxesRef.current.filter((l) => !l.collected || l.collectAnim < 1.0);
 
           // ── Update Floating Numbers ───────────────────────────────────────
           for (const fn of floatingNumbersRef.current) {
@@ -1034,30 +1096,16 @@ export default function GameCanvas({
             depthObjects.push(...objs);
           }
 
-          // Add Corpses to depth sorting (below living monsters)
-          for (const corpse of corpsesRef.current) {
-            if (corpse.x + corpse.config.width < camX || corpse.x > camX + worldViewW) continue;
-            if (corpse.y + corpse.config.height < camY || corpse.y > camY + worldViewH) continue;
+          // Add Loot Boxes to depth sorting (on ground until collected)
+          for (const loot of lootBoxesRef.current) {
+            if (loot.x + 30 < camX || loot.x - 30 > camX + worldViewW) continue;
+            if (loot.y + 30 < camY || loot.y - 30 > camY + worldViewH) continue;
 
-            const corpseBaseY = corpse.y + corpse.config.hitboxH;
             depthObjects.push({
               type: 'tiled-obj',
-              sortY: corpseBaseY - 0.5, // render under living entities
+              sortY: loot.y + 4,
               draw: (renderCtx) => {
-                const spriteKey = `${corpse.type}_1_${corpse.dir}`;
-                const spr = cached.monsters[spriteKey];
-                if (!spr) return;
-
-                const drawX = corpse.x + corpse.config.hitboxW / 2 - corpse.config.visCenterX - camX;
-                const drawY = corpse.y + corpse.config.hitboxH - corpse.config.feetY - camY;
-
-                renderCtx.save();
-                renderCtx.globalAlpha = corpse.alpha;
-                // Red tint for corpse (Tibia-style)
-                renderCtx.filter = 'sepia(1) saturate(3) hue-rotate(-20deg) brightness(0.7)';
-                renderCtx.drawImage(spr, drawX, drawY, corpse.config.width, corpse.config.height);
-                renderCtx.filter = 'none';
-                renderCtx.restore();
+                drawLootBox(renderCtx, loot, camX, camY);
               },
             });
           }
@@ -1172,144 +1220,204 @@ export default function GameCanvas({
               renderCtx.fill();
               renderCtx.restore();
 
-              // Helper para desenhar as Asas Equipadas (Angelicais ou Trovão)
-              const currentEquippedWings = propsRef.current.equippedWings ?? 'none';
-              const isAngelic = currentEquippedWings === 'angelic';
-              const isThunder = currentEquippedWings === 'thunder';
-              const wingsImg = isAngelic ? cached.items['wings_angelic'] : isThunder ? cached.items['wings_thunder'] : null;
+                // Player Shadow
+                renderCtx.save();
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.40)';
+                renderCtx.beginPath();
+                renderCtx.ellipse(
+                  px + HITBOX_W / 2 - camX,
+                  py + HITBOX_H - 3 - camY,
+                  10,
+                  5,
+                  0,
+                  0,
+                  Math.PI * 2
+                );
+                renderCtx.fill();
+                renderCtx.restore();
 
-              const currentDirection = animator.direction;
-              const wingCfg = isAngelic
-                ? (WINGS_ANGELIC_CONFIG[currentDirection] || WINGS_ANGELIC_CONFIG.down)
-                : (WINGS_THUNDER_CONFIG[currentDirection] || WINGS_THUNDER_CONFIG.down);
+                // Calculate Elastic Attack & Lunge Transform
+                let attackOffsetX = 0;
+                let attackOffsetY = 0;
+                let attackScaleX = 1.0;
+                let attackScaleY = 1.0;
+                let attackRotate = 0;
 
-              const drawWings = () => {
-                if (!wingsImg || currentEquippedWings === 'none') return;
+                if (playerAttackAnimTimer > 0) {
+                  const p = 1 - playerAttackAnimTimer / PLAYER_ATTACK_ANIM_DURATION;
+                  const dir = animator.direction;
+                  // Dynamic forward thrust impulse
+                  const thrustDist = Math.sin(p * Math.PI) * 7;
+                  // Squash & stretch elastic wave
+                  const stretch = Math.sin(p * Math.PI) * 0.20 - Math.sin(p * Math.PI * 2) * 0.05;
+                  const squash = Math.sin(p * Math.PI) * 0.14;
 
-                const cfg = wingCfg;
+                  if (dir === 'right') {
+                    attackOffsetX = thrustDist;
+                    attackScaleX = 1 + stretch;
+                    attackScaleY = 1 - squash;
+                    attackRotate = Math.sin(p * Math.PI) * 0.07;
+                  } else if (dir === 'left') {
+                    attackOffsetX = -thrustDist;
+                    attackScaleX = 1 + stretch;
+                    attackScaleY = 1 - squash;
+                    attackRotate = -Math.sin(p * Math.PI) * 0.07;
+                  } else if (dir === 'up') {
+                    attackOffsetY = -thrustDist;
+                    attackScaleX = 1 - squash;
+                    attackScaleY = 1 + stretch;
+                  } else if (dir === 'down') {
+                    attackOffsetY = thrustDist;
+                    attackScaleX = 1 - squash;
+                    attackScaleY = 1 + stretch;
+                  }
+                }
 
-                // Animação de bater asas (flap) e flutuação (bob)
-                const isPlayerMoving = animator.state === 'walk';
-                const flap = Math.sin(now * (isPlayerMoving ? 0.020 : 0.005)) * (isPlayerMoving ? 0.14 : 0.04);
-                const bob = isPlayerMoving ? Math.abs(Math.cos(now * 0.012)) * 2 : Math.sin(now * 0.004) * 1.5;
-
-                // Dimensões e coordenadas do spritesheet original
-                const sx = cfg.sx;
-                const sy = cfg.sy;
-                const sw = cfg.sw;
-                const sh = cfg.sh;
-
-                // Tamanho final na tela (aplicando escala e flap)
-                const wingDestW = cfg.baseW * cfg.scale * (1 + flap);
-                const wingDestH = cfg.baseH * cfg.scale;
-
-                // Posição final e Centro de Rotação (Eixo X e Eixo Y)
-                const wingCenterX = px + HITBOX_W / 2 - camX + cfg.offX;
-                const wingCenterY = py + HITBOX_H - curCharDef.feetY + cfg.offY - bob - camY + wingDestH / 2;
+                // Base player anchor at feet
+                const pFeetX = px + HITBOX_W / 2 - camX;
+                const pFeetY = py + HITBOX_H - camY;
 
                 renderCtx.save();
-                renderCtx.translate(wingCenterX, wingCenterY);
-                if (cfg.rot) {
-                  renderCtx.rotate((cfg.rot * Math.PI) / 180);
+                renderCtx.translate(pFeetX + attackOffsetX, pFeetY + attackOffsetY);
+                renderCtx.scale(attackScaleX, attackScaleY);
+                if (attackRotate !== 0) {
+                  renderCtx.rotate(attackRotate);
                 }
 
-                if (isAngelic) {
-                  // Aura Divina Sagrada Dourada
-                  renderCtx.shadowColor = 'rgba(250, 204, 21, 0.75)';
-                  renderCtx.shadowBlur = 8;
-                } else {
-                  // Aura Elétrica Tempestuosa Azul
-                  renderCtx.shadowColor = 'rgba(56, 189, 248, 0.65)';
-                  renderCtx.shadowBlur = 6;
-                }
+                // Helper para desenhar as Asas Equipadas (Angelicais ou Trovão)
+                const currentEquippedWings = propsRef.current.equippedWings ?? 'none';
+                const isAngelic = currentEquippedWings === 'angelic';
+                const isThunder = currentEquippedWings === 'thunder';
+                const wingsImg = isAngelic ? cached.items['wings_angelic'] : isThunder ? cached.items['wings_thunder'] : null;
 
-                renderCtx.drawImage(
-                  wingsImg,
-                  sx,
-                  sy,
-                  sw,
-                  sh,
-                  -wingDestW / 2,
-                  -wingDestH / 2,
-                  wingDestW,
-                  wingDestH
-                );
-                renderCtx.restore();
-              };
+                const currentDirection = animator.direction;
+                const wingCfg = isAngelic
+                  ? (WINGS_ANGELIC_CONFIG[currentDirection] || WINGS_ANGELIC_CONFIG.down)
+                  : (WINGS_THUNDER_CONFIG[currentDirection] || WINGS_THUNDER_CONFIG.down);
 
-              // PROFUNDIDADE: Se behind for TRUE -> Desenha a asa ATRÁS do corpo do personagem
-              if (wingCfg.behind && currentEquippedWings !== 'none') {
-                drawWings();
-              }
+                const drawWings = () => {
+                  if (!wingsImg || currentEquippedWings === 'none') return;
 
-              // Render Character Sprite
-              if (curCharDef.type === 'sheet') {
-                // Mark spritesheet
-                const currentAnim = animator.state;
-                const sprKey =
-                  currentAnim === 'attack'
-                    ? 'mark_attack'
-                    : currentAnim === 'dead'
-                    ? 'mark_dead'
-                    : 'mark_walk';
-                const sprImage = cached.characters[sprKey];
+                  const cfg = wingCfg;
 
-                if (sprImage) {
-                  const { col, row } = animator.getFrameCoords();
-                  const sx = col * FRAME_SIZE;
-                  const sy = row * FRAME_SIZE;
+                  // Animação de bater asas (flap) e flutuação (bob)
+                  const isPlayerMoving = animator.state === 'walk';
+                  const flap = Math.sin(now * (isPlayerMoving ? 0.020 : 0.005)) * (isPlayerMoving ? 0.14 : 0.04);
+                  const bob = isPlayerMoving ? Math.abs(Math.cos(now * 0.012)) * 2 : Math.sin(now * 0.004) * 1.5;
 
-                  const drawX = px + HITBOX_W / 2 - curCharDef.width / 2 - camX;
-                  const drawY = py + HITBOX_H - curCharDef.height - camY;
+                  // Dimensões e coordenadas do spritesheet original
+                  const sx = cfg.sx;
+                  const sy = cfg.sy;
+                  const sw = cfg.sw;
+                  const sh = cfg.sh;
+
+                  // Tamanho final na tela (aplicando escala e flap)
+                  const wingDestW = cfg.baseW * cfg.scale * (1 + flap);
+                  const wingDestH = cfg.baseH * cfg.scale;
+
+                  // Posição relativa ao centro dos pés (0, 0)
+                  const wingCenterX = cfg.offX;
+                  const wingCenterY = -curCharDef.feetY + cfg.offY - bob + wingDestH / 2;
+
+                  renderCtx.save();
+                  renderCtx.translate(wingCenterX, wingCenterY);
+                  if (cfg.rot) {
+                    renderCtx.rotate((cfg.rot * Math.PI) / 180);
+                  }
+
+                  if (isAngelic) {
+                    renderCtx.shadowColor = 'rgba(250, 204, 21, 0.75)';
+                    renderCtx.shadowBlur = 8;
+                  } else {
+                    renderCtx.shadowColor = 'rgba(56, 189, 248, 0.65)';
+                    renderCtx.shadowBlur = 6;
+                  }
 
                   renderCtx.drawImage(
-                    sprImage,
+                    wingsImg,
                     sx,
                     sy,
-                    FRAME_SIZE,
-                    FRAME_SIZE,
-                    drawX,
-                    drawY,
-                    curCharDef.width,
-                    curCharDef.height
+                    sw,
+                    sh,
+                    -wingDestW / 2,
+                    -wingDestH / 2,
+                    wingDestW,
+                    wingDestH
                   );
+                  renderCtx.restore();
+                };
+
+                // PROFUNDIDADE: Se behind for TRUE -> Desenha a asa ATRÁS do corpo do personagem
+                if (wingCfg.behind && currentEquippedWings !== 'none') {
+                  drawWings();
                 }
-              } else {
-                // OTServ individual PNGs (archer, barbarian, magician, necromancer, paladin)
-                const dirNum = dirToOtsNum(animator.direction);
-                const spriteKey = `${curCharDef.id}_${otsWalkFrame}_${dirNum}`;
-                const sprImage = cached.characters[spriteKey];
 
-                if (sprImage) {
-                  const drawX = px + HITBOX_W / 2 - curCharDef.visCenterX - camX;
-                  const drawY = py + HITBOX_H - curCharDef.feetY - camY;
+                // Render Character Sprite
+                if (curCharDef.type === 'sheet') {
+                  // Mark spritesheet
+                  const currentAnim = animator.state;
+                  const sprKey =
+                    currentAnim === 'attack'
+                      ? 'mark_attack'
+                      : currentAnim === 'dead'
+                      ? 'mark_dead'
+                      : 'mark_walk';
+                  const sprImage = cached.characters[sprKey];
 
-                  renderCtx.drawImage(
-                    sprImage,
-                    drawX,
-                    drawY,
-                    curCharDef.width,
-                    curCharDef.height
-                  );
+                  if (sprImage) {
+                    const { col, row } = animator.getFrameCoords();
+                    const sx = col * FRAME_SIZE;
+                    const sy = row * FRAME_SIZE;
+
+                    renderCtx.drawImage(
+                      sprImage,
+                      sx,
+                      sy,
+                      FRAME_SIZE,
+                      FRAME_SIZE,
+                      -curCharDef.width / 2,
+                      -curCharDef.height,
+                      curCharDef.width,
+                      curCharDef.height
+                    );
+                  }
+                } else {
+                  // OTServ individual PNGs (archer, barbarian, magician, necromancer, paladin)
+                  const dirNum = dirToOtsNum(animator.direction);
+                  // During attack, use dynamic fighting stance step (frame 2)
+                  const displayFrame = playerAttackAnimTimer > 0 ? 2 : otsWalkFrame;
+                  const spriteKey = `${curCharDef.id}_${displayFrame}_${dirNum}`;
+                  const sprImage = cached.characters[spriteKey];
+
+                  if (sprImage) {
+                    renderCtx.drawImage(
+                      sprImage,
+                      -curCharDef.visCenterX,
+                      -curCharDef.feetY,
+                      curCharDef.width,
+                      curCharDef.height
+                    );
+                  }
                 }
-              }
 
-              // PROFUNDIDADE: Se behind for FALSE -> Desenha a asa NA FRENTE do corpo do personagem
-              if (!wingCfg.behind && currentEquippedWings !== 'none') {
-                drawWings();
-              }
+                // PROFUNDIDADE: Se behind for FALSE -> Desenha a asa NA FRENTE do corpo do personagem
+                if (!wingCfg.behind && currentEquippedWings !== 'none') {
+                  drawWings();
+                }
 
-              // Player Name tag
-              renderCtx.save();
-              const pNameX = px + HITBOX_W / 2 - camX;
-              const pNameY = py + HITBOX_H - curCharDef.height - 4 - camY;
-              renderCtx.font = 'bold 9px Tahoma, Verdana, sans-serif';
-              renderCtx.textAlign = 'center';
-              renderCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-              renderCtx.fillText(curCharDef.name, pNameX + 1, pNameY + 1);
-              renderCtx.fillStyle = '#38bdf8';
-              renderCtx.fillText(curCharDef.name, pNameX, pNameY);
-              renderCtx.restore();
+                renderCtx.restore();
+
+                // Player Name tag (drawn above character, unaffected by squash/stretch)
+                renderCtx.save();
+                const pNameX = px + HITBOX_W / 2 - camX + attackOffsetX * 0.5;
+                const pNameY = py + HITBOX_H - curCharDef.height - 4 - camY + attackOffsetY * 0.5;
+                renderCtx.font = 'bold 9px Tahoma, Verdana, sans-serif';
+                renderCtx.textAlign = 'center';
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                renderCtx.fillText(curCharDef.name, pNameX + 1, pNameY + 1);
+                renderCtx.fillStyle = '#38bdf8';
+                renderCtx.fillText(curCharDef.name, pNameX, pNameY);
+                renderCtx.restore();
             },
           });
 
@@ -1354,7 +1462,7 @@ export default function GameCanvas({
                     spell.def.renderW,
                     spell.def.renderH
                   );
-                } else if (spell.def.animType === 'sheet') {
+                } else if (spell.def.animType === 'directional_projectile' || spell.def.animType === 'sheet') {
                   const { col, row } = spell.getFrameCoords();
                   const frameW = spell.def.frameW || 128;
                   const frameH = spell.def.frameH || 128;
@@ -1415,19 +1523,68 @@ export default function GameCanvas({
           ctx.globalAlpha = 1;
           ctx.restore();
 
-          // ── Sword Slash Effects ──────────────────────────────────────────
+          // ── Sword Slash Effects (slice.png animation) ────────────────────
+          const sliceImg = cached.magic['slice'];
           ctx.save();
           for (const slash of slashEffectsRef.current) {
             const sx = slash.x - camX;
             const sy = slash.y - camY;
-            const progress = slash.timer / slash.duration;
-            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - progress})`;
-            ctx.fillStyle = `rgba(56, 189, 248, ${0.45 * (1 - progress)})`;
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.arc(sx, sy, 14 + progress * 10, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.fill();
+            const progress = Math.min(1, Math.max(0, slash.timer / slash.duration));
+            const frameIdx = Math.min(5, Math.floor(progress * 6));
+
+            if (sliceImg) {
+              const srcX = frameIdx * 64;
+              const renderSize = 64;
+
+              ctx.save();
+              ctx.translate(sx, sy);
+
+              if (slash.dir === 'right') {
+                ctx.rotate(0);
+              } else if (slash.dir === 'left') {
+                ctx.scale(-1, 1);
+              } else if (slash.dir === 'up') {
+                ctx.rotate(-Math.PI / 2);
+              } else if (slash.dir === 'down') {
+                ctx.rotate(Math.PI / 2);
+              }
+
+              ctx.drawImage(
+                sliceImg,
+                srcX,
+                0,
+                64,
+                64,
+                -renderSize / 2,
+                -renderSize / 2,
+                renderSize,
+                renderSize
+              );
+
+              // Subtle luminous blade glow
+              ctx.globalAlpha = Math.max(0, 0.35 * (1 - progress));
+              ctx.drawImage(
+                sliceImg,
+                srcX,
+                0,
+                64,
+                64,
+                -renderSize / 2,
+                -renderSize / 2,
+                renderSize,
+                renderSize
+              );
+
+              ctx.restore();
+            } else {
+              ctx.strokeStyle = `rgba(255, 255, 255, ${1 - progress})`;
+              ctx.fillStyle = `rgba(56, 189, 248, ${0.45 * (1 - progress)})`;
+              ctx.lineWidth = 2.5;
+              ctx.beginPath();
+              ctx.arc(sx, sy, 14 + progress * 10, 0, Math.PI * 2);
+              ctx.stroke();
+              ctx.fill();
+            }
           }
           ctx.restore();
 
@@ -1648,6 +1805,19 @@ export default function GameCanvas({
       if (Math.hypot(clickWorldX - mobCenterX, clickWorldY - mobCenterY) < 32) {
         selectedTargetIdRef.current = selectedTargetIdRef.current === mob.id ? null : mob.id;
         tapTargetRef.current = null;
+        return;
+      }
+    }
+
+    // 2. Check if clicking on a loot box to walk towards it
+    for (const loot of lootBoxesRef.current) {
+      if (loot.collected) continue;
+      if (Math.hypot(clickWorldX - loot.x, clickWorldY - loot.y) < 26) {
+        tapTargetRef.current = {
+          x: loot.x - HITBOX_W / 2,
+          y: loot.y - HITBOX_H / 2,
+          anim: 0,
+        };
         return;
       }
     }

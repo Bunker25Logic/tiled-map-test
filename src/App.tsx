@@ -24,6 +24,7 @@ import {
   type EquippedGear,
   DEFAULT_INVENTORY_ITEMS,
   DEFAULT_EQUIPPED_GEAR,
+  ALL_ITEMS,
 } from './game/items';
 import {
   type PlayerAccount,
@@ -44,8 +45,8 @@ import './App.css';
 const DEFAULT_CLASS_SPELLS: Record<CharacterId, string[]> = {
   luxio: ['firelion', 'lightningclaw', 'sparkling_fireball'],
   archer: ['snakebite', 'wind_fireball', 'leaf_tempest'],
-  magician: ['arcane_astral', 'arcane_nova', 'arcane_vortex'],
-  necromancer: ['necro_orb', 'necro_reaper', 'arcane_astral'],
+  magician: ['fireball', 'arcane_nova', 'arcane_astral'],
+  necromancer: ['necro_orb', 'necro_reaper', 'fireball'],
   paladin: ['lightningclaw', 'arcane_sanctuary', 'iceshield'],
 };
 
@@ -63,7 +64,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   const [graphicStyle, setGraphicStyle] = useState<GraphicStyle>('pixel-sharp');
-  const [enableParticles, setEnableParticles] = useState<boolean>(true);
+  const [enableParticles, setEnableParticles] = useState<boolean>(false);
   const [debugColliders, setDebugColliders] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(false);
   const [equippedWings, setEquippedWings] = useState<WingType>('angelic');
@@ -305,6 +306,24 @@ export default function App() {
     if (didLevelUp) {
       setLevelUpMsg(`🎉 LEVEL UP! Você atingiu o nível ${newLevel}!`);
       setTimeout(() => setLevelUpMsg(null), 4000);
+    }
+  }, []);
+
+  const handleCollectLoot = useCallback((_gold: number, itemId?: string) => {
+    if (itemId && ALL_ITEMS[itemId]) {
+      const itemDef = ALL_ITEMS[itemId];
+      setInventoryItems((prev) => {
+        const existing = prev.find((i) => i.id === itemDef.id);
+        if (existing && existing.slotType === 'potion') {
+          return prev.map((i) =>
+            i.id === itemDef.id ? { ...i, quantity: (i.quantity || 1) + 1 } : i
+          );
+        }
+        if (!existing) {
+          return [...prev, { ...itemDef, quantity: 1 }];
+        }
+        return prev;
+      });
     }
   }, []);
 
@@ -578,6 +597,7 @@ export default function App() {
           onPlayerDeath={handlePlayerDeath}
           onConsumeMana={handleConsumeMana}
           onOpenInventory={() => setIsInventoryOpen(true)}
+          onCollectLoot={handleCollectLoot}
         />
 
         <Minimap

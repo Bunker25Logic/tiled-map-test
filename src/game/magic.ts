@@ -1,7 +1,30 @@
 import type { Direction } from './types';
 import type { CharacterId } from './characters';
 
-export type SpellAnimType = 'sheet' | 'sequence' | 'custom_frames';
+export type SpellAnimType = 'sheet' | 'sequence' | 'custom_frames' | 'directional_projectile';
+
+export function getFireballDirectionFrame(vx: number, vy: number, dir: Direction): number {
+  const speed = Math.hypot(vx, vy);
+  if (speed < 1) {
+    switch (dir) {
+      case 'up': return 1;
+      case 'right': return 5;
+      case 'down': return 7;
+      case 'left': return 3;
+      default: return 5;
+    }
+  }
+  const deg = (Math.atan2(vy, vx) * (180 / Math.PI) + 360) % 360;
+  if (deg >= 337.5 || deg < 22.5) return 5; // Right / East
+  if (deg >= 22.5 && deg < 67.5) return 8;  // Down-Right / South-East
+  if (deg >= 67.5 && deg < 112.5) return 7; // Down / South
+  if (deg >= 112.5 && deg < 157.5) return 6;// Down-Left / South-West
+  if (deg >= 157.5 && deg < 202.5) return 3;// Left / West
+  if (deg >= 202.5 && deg < 247.5) return 0;// Up-Left / North-West
+  if (deg >= 247.5 && deg < 292.5) return 1;// Up / North
+  if (deg >= 292.5 && deg < 337.5) return 2;// Up-Right / North-East
+  return 5;
+}
 
 export interface SpellFrameCoord {
   sx: number;
@@ -298,6 +321,38 @@ export const ALL_SPELLS: SpellDef[] = [
       if (dir === 'down') return 'snakebite_down';
       return 'snakebite_side';
     },
+  },
+
+  // ─── Fireball (Mage & Elemental) ─────────────────────────────────────────
+  {
+    id: 'fireball',
+    allowedClasses: ['magician', 'necromancer'],
+    damage: 65,
+    manaCost: 20,
+    damageRadius: 36,
+    isHoming: true,
+    projectileSpeed: 230,
+    name: 'Bola de Fogo',
+    category: 'elemental',
+    key: '1',
+    icon: '🔥',
+    color: '#ff4500',
+    description: 'Dispara uma esfera flamejante veloz que persegue o alvo e causa dano de fogo',
+    animType: 'directional_projectile',
+    imageKey: 'fireball',
+    cols: 9,
+    rows: 1,
+    totalFrames: 9,
+    frameW: 32,
+    frameH: 32,
+    renderW: 44,
+    renderH: 44,
+    fps: 1,
+    spawnOrigin: 'torso',
+    anchorX: () => 0.5,
+    anchorY: () => 0.5,
+    spawnOffsetDist: 14,
+    getImageKey: () => 'fireball',
   },
 
   // ─── Fireball & Particle Blasts ───────────────────────────────────────────
@@ -617,6 +672,9 @@ export const ALL_SPELLS: SpellDef[] = [
 ];
 
 export const ALL_MAGIC_IMAGE_PATHS: Record<string, string> = {
+  // Mage Fireball & Paladin/Warrior Slice
+  fireball: '/assets/magic-effects/fireball.png',
+  slice: '/assets/magic-effects/slice.png',
   // Necromancer Exclusive Spells
   attack_necro: '/assets/magic-effects/attack_necro.png',
   attack_summon: '/assets/magic-effects/attack_summon.png',
@@ -772,6 +830,15 @@ export class ActiveSpell {
       this.y += this.vy * dt;
     }
 
+    if (this.def.animType === 'directional_projectile') {
+      this.timer += dt;
+      if (this.timer >= 1.8) {
+        this.isFinished = true;
+      }
+      this.frame = getFireballDirectionFrame(this.vx, this.vy, this.dir);
+      return;
+    }
+
     this.timer += dt;
     const frameDuration = 1 / this.def.fps;
     const totalFrames =
@@ -792,6 +859,10 @@ export class ActiveSpell {
   }
 
   getFrameCoords(): { col: number; row: number } {
+    if (this.def.animType === 'directional_projectile') {
+      const col = getFireballDirectionFrame(this.vx, this.vy, this.dir);
+      return { col, row: 0 };
+    }
     const cols = this.def.cols || 1;
     const col = this.frame % cols;
     const row = Math.floor(this.frame / cols);

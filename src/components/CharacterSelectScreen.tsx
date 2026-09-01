@@ -98,11 +98,25 @@ export default function CharacterSelectScreen({
 
                 {/* Info */}
                 <div className="charselect-card-info">
-                  <div className="charselect-card-name">
-                    <span className="charselect-char-icon">{getCharIcon(char.characterId)}</span>
-                    <strong>{account.name}</strong>
+                  <div className="charselect-card-top">
+                    <div className="charselect-card-title-group">
+                      <div className="charselect-card-name">
+                        <span className="charselect-char-icon">{getCharIcon(char.characterId)}</span>
+                        <strong>{account.name}</strong>
+                      </div>
+                      <span className="charselect-class-name">{getClassName(char.characterId)}</span>
+                      <span className="charselect-zone-tag">
+                        📍 {char.lastZone === 'map1' ? 'Superfície' : char.lastZone}
+                      </span>
+                    </div>
+
+                    <button
+                      className={`charselect-play-btn ${isConfirming ? 'confirming' : ''}`}
+                      onClick={() => handlePlay(index)}
+                    >
+                      {isConfirming ? '▶ Confirmar?' : '▶ Jogar'}
+                    </button>
                   </div>
-                  <span className="charselect-class-name">{getClassName(char.characterId)}</span>
 
                   {/* XP Bar */}
                   <div className="charselect-xp-row">
@@ -139,18 +153,6 @@ export default function CharacterSelectScreen({
                       <span className="charselect-vital-num">{char.mp}/{char.maxMp}</span>
                     </div>
                   </div>
-
-                  <div className="charselect-card-footer">
-                    <span className="charselect-zone-tag">
-                      📍 {char.lastZone === 'map1' ? 'Superfície' : char.lastZone}
-                    </span>
-                    <button
-                      className={`charselect-play-btn ${isConfirming ? 'confirming' : ''}`}
-                      onClick={() => handlePlay(index)}
-                    >
-                      {isConfirming ? '▶ Confirmar?' : '▶ Jogar'}
-                    </button>
-                  </div>
                 </div>
               </div>
             );
@@ -163,10 +165,12 @@ export default function CharacterSelectScreen({
               onClick={() => setShowPicker(true)}
             >
               <span className="charselect-add-icon">＋</span>
-              <span>Adicionar Personagem</span>
-              <span className="charselect-add-sub">
-                Slot {account.characters.length + 1}/{MAX_CHARACTERS}
-              </span>
+              <div className="charselect-add-text-group">
+                <span className="charselect-add-title">Adicionar Personagem</span>
+                <span className="charselect-add-sub">
+                  Slot {account.characters.length + 1}/{MAX_CHARACTERS}
+                </span>
+              </div>
             </button>
           )}
         </div>

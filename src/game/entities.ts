@@ -464,6 +464,284 @@ export function updateCorpse(corpse: MonsterCorpse, dt: number): boolean {
   return corpse.timer >= solidDuration + fadeDuration;
 }
 
+// ─── Loot Box System ──────────────────────────────────────────────────────────
+
+export type LootRarity = 'common' | 'rare' | 'epic' | 'legendary';
+
+export interface LootBox {
+  id: string;
+  x: number;
+  y: number;
+  rarity: LootRarity;
+  /** Gold amount inside */
+  gold: number;
+  /** Optional item ID from the items table */
+  itemId?: string;
+  /** Floating animation timer */
+  animTimer: number;
+  /** Whether this loot box has been collected */
+  collected: boolean;
+  /** Collection animation progress (0 to 1) */
+  collectAnim: number;
+}
+
+/** Loot table entries per rarity */
+const LOOT_TABLE: { rarity: LootRarity; weight: number; goldRange: [number, number]; itemPool: string[] }[] = [
+  {
+    rarity: 'common',
+    weight: 55,
+    goldRange: [5, 25],
+    itemPool: [],
+  },
+  {
+    rarity: 'rare',
+    weight: 30,
+    goldRange: [20, 60],
+    itemPool: ['potion_hp_large', 'potion_mp_large'],
+  },
+  {
+    rarity: 'epic',
+    weight: 12,
+    goldRange: [50, 120],
+    itemPool: ['elixir_fury', 'sword_light', 'bow_elven'],
+  },
+  {
+    rarity: 'legendary',
+    weight: 3,
+    goldRange: [100, 300],
+    itemPool: ['staff_shadow', 'armor_paladin', 'ring_storm'],
+  },
+];
+
+const RARITY_COLORS: Record<LootRarity, { main: string; glow: string; accent: string }> = {
+  common:    { main: '#94a3b8', glow: 'rgba(148, 163, 184, 0.4)', accent: '#cbd5e1' },
+  rare:      { main: '#38bdf8', glow: 'rgba(56, 189, 248, 0.5)',  accent: '#7dd3fc' },
+  epic:      { main: '#c084fc', glow: 'rgba(192, 132, 252, 0.5)', accent: '#e9d5ff' },
+  legendary: { main: '#f59e0b', glow: 'rgba(245, 158, 11, 0.6)',  accent: '#fde68a' },
+};
+
+/** Generate a loot box drop from a killed monster */
+export function generateLootBox(monsterId: string, x: number, y: number, xpReward: number): LootBox {
+  // XP bonus shifts rarity weights towards better loot
+  const xpBonus = Math.min(45, xpReward / 10);
+
+  // Roll rarity
+  const adjustedWeights = LOOT_TABLE.map((entry) => {
+    let w = entry.weight;
+    if (entry.rarity === 'common') w = Math.max(8, w - xpBonus * 1.2);
+    else if (entry.rarity === 'rare') w += xpBonus * 0.45;
+    else if (entry.rarity === 'epic') w += xpBonus * 0.45;
+    else if (entry.rarity === 'legendary') w += xpBonus * 0.30;
+    return w;
+  });
+  const totalWeight = adjustedWeights.reduce((a, b) => a + b, 0);
+  let roll = Math.random() * totalWeight;
+  let selectedEntry = LOOT_TABLE[0];
+  for (let i = 0; i < LOOT_TABLE.length; i++) {
+    roll -= adjustedWeights[i];
+    if (roll <= 0) {
+      selectedEntry = LOOT_TABLE[i];
+      break;
+    }
+  }
+
+  const minGold = selectedEntry.goldRange[0];
+  const maxGold = selectedEntry.goldRange[1];
+  const gold = minGold + Math.floor(Math.random() * (maxGold - minGold + 1));
+  const hasItem = selectedEntry.itemPool.length > 0 && (selectedEntry.rarity !== 'common' ? Math.random() < 0.75 : Math.random() < 0.25);
+  const itemId = hasItem && selectedEntry.itemPool.length > 0
+    ? selectedEntry.itemPool[Math.floor(Math.random() * selectedEntry.itemPool.length)]
+    : undefined;
+
+  return {
+    id: `loot_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    x,
+    y,
+    rarity: selectedEntry.rarity,
+    gold,
+    itemId,
+    animTimer: Math.random() * Math.PI * 2,
+    collected: false,
+    collectAnim: 0,
+  };
+}
+
+/** Check if player is close enough to collect a loot box */
+export function canCollectLootBox(loot: LootBox, playerX: number, playerY: number, hitboxW: number, hitboxH: number): boolean {
+  if (loot.collected) return false;
+  const lootCenterX = loot.x;
+  const lootCenterY = loot.y;
+  const playerCenterX = playerX + hitboxW / 2;
+  const playerCenterY = playerY + hitboxH / 2;
+  return Math.hypot(lootCenterX - playerCenterX, lootCenterY - playerCenterY) < 28;
+}
+
+/**
+ * Draw a loot box on the canvas using SVG-style path drawing.
+ * Renders a stylized treasure chest with rarity-based colors, metallic trims and glow.
+ */
+export function drawLootBox(
+  ctx: CanvasRenderingContext2D,
+  loot: LootBox,
+  camX: number,
+  camY: number,
+): void {
+  const screenX = loot.x - camX;
+  const screenY = loot.y - camY;
+  const colors = RARITY_COLORS[loot.rarity];
+
+  // Floating bob animation
+  const bob = Math.sin(loot.animTimer) * 2.5;
+  // Pulsing glow
+  const glowPulse = 0.65 + Math.sin(loot.animTimer * 1.8) * 0.35;
+
+  // Collection shrink animation
+  let scale = 1.0;
+  let alpha = 1.0;
+  if (loot.collected) {
+    scale = Math.max(0, 1.0 - loot.collectAnim * 0.7);
+    alpha = Math.max(0, 1.0 - loot.collectAnim);
+    if (alpha <= 0) return;
+  }
+
+  ctx.save();
+  ctx.translate(screenX, screenY + bob);
+  ctx.scale(scale, scale);
+  ctx.globalAlpha = alpha;
+
+  const boxW = 20;
+  const boxH = 15;
+  const halfW = boxW / 2;
+  const halfH = boxH / 2;
+
+  // ── Vertical Light Beam (Epic / Legendary) ──
+  if (loot.rarity === 'legendary' || loot.rarity === 'epic') {
+    ctx.save();
+    const beamH = loot.rarity === 'legendary' ? 48 : 32;
+    const beamW = loot.rarity === 'legendary' ? 14 : 10;
+    const beamGrad = ctx.createLinearGradient(0, halfH, 0, -beamH);
+    beamGrad.addColorStop(0, colors.glow);
+    beamGrad.addColorStop(0.7, colors.glow.replace(/[\d.]+\)$/, '0.15)'));
+    beamGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = beamGrad;
+    ctx.fillRect(-beamW / 2, -beamH, beamW, beamH + halfH);
+    ctx.restore();
+  }
+
+  // ── Ground Shadow ──
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.beginPath();
+  ctx.ellipse(0, halfH + 3 - bob, 11, 3.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Outer glow aura
+  ctx.shadowColor = colors.glow;
+  ctx.shadowBlur = (loot.rarity === 'legendary' ? 12 : 8) * glowPulse;
+
+  // ── Chest Body (bottom base) ──
+  ctx.fillStyle = '#27170a'; // Dark sturdy mahogany wood
+  ctx.strokeStyle = colors.main;
+  ctx.lineWidth = 1;
+
+  const bodyTop = -1;
+  const bodyBottom = halfH;
+  const radius = 2;
+  ctx.beginPath();
+  ctx.moveTo(-halfW + radius, bodyTop);
+  ctx.lineTo(halfW - radius, bodyTop);
+  ctx.quadraticCurveTo(halfW, bodyTop, halfW, bodyTop + radius);
+  ctx.lineTo(halfW, bodyBottom);
+  ctx.lineTo(-halfW, bodyBottom);
+  ctx.lineTo(-halfW, bodyTop + radius);
+  ctx.quadraticCurveTo(-halfW, bodyTop, -halfW + radius, bodyTop);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Wood planks highlight on body
+  ctx.fillStyle = '#3d2412';
+  ctx.fillRect(-halfW + 3, bodyTop + 2, boxW - 6, boxH - 5);
+
+  // ── Chest Lid (curved dome) ──
+  const lidTop = -halfH - 3;
+  const lidBottom = bodyTop;
+  ctx.fillStyle = '#341d0e';
+  ctx.beginPath();
+  ctx.moveTo(-halfW - 1, lidBottom);
+  ctx.lineTo(-halfW - 1, lidTop + 3);
+  ctx.quadraticCurveTo(-halfW - 1, lidTop, -halfW + 3, lidTop);
+  ctx.lineTo(halfW - 3, lidTop);
+  ctx.quadraticCurveTo(halfW + 1, lidTop, halfW + 1, lidTop + 3);
+  ctx.lineTo(halfW + 1, lidBottom);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = colors.main;
+  ctx.stroke();
+
+  // Lid top highlight
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(-halfW + 4, lidTop + 1, boxW - 8, 1.5);
+
+  // ── Metal Straps & Rims (Rarity Colored) ──
+  ctx.fillStyle = colors.main;
+  // Left vertical strap
+  ctx.fillRect(-halfW + 3, lidTop, 2.5, boxH + 3);
+  // Right vertical strap
+  ctx.fillRect(halfW - 5.5, lidTop, 2.5, boxH + 3);
+  // Horizontal middle rim
+  ctx.fillRect(-halfW - 1, bodyTop - 1, boxW + 2, 2.5);
+
+  // ── Central Lock Gem / Clasp ──
+  ctx.shadowBlur = 6 * glowPulse;
+  ctx.shadowColor = colors.glow;
+  ctx.fillStyle = colors.accent;
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.arc(0, bodyTop + 0.5, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Center crystal core
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(-0.6, bodyTop - 0.2, 1.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ── Sparkle particles around rare+ loot ──
+  if (loot.rarity !== 'common') {
+    const sparkleCount = loot.rarity === 'legendary' ? 6 : loot.rarity === 'epic' ? 4 : 2;
+    for (let i = 0; i < sparkleCount; i++) {
+      const angle = (loot.animTimer * 1.5 + (i * Math.PI * 2) / sparkleCount);
+      const sparkleR = 13 + Math.sin(loot.animTimer * 2 + i) * 4;
+      const sx = Math.cos(angle) * sparkleR;
+      const sy = Math.sin(angle) * sparkleR * 0.55 - 2;
+      const sparkleAlpha = 0.45 + Math.sin(loot.animTimer * 3 + i * 1.5) * 0.35;
+
+      ctx.fillStyle = colors.accent;
+      ctx.globalAlpha = alpha * sparkleAlpha;
+      ctx.beginPath();
+      ctx.arc(sx, sy, loot.rarity === 'legendary' ? 1.6 : 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // ── Small Floating Rarity Badge ──
+  ctx.globalAlpha = alpha * 0.9;
+  ctx.shadowBlur = 0;
+  ctx.font = 'bold 8px Tahoma, Verdana, sans-serif';
+  ctx.textAlign = 'center';
+  const tagY = lidTop - 5;
+  const tagText = loot.rarity === 'legendary' ? '★ LENDÁRIO' : loot.rarity === 'epic' ? '◆ ÉPICO' : loot.rarity === 'rare' ? '● RARO' : 'BAÚ';
+  
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+  ctx.fillText(tagText, 1, tagY + 1);
+  ctx.fillStyle = colors.accent;
+  ctx.fillText(tagText, 0, tagY);
+
+  ctx.restore();
+}
+
 // Global active walkable land tiles index for current surface map
 let activeWalkableLandSet: Set<string> | null = null;
 
