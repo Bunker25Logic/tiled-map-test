@@ -1,6 +1,7 @@
 import type { Rect, TiledMap } from './types';
 import { loadChromaKeyImage } from './imageLoader';
 import { moveAndSlide } from './mapUtils';
+import { type CoinType, getCoinFrameIndex } from './currency';
 import rawConfigs from './entitiesConfig.json';
 
 export interface MonsterConfig {
@@ -738,6 +739,177 @@ export function drawLootBox(
   ctx.fillText(tagText, 1, tagY + 1);
   ctx.fillStyle = colors.accent;
   ctx.fillText(tagText, 0, tagY);
+
+  ctx.restore();
+}
+
+// ─── Tibia Stackable Coin Drops System ────────────────────────────────────────
+
+export interface CoinDrop {
+  id: string;
+  x: number;
+  y: number;
+  coinType: CoinType;
+  amount: number;
+  frameIndex: number;
+  animTimer: number;
+  collected: boolean;
+  collectAnim: number;
+}
+
+/** Check if player is close enough to collect a coin drop */
+export function canCollectCoinDrop(
+  coin: CoinDrop,
+  playerX: number,
+  playerY: number,
+  hitboxW: number,
+  hitboxH: number
+): boolean {
+  if (coin.collected) return false;
+  const playerCenterX = playerX + hitboxW / 2;
+  const playerCenterY = playerY + hitboxH / 2;
+  return Math.hypot(coin.x - playerCenterX, coin.y - playerCenterY) < 28;
+}
+
+/**
+ * Generate Tibia-style coin drops for a defeated monster.
+ * Drops authentic Gold, Silver (Platinum), and Basalt (Crystal) coin stacks.
+ */
+export function generateMonsterCoinDrops(
+  monsterId: string,
+  x: number,
+  y: number,
+  xpReward: number
+): CoinDrop[] {
+  const drops: CoinDrop[] = [];
+
+  // 1. Gold coins: Almost all monsters drop gold
+  const minGold = Math.max(1, Math.floor(xpReward * 0.35));
+  const maxGold = Math.max(4, Math.floor(xpReward * 1.3));
+  const goldAmount = Math.min(100, minGold + Math.floor(Math.random() * (maxGold - minGold + 1)));
+
+  drops.push({
+    id: `coin_gold_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    x: x + (Math.random() - 0.5) * 6,
+    y: y + (Math.random() - 0.5) * 6,
+    coinType: 'gold',
+    amount: goldAmount,
+    frameIndex: getCoinFrameIndex(goldAmount),
+    animTimer: Math.random() * Math.PI * 2,
+    collected: false,
+    collectAnim: 0,
+  });
+
+  // 2. Silver coins (Tier 2 / stronger mobs, xp >= 55)
+  if (xpReward >= 55) {
+    const silverChance = Math.min(0.85, (xpReward - 35) / 200);
+    if (Math.random() < silverChance) {
+      const maxSilver = Math.min(30, Math.max(1, Math.floor(xpReward / 40)));
+      const silverAmount = 1 + Math.floor(Math.random() * maxSilver);
+      drops.push({
+        id: `coin_silver_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        x: x + 12 + (Math.random() - 0.5) * 4,
+        y: y + (Math.random() - 0.5) * 6,
+        coinType: 'silver',
+        amount: silverAmount,
+        frameIndex: getCoinFrameIndex(silverAmount),
+        animTimer: Math.random() * Math.PI * 2,
+        collected: false,
+        collectAnim: 0,
+      });
+    }
+  }
+
+  // 3. Basalt / Crystal coins (Tier 3 / bosses, dragons, xp >= 220)
+  if (xpReward >= 220) {
+    const basaltChance = Math.min(0.75, (xpReward - 180) / 350);
+    if (Math.random() < basaltChance) {
+      const maxBasalt = Math.min(8, Math.max(1, Math.floor(xpReward / 180)));
+      const basaltAmount = 1 + Math.floor(Math.random() * maxBasalt);
+      drops.push({
+        id: `coin_basalt_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        x: x - 12 + (Math.random() - 0.5) * 4,
+        y: y + (Math.random() - 0.5) * 6,
+        coinType: 'basalt',
+        amount: basaltAmount,
+        frameIndex: getCoinFrameIndex(basaltAmount),
+        animTimer: Math.random() * Math.PI * 2,
+        collected: false,
+        collectAnim: 0,
+      });
+    }
+  }
+
+  return drops;
+}
+
+/**
+ * Draw a Tibia coin stack on the canvas with exact sprite frame from spritesheet.
+ */
+export function drawCoinDrop(
+  ctx: CanvasRenderingContext2D,
+  coin: CoinDrop,
+  coinImg: HTMLImageElement | undefined,
+  camX: number,
+  camY: number,
+): void {
+  const screenX = coin.x - camX;
+  const screenY = coin.y - camY;
+
+  // Subtle floating bob
+  const bob = Math.sin(coin.animTimer * 2.5) * 1.5;
+  const glowPulse = 0.5 + Math.sin(coin.animTimer * 3.0) * 0.5;
+
+  let scale = 1.0;
+  let alpha = 1.0;
+  if (coin.collected) {
+    scale = Math.max(0, 1.0 - coin.collectAnim * 0.85);
+    alpha = Math.max(0, 1.0 - coin.collectAnim);
+    if (alpha <= 0) return;
+  }
+
+  ctx.save();
+  ctx.translate(screenX, screenY + bob);
+  ctx.scale(scale, scale);
+  ctx.globalAlpha = alpha;
+
+  // Ground drop shadow
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.beginPath();
+  ctx.ellipse(0, 8 - bob, 9, 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Draw 32x32 sprite frame from coin spritesheet
+  if (coinImg) {
+    const frameW = 32;
+    const frameH = 32;
+    const sx = coin.frameIndex * frameW;
+    ctx.drawImage(coinImg, sx, 0, frameW, frameH, -16, -16, 32, 32);
+  }
+
+  // Sparkles for silver / basalt or high piles
+  if (coin.coinType !== 'gold' || coin.amount >= 25) {
+    const sparkleColor =
+      coin.coinType === 'basalt' ? '#38bdf8' : coin.coinType === 'silver' ? '#e2e8f0' : '#facc15';
+    ctx.fillStyle = sparkleColor;
+    ctx.globalAlpha = alpha * glowPulse * 0.8;
+    const sparkX = Math.cos(coin.animTimer * 2.0) * 10;
+    const sparkY = Math.sin(coin.animTimer * 2.0) * 7 - 3;
+    ctx.beginPath();
+    ctx.arc(sparkX, sparkY, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Floating amount badge above coin stack
+  ctx.globalAlpha = alpha * 0.9;
+  ctx.font = 'bold 8px Tahoma, Verdana, sans-serif';
+  ctx.textAlign = 'center';
+  const tagColor =
+    coin.coinType === 'basalt' ? '#38bdf8' : coin.coinType === 'silver' ? '#cbd5e1' : '#facc15';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+  ctx.fillText(`${coin.amount}`, 1, -13);
+  ctx.fillStyle = tagColor;
+  ctx.fillText(`${coin.amount}`, 0, -14);
 
   ctx.restore();
 }

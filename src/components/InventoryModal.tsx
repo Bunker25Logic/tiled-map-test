@@ -6,6 +6,8 @@ import {
   getRarityColor,
 } from '../game/items';
 import { PLAYABLE_CHARACTERS, type CharacterId } from '../game/characters';
+import type { PlayerWallet } from '../game/playerStore';
+import CoinIcon from './CoinIcon';
 
 interface InventoryModalProps {
   isOpen: boolean;
@@ -19,6 +21,7 @@ interface InventoryModalProps {
   playerMaxMp: number;
   inventoryItems: ItemDef[];
   equippedGear: EquippedGear;
+  playerWallet?: PlayerWallet;
   onEquipItem: (item: ItemDef) => void;
   onUnequipSlot: (slot: keyof EquippedGear) => void;
   onUsePotion: (item: ItemDef) => void;
@@ -36,6 +39,7 @@ export default function InventoryModal({
   playerMaxMp,
   inventoryItems,
   equippedGear,
+  playerWallet = { gold: 0, silver: 0, basalt: 0 },
   onEquipItem,
   onUnequipSlot,
   onUsePotion,
@@ -410,6 +414,39 @@ export default function InventoryModal({
 
           {/* Right Panel: Bag Items & Selected Item Inspector */}
           <div className="inventory-bag-panel">
+            {/* Special Currency Pouch (Bolsa de Moedas) */}
+            <div className="inventory-coin-pouch">
+              <div className="coin-pouch-title">
+                <span>💰</span>
+                <strong>Bolsa de Moedas</strong>
+              </div>
+              <div className="coin-pouch-slots">
+                <div className="coin-pouch-slot" title="Moedas de Cristal (1 = 100 Prata = 10.000 Ouro)">
+                  <CoinIcon type="basalt" amount={playerWallet.basalt} size={24} />
+                  <div className="coin-pouch-meta">
+                    <span className="coin-pouch-count">{playerWallet.basalt.toLocaleString()}</span>
+                    <span className="coin-pouch-label">Cristal</span>
+                  </div>
+                </div>
+
+                <div className="coin-pouch-slot" title="Moedas de Prata (1 = 100 Ouro)">
+                  <CoinIcon type="silver" amount={playerWallet.silver} size={24} />
+                  <div className="coin-pouch-meta">
+                    <span className="coin-pouch-count">{playerWallet.silver.toLocaleString()}</span>
+                    <span className="coin-pouch-label">Prata</span>
+                  </div>
+                </div>
+
+                <div className="coin-pouch-slot" title="Moedas de Ouro">
+                  <CoinIcon type="gold" amount={playerWallet.gold} size={24} />
+                  <div className="coin-pouch-meta">
+                    <span className="coin-pouch-count">{playerWallet.gold.toLocaleString()}</span>
+                    <span className="coin-pouch-label">Ouro</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Filter Tabs */}
             <div className="bag-filters-row">
               <button

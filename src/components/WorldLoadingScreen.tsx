@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { CharacterId } from '../game/characters';
 import { PLAYABLE_CHARACTERS } from '../game/characters';
 import CharacterSpriteAvatar from './CharacterSpriteAvatar';
+import { preloadAllGameAssets } from '../game/assetManager';
 
 interface WorldLoadingScreenProps {
   zoneName?: string;
@@ -14,10 +15,11 @@ const LOADING_TIPS = [
   'Dica: Inimigos vermelhos como Orcs e Dragões avançam assim que você se aproxima!',
   'Dica: Animais como Esquilos e Dodos são pacíficos até que você os ataque.',
   'Dica: O XP necessário para cada nível segue a fórmula exata do Tibia clássico.',
-  'Dica: Ao derrotar monstros, seus corpos permanecem no chão temporariamente.',
+  'Dica: Ao derrotar monstros, eles dropam pilhas de moedas (Ouro, Prata e Cristal)!',
   'Dica: Pressione ESPAÇO ou J para desferir golpes corpo a corpo.',
   'Dica: Pressione 1 a 5 no teclado para conjurar magias do seu Grimório.',
-  'Dica: Você pode explorar cavernas descendo em buracos interativos com a tecla E.',
+  'Dica: 100 Moedas de Ouro equivalem a 1 Moeda de Prata. 100 de Prata valem 1 Cristal!',
+  'Dica: Você pode explorar cavernas descendo em buracos interativos com a tecla E ou clique.',
 ];
 
 export default function WorldLoadingScreen({
@@ -28,10 +30,22 @@ export default function WorldLoadingScreen({
 }: WorldLoadingScreenProps) {
   const [tipIndex, setTipIndex] = useState(0);
   const [progress, setProgress] = useState(15);
+  const [assetsReady, setAssetsReady] = useState(false);
 
   const charDef = PLAYABLE_CHARACTERS.find((c) => c.id === characterId) || PLAYABLE_CHARACTERS[0];
 
   useEffect(() => {
+    // Real asset preloading in background
+    let isMounted = true;
+    preloadAllGameAssets()
+      .then(() => {
+        if (isMounted) setAssetsReady(true);
+      })
+      .catch((err) => {
+        console.warn('Preload warning:', err);
+        if (isMounted) setAssetsReady(true);
+      });
+
     const tipInterval = setInterval(() => {
       setTipIndex((prev) => (prev + 1) % LOADING_TIPS.length);
     }, 2800);
@@ -39,25 +53,26 @@ export default function WorldLoadingScreen({
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) return 100;
-        const next = prev + Math.floor(Math.random() * 14) + 8;
+        const next = prev + Math.floor(Math.random() * 15) + 10;
         return next > 100 ? 100 : next;
       });
-    }, 110);
+    }, 90);
 
     return () => {
+      isMounted = false;
       clearInterval(tipInterval);
       clearInterval(progressInterval);
     };
   }, []);
 
   useEffect(() => {
-    if (progress >= 100 && onLoadComplete) {
+    if (progress >= 100 && assetsReady && onLoadComplete) {
       const timer = setTimeout(() => {
         onLoadComplete();
-      }, 400);
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, [progress, onLoadComplete]);
+  }, [progress, assetsReady, onLoadComplete]);
 
   return (
     <div className="world-loading-overlay">

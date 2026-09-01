@@ -83,7 +83,7 @@ export async function preloadAllGameAssets(): Promise<GameAssetCache> {
       }
     });
 
-    // 5. Load equipment item textures (Thunder Wings + Angelic Wings)
+    // 5. Load equipment item textures and coin sprite sheets
     const itemPromises = [
       loadChromaKeyImage('/assets/itens/asas trovao.webp')
         .then((img) => {
@@ -98,6 +98,27 @@ export async function preloadAllGameAssets(): Promise<GameAssetCache> {
         })
         .catch((err) => {
           console.warn('Failed loading angelic wings:', err);
+        }),
+      loadChromaKeyImage('/assets/itens/gold.png')
+        .then((img) => {
+          globalCache.items['coin_gold'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading gold coin sheet:', err);
+        }),
+      loadChromaKeyImage('/assets/itens/silver.png')
+        .then((img) => {
+          globalCache.items['coin_silver'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading silver coin sheet:', err);
+        }),
+      loadChromaKeyImage('/assets/itens/basalt.png')
+        .then((img) => {
+          globalCache.items['coin_basalt'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading basalt coin sheet:', err);
         }),
     ];
 

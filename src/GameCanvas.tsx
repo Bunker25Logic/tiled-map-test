@@ -14,9 +14,13 @@ import {
   createMapMonsters,
   type MonsterCorpse,
   type LootBox,
+  type CoinDrop,
   generateLootBox,
   drawLootBox,
   canCollectLootBox,
+  generateMonsterCoinDrops,
+  drawCoinDrop,
+  canCollectCoinDrop,
 } from './game/entities';
 import { ALL_ITEMS } from './game/items';
 import {
@@ -37,7 +41,6 @@ import {
   type GraphicStyle,
 } from './game/graphics';
 import VirtualJoystick from './components/VirtualJoystick';
-import WorldLoadingScreen from './components/WorldLoadingScreen';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -144,6 +147,8 @@ interface GameCanvasProps {
   onOpenInventory?: () => void;
   /** Called when a loot box is collected */
   onCollectLoot?: (gold: number, itemId?: string) => void;
+  /** Called when coins are collected */
+  onCollectCoins?: (coins: { gold?: number; silver?: number; basalt?: number }) => void;
 }
 
 export default function GameCanvas({
@@ -169,9 +174,10 @@ export default function GameCanvas({
   onPlayerDeath,
   onOpenInventory,
   onCollectLoot,
+  onCollectCoins,
 }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [, setAssetsLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [activeNearbyPortal, setActiveNearbyPortal] = useState<PortalDef | null>(null);
 
@@ -191,10 +197,11 @@ export default function GameCanvas({
   // Keep camera coords in ref for mouse/touch raycasting
   const cameraRef = useRef({ x: 0, y: 0, scale: 1.0 });
 
-  // Persistent monsters, corpses, loot boxes, spells, floating numbers, slashes, targeted mob
+  // Persistent monsters, corpses, loot boxes, coin drops, spells, floating numbers, slashes, targeted mob
   const monstersRef = useRef<Monster[]>([]);
   const corpsesRef = useRef<MonsterCorpse[]>([]);
   const lootBoxesRef = useRef<LootBox[]>([]);
+  const coinDropsRef = useRef<CoinDrop[]>([]);
   const activeSpellsRef = useRef<ActiveSpell[]>([]);
   const floatingNumbersRef = useRef<FloatingNumber[]>([]);
   const slashEffectsRef = useRef<Array<{ x: number; y: number; dir: Direction; timer: number; duration: number }>>([]);
@@ -205,12 +212,14 @@ export default function GameCanvas({
   const onMonsterKillRef = useRef(onMonsterKill);
   const onPlayerDeathRef = useRef(onPlayerDeath);
   const onCollectLootRef = useRef(onCollectLoot);
+  const onCollectCoinsRef = useRef(onCollectCoins);
   useEffect(() => {
     onPlayerDamageRef.current = onPlayerDamage;
     onMonsterKillRef.current = onMonsterKill;
     onPlayerDeathRef.current = onPlayerDeath;
     onCollectLootRef.current = onCollectLoot;
-  }, [onPlayerDamage, onMonsterKill, onPlayerDeath, onCollectLoot]);
+    onCollectCoinsRef.current = onCollectCoins;
+  }, [onPlayerDamage, onMonsterKill, onPlayerDeath, onCollectLoot, onCollectCoins]);
 
   // Ambient atmospheric particle system
   const particleSystemRef = useRef<ParticleSystem>(new ParticleSystem(35, mapId));
@@ -238,6 +247,7 @@ export default function GameCanvas({
     onPlayerDeath,
     onOpenInventory,
     onCollectLoot,
+    onCollectCoins,
   });
 
   useEffect(() => {
@@ -259,7 +269,8 @@ export default function GameCanvas({
     propsRef.current.onPlayerDeath = onPlayerDeath;
     propsRef.current.onOpenInventory = onOpenInventory;
     propsRef.current.onCollectLoot = onCollectLoot;
-  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot]);
+    propsRef.current.onCollectCoins = onCollectCoins;
+  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot, onCollectCoins]);
 
   // Update particles on map change
   useEffect(() => {
@@ -294,20 +305,27 @@ export default function GameCanvas({
         // 4. Initialize monsters for this specific zone (procedural map-wide spawner)
         corpsesRef.current = [];
         lootBoxesRef.current = [];
+        coinDropsRef.current = [];
         floatingNumbersRef.current = [];
         const spawnMonsters = () => {
           const mobs = createMapMonsters(mapId, mapData, colliders);
           for (const mob of mobs) {
             mob.onDeath = (xpReward, deathX, deathY) => {
-              // Spawn loot box on the ground (monster disappears immediately and leaves loot)
-              const loot = generateLootBox(mob.id, deathX, deathY, xpReward);
-              lootBoxesRef.current.push(loot);
+              // 1. Spawn authentic stackable Tibia coin drops on the ground
+              const coins = generateMonsterCoinDrops(mob.id, deathX, deathY, xpReward);
+              coinDropsRef.current.push(...coins);
 
-              // Floating XP number
+              // 2. Extra equipment or potion loot box if rare item rolled
+              const loot = generateLootBox(mob.id, deathX, deathY - 8, xpReward);
+              if (loot.itemId || loot.rarity !== 'common') {
+                lootBoxesRef.current.push(loot);
+              }
+
+              // 3. Floating XP number
               floatingNumbersRef.current.push({
                 id: `xp_${Date.now()}_${Math.random()}`,
                 x: deathX,
-                y: deathY - 16,
+                y: deathY - 20,
                 text: `+${xpReward} XP`,
                 color: '#facc15',
                 alpha: 1,
@@ -842,6 +860,39 @@ export default function GameCanvas({
           // Remove dead monsters after a brief delay (corpse already spawned)
           monstersRef.current = monstersRef.current.filter((m) => !m.isDead);
 
+          // ── Update Coin Drops (Collect on player proximity) ──────────────
+          for (const coin of coinDropsRef.current) {
+            coin.animTimer += dt * 3.0;
+
+            if (!coin.collected) {
+              if (canCollectCoinDrop(coin, playerRef.current.x, playerRef.current.y, HITBOX_W, HITBOX_H)) {
+                coin.collected = true;
+
+                const coinLabel =
+                  coin.coinType === 'basalt' ? 'Cristal' : coin.coinType === 'silver' ? 'Prata' : 'Ouro';
+                const coinColor =
+                  coin.coinType === 'basalt' ? '#38bdf8' : coin.coinType === 'silver' ? '#cbd5e1' : '#facc15';
+
+                floatingNumbersRef.current.push({
+                  id: `coin_${Date.now()}_${Math.random()}`,
+                  x: coin.x,
+                  y: coin.y - 14,
+                  text: `+${coin.amount} ${coinLabel}`,
+                  color: coinColor,
+                  alpha: 1,
+                  vy: -32,
+                  timer: 0,
+                  duration: 1.8,
+                });
+
+                propsRef.current.onCollectCoins?.({ [coin.coinType]: coin.amount });
+              }
+            } else {
+              coin.collectAnim += dt * 3.5;
+            }
+          }
+          coinDropsRef.current = coinDropsRef.current.filter((c) => !c.collected || c.collectAnim < 1.0);
+
           // ── Update Loot Boxes (Collect on player proximity) ──────────────
           for (const loot of lootBoxesRef.current) {
             loot.animTimer += dt * 3.0;
@@ -1094,6 +1145,28 @@ export default function GameCanvas({
               animMap
             );
             depthObjects.push(...objs);
+          }
+
+          // Add Coin Drops to depth sorting (on ground until collected)
+          for (const coin of coinDropsRef.current) {
+            if (coin.x + 24 < camX || coin.x - 24 > camX + worldViewW) continue;
+            if (coin.y + 24 < camY || coin.y - 24 > camY + worldViewH) continue;
+
+            const assetKey =
+              coin.coinType === 'basalt'
+                ? 'coin_basalt'
+                : coin.coinType === 'silver'
+                ? 'coin_silver'
+                : 'coin_gold';
+            const coinImg = cached.items[assetKey];
+
+            depthObjects.push({
+              type: 'tiled-obj',
+              sortY: coin.y + 2,
+              draw: (renderCtx) => {
+                drawCoinDrop(renderCtx, coin, coinImg, camX, camY);
+              },
+            });
           }
 
           // Add Loot Boxes to depth sorting (on ground until collected)
@@ -1809,7 +1882,20 @@ export default function GameCanvas({
       }
     }
 
-    // 2. Check if clicking on a loot box to walk towards it
+    // 2. Check if clicking on a coin drop to walk towards it
+    for (const coin of coinDropsRef.current) {
+      if (coin.collected) continue;
+      if (Math.hypot(clickWorldX - coin.x, clickWorldY - coin.y) < 22) {
+        tapTargetRef.current = {
+          x: coin.x - HITBOX_W / 2,
+          y: coin.y - HITBOX_H / 2,
+          anim: 0,
+        };
+        return;
+      }
+    }
+
+    // 3. Check if clicking on a loot box to walk towards it
     for (const loot of lootBoxesRef.current) {
       if (loot.collected) continue;
       if (Math.hypot(clickWorldX - loot.x, clickWorldY - loot.y) < 26) {
@@ -1872,13 +1958,6 @@ export default function GameCanvas({
 
   return (
     <div className="canvas-container" tabIndex={0}>
-      {!assetsLoaded && (
-        <WorldLoadingScreen
-          zoneName={mapId.startsWith('caverna') ? 'Caverna Subterrânea' : 'Superfície de Tibia'}
-          characterId={selectedCharacterId}
-        />
-      )}
-
       {/* Interactive Portal Action Button (Click to Enter/Exit) */}
       {activeNearbyPortal && (
         <div className="portal-action-container">

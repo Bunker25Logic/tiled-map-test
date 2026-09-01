@@ -35,6 +35,7 @@ import {
   saveSession,
   clearSession,
   addXPToCharacter,
+  addCoinsToCharacter,
   getLevelFromXP,
   loadSession,
   loadAccount,
@@ -327,6 +328,19 @@ export default function App() {
     }
   }, []);
 
+  const handleCollectCoins = useCallback(
+    (coins: { gold?: number; silver?: number; basalt?: number }) => {
+      const acc = accountRef.current;
+      if (!acc || acc.characters.length === 0) return;
+      const charIdx = activeCharIndexRef.current;
+      const { account: updatedAccount } = addCoinsToCharacter(acc, charIdx, coins);
+      const cloned = { ...updatedAccount, characters: [...updatedAccount.characters] };
+      setAccount(cloned);
+      accountRef.current = cloned;
+    },
+    []
+  );
+
   const handleConsumeMana = useCallback((amount: number): boolean => {
     setPlayerMp((curMp) => {
       const nextMp = Math.max(0, curMp - amount);
@@ -598,6 +612,7 @@ export default function App() {
           onConsumeMana={handleConsumeMana}
           onOpenInventory={() => setIsInventoryOpen(true)}
           onCollectLoot={handleCollectLoot}
+          onCollectCoins={handleCollectCoins}
         />
 
         <Minimap
@@ -701,6 +716,7 @@ export default function App() {
         playerMaxMp={playerMaxMp}
         inventoryItems={inventoryItems}
         equippedGear={equippedGear}
+        playerWallet={account?.characters[activeCharIndex]?.wallet}
         onEquipItem={handleEquipItem}
         onUnequipSlot={handleUnequipSlot}
         onUsePotion={handleUsePotion}

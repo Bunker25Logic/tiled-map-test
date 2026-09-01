@@ -1,6 +1,7 @@
 import { getLevelFromXP, getLevelProgress, getXPToNextLevel } from '../game/playerStore';
 import type { PlayerCharacter } from '../game/playerStore';
 import { PLAYABLE_CHARACTERS } from '../game/characters';
+import CoinIcon from './CoinIcon';
 
 interface PlayerHUDProps {
   character: PlayerCharacter;
@@ -27,6 +28,7 @@ export default function PlayerHUD({
   const hpPercent = maxHp > 0 ? hp / maxHp : 1;
   const mpPercent = maxMp > 0 ? mp / maxMp : 1;
   const charDef = PLAYABLE_CHARACTERS.find((c) => c.id === character.characterId);
+  const wallet = character.wallet || { gold: 0, silver: 0, basalt: 0 };
 
   // Color for HP bar based on percentage
   const hpColor =
@@ -82,6 +84,23 @@ export default function PlayerHUD({
           <span className="hud-xp-pct">{Math.round(xpProgress * 100)}%</span>
         </div>
         <span className="hud-bar-value hud-xp-value">{character.xp.toLocaleString()}</span>
+      </div>
+
+      {/* Coin Wallet */}
+      <div className="hud-wallet">
+        {wallet.basalt > 0 && (
+          <div className="hud-coin-slot" title={`${wallet.basalt} Moeda(s) de Cristal`}>
+            <CoinIcon type="basalt" amount={wallet.basalt} size={20} showAmount />
+          </div>
+        )}
+        {wallet.silver > 0 && (
+          <div className="hud-coin-slot" title={`${wallet.silver} Moeda(s) de Prata`}>
+            <CoinIcon type="silver" amount={wallet.silver} size={20} showAmount />
+          </div>
+        )}
+        <div className="hud-coin-slot" title={`${wallet.gold} Moeda(s) de Ouro`}>
+          <CoinIcon type="gold" amount={wallet.gold} size={20} showAmount />
+        </div>
       </div>
     </div>
   );

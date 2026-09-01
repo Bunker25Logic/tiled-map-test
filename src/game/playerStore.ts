@@ -11,6 +11,16 @@ import type { CharacterId } from './characters';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+export interface PlayerWallet {
+  gold: number;
+  silver: number;
+  basalt: number;
+}
+
+export function getDefaultWallet(): PlayerWallet {
+  return { gold: 0, silver: 0, basalt: 0 };
+}
+
 export interface PlayerCharacter {
   characterId: CharacterId;
   xp: number;
@@ -18,6 +28,7 @@ export interface PlayerCharacter {
   maxHp: number;
   mp: number;
   maxMp: number;
+  wallet?: PlayerWallet;
   lastZone: string;
   lastPos: { x: number; y: number } | null;
   createdAt: number;
@@ -168,6 +179,7 @@ export function createCharacter(
     maxHp,
     mp: maxMp,
     maxMp,
+    wallet: getDefaultWallet(),
     lastZone: 'map1',
     lastPos: null,
     createdAt: Date.now(),
@@ -183,6 +195,47 @@ export function saveAccount(account: PlayerAccount): void {
   const accounts = loadAllAccounts();
   accounts[account.name.toLowerCase()] = account;
   saveAllAccounts(accounts);
+}
+
+export function addCoinsToCharacter(
+  account: PlayerAccount,
+  charIndex: number,
+  coins: { gold?: number; silver?: number; basalt?: number }
+): { account: PlayerAccount; wallet: PlayerWallet } {
+  const char = account.characters[charIndex];
+  if (!char) return { account, wallet: getDefaultWallet() };
+  if (!char.wallet) {
+    char.wallet = getDefaultWallet();
+  }
+  char.wallet.gold = Math.max(0, (char.wallet.gold || 0) + (coins.gold || 0));
+  char.wallet.silver = Math.max(0, (char.wallet.silver || 0) + (coins.silver || 0));
+  char.wallet.basalt = Math.max(0, (char.wallet.basalt || 0) + (coins.basalt || 0));
+
+  // Auto-convert standard Tibia denomination (100 gold = 1 silver, 100 silver = 1 basalt)
+  if (char.wallet.gold >= 100) {
+    const extraSilver = Math.floor(char.wallet.gold / 100);
+    char.wallet.silver += extraSilver;
+    char.wallet.gold %= 100;
+  }
+  if (char.wallet.silver >= 100) {
+    const extraBasalt = Math.floor(char.wallet.silver / 100);
+    char.wallet.basalt += extraBasalt;
+    char.wallet.silver %= 100;
+  }
+
+  saveAccount(account);
+  return { account, wallet: { ...char.wallet } };
+}
+
+export function savePlayerWallet(
+  account: PlayerAccount,
+  charIndex: number,
+  wallet: PlayerWallet
+): void {
+  const char = account.characters[charIndex];
+  if (!char) return;
+  char.wallet = wallet;
+  saveAccount(account);
 }
 
 export function addXPToCharacter(
