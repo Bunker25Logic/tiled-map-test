@@ -8,6 +8,7 @@ import {
 import { PLAYABLE_CHARACTERS, type CharacterId } from '../game/characters';
 import type { PlayerWallet } from '../game/playerStore';
 import CoinIcon from './CoinIcon';
+import ItemIcon from './ItemIcon';
 
 interface InventoryModalProps {
   isOpen: boolean;
@@ -147,11 +148,22 @@ export default function InventoryModal({
                   </span>
                 )}
               </div>
-              <p className="inventory-sub-desc">
-                Gerencie seus itens, asas e relíquias de poder
-              </p>
             </div>
           </div>
+
+          {/* Compact Currency Wallet Chips */}
+          <div className="inventory-header-wallet">
+            <div className="header-coin-chip" title="Moedas de Cristal (1 = 100 Prata = 10.000 Ouro)">
+              <CoinIcon type="basalt" amount={playerWallet.basalt} size={18} showAmount />
+            </div>
+            <div className="header-coin-chip" title="Moedas de Prata (1 = 100 Ouro)">
+              <CoinIcon type="silver" amount={playerWallet.silver} size={18} showAmount />
+            </div>
+            <div className="header-coin-chip" title="Moedas de Ouro">
+              <CoinIcon type="gold" amount={playerWallet.gold} size={18} showAmount />
+            </div>
+          </div>
+
           <button className="btn-modal-close" onClick={onClose} title="Fechar Mochila">
             ✕
           </button>
@@ -232,13 +244,12 @@ export default function InventoryModal({
               >
                 <span className="paperdoll-slot-tag">Asas</span>
                 <div className="paperdoll-slot-body">
-                  {equippedGear.wings === 'angelic' ? (
-                    <img src="/assets/itens/asas angelicais.webp" alt="Asas Angelicais" className="gear-slot-img" />
-                  ) : equippedGear.wings === 'thunder' ? (
-                    <img src="/assets/itens/asas trovao.webp" alt="Asas do Trovão" className="gear-slot-img" />
-                  ) : (
-                    <span className="slot-placeholder-icon">🪽</span>
-                  )}
+                  <ItemIcon
+                    item={getEquippedDef('wings')}
+                    wingType={equippedGear.wings}
+                    size={32}
+                    fallbackIcon="🪽"
+                  />
                 </div>
                 {equippedGear.wings !== 'none' && (
                   <button
@@ -264,7 +275,7 @@ export default function InventoryModal({
               >
                 <span className="paperdoll-slot-tag">Arma</span>
                 <div className="paperdoll-slot-body">
-                  <span className="gear-slot-emoji">{getEquippedDef('weapon')?.icon || '🗡️'}</span>
+                  <ItemIcon item={getEquippedDef('weapon')} size={26} fallbackIcon="🗡️" />
                 </div>
                 {equippedGear.weapon && (
                   <button
@@ -290,7 +301,7 @@ export default function InventoryModal({
               >
                 <span className="paperdoll-slot-tag">Peitoral</span>
                 <div className="paperdoll-slot-body">
-                  <span className="gear-slot-emoji">{getEquippedDef('armor')?.icon || '🦺'}</span>
+                  <ItemIcon item={getEquippedDef('armor')} size={26} fallbackIcon="🦺" />
                 </div>
                 {equippedGear.armor && (
                   <button
@@ -316,7 +327,7 @@ export default function InventoryModal({
               >
                 <span className="paperdoll-slot-tag">Escudo</span>
                 <div className="paperdoll-slot-body">
-                  <span className="gear-slot-emoji">{getEquippedDef('shield')?.icon || '🛡️'}</span>
+                  <ItemIcon item={getEquippedDef('shield')} size={26} fallbackIcon="🛡️" />
                 </div>
                 {equippedGear.shield && (
                   <button
@@ -342,7 +353,7 @@ export default function InventoryModal({
               >
                 <span className="paperdoll-slot-tag">Amuleto</span>
                 <div className="paperdoll-slot-body">
-                  <span className="gear-slot-emoji">{getEquippedDef('amulet')?.icon || '📿'}</span>
+                  <ItemIcon item={getEquippedDef('amulet')} size={26} fallbackIcon="📿" />
                 </div>
                 {equippedGear.amulet && (
                   <button
@@ -368,7 +379,7 @@ export default function InventoryModal({
               >
                 <span className="paperdoll-slot-tag">Anel</span>
                 <div className="paperdoll-slot-body">
-                  <span className="gear-slot-emoji">{getEquippedDef('ring')?.icon || '💍'}</span>
+                  <ItemIcon item={getEquippedDef('ring')} size={26} fallbackIcon="💍" />
                 </div>
                 {equippedGear.ring && (
                   <button
@@ -394,7 +405,7 @@ export default function InventoryModal({
               >
                 <span className="paperdoll-slot-tag">Botas</span>
                 <div className="paperdoll-slot-body">
-                  <span className="gear-slot-emoji">{getEquippedDef('boots')?.icon || '👢'}</span>
+                  <ItemIcon item={getEquippedDef('boots')} size={26} fallbackIcon="👢" />
                 </div>
                 {equippedGear.boots && (
                   <button
@@ -414,39 +425,6 @@ export default function InventoryModal({
 
           {/* Right Panel: Bag Items & Selected Item Inspector */}
           <div className="inventory-bag-panel">
-            {/* Special Currency Pouch (Bolsa de Moedas) */}
-            <div className="inventory-coin-pouch">
-              <div className="coin-pouch-title">
-                <span>💰</span>
-                <strong>Bolsa de Moedas</strong>
-              </div>
-              <div className="coin-pouch-slots">
-                <div className="coin-pouch-slot" title="Moedas de Cristal (1 = 100 Prata = 10.000 Ouro)">
-                  <CoinIcon type="basalt" amount={playerWallet.basalt} size={24} />
-                  <div className="coin-pouch-meta">
-                    <span className="coin-pouch-count">{playerWallet.basalt.toLocaleString()}</span>
-                    <span className="coin-pouch-label">Cristal</span>
-                  </div>
-                </div>
-
-                <div className="coin-pouch-slot" title="Moedas de Prata (1 = 100 Ouro)">
-                  <CoinIcon type="silver" amount={playerWallet.silver} size={24} />
-                  <div className="coin-pouch-meta">
-                    <span className="coin-pouch-count">{playerWallet.silver.toLocaleString()}</span>
-                    <span className="coin-pouch-label">Prata</span>
-                  </div>
-                </div>
-
-                <div className="coin-pouch-slot" title="Moedas de Ouro">
-                  <CoinIcon type="gold" amount={playerWallet.gold} size={24} />
-                  <div className="coin-pouch-meta">
-                    <span className="coin-pouch-count">{playerWallet.gold.toLocaleString()}</span>
-                    <span className="coin-pouch-label">Ouro</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Filter Tabs */}
             <div className="bag-filters-row">
               <button
@@ -490,11 +468,7 @@ export default function InventoryModal({
                     onClick={() => setSelectedItemId(item.id)}
                     title={item.name}
                   >
-                    {item.image ? (
-                      <img src={item.image} alt={item.name} className="bag-item-img" />
-                    ) : (
-                      <span className="bag-item-emoji">{item.icon}</span>
-                    )}
+                    <ItemIcon item={item} size={34} />
 
                     {item.quantity && item.quantity > 1 && (
                       <span className="bag-item-qty">x{item.quantity}</span>
@@ -516,11 +490,7 @@ export default function InventoryModal({
                     className="inspector-icon-frame"
                     style={{ borderColor: getRarityColor(selectedItem.rarity) }}
                   >
-                    {selectedItem.image ? (
-                      <img src={selectedItem.image} alt={selectedItem.name} className="inspector-img" />
-                    ) : (
-                      <span className="inspector-emoji">{selectedItem.icon}</span>
-                    )}
+                    <ItemIcon item={selectedItem} size={38} />
                   </div>
 
                   <div className="inspector-meta">
