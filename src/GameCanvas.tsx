@@ -23,6 +23,7 @@ import {
   canCollectCoinDrop,
 } from './game/entities';
 import { ALL_ITEMS } from './game/items';
+import { ITEM_OFFSETS, type ItemOffsetConfig } from './game/itemOffsets';
 import {
   PLAYABLE_CHARACTERS,
   dirToOtsNum,
@@ -123,6 +124,12 @@ interface GameCanvasProps {
   debugColliders: boolean;
   showGrid: boolean;
   equippedWings?: WingType;
+  /** Currently equipped weapon item ID */
+  equippedWeapon?: string | null;
+  /** Live weapon offsets (e.g. from real-time calibrator) */
+  weaponOffsets?: ItemOffsetConfig | null;
+  /** Force a player facing direction (for weapon offset calibrator) */
+  overrideDirection?: Direction | null;
   /** Currently equipped spell IDs (5 slots) */
   equippedSpellIds?: string[];
   /** Current player HP (from account) */
@@ -161,6 +168,9 @@ export default function GameCanvas({
   debugColliders,
   showGrid,
   equippedWings = 'angelic',
+  equippedWeapon = null,
+  weaponOffsets = null,
+  overrideDirection = null,
   equippedSpellIds = [],
   playerHp,
   playerMaxHp,
@@ -236,6 +246,9 @@ export default function GameCanvas({
     debugColliders,
     showGrid,
     equippedWings,
+    equippedWeapon,
+    weaponOffsets,
+    overrideDirection,
     equippedSpellIds,
     playerHp,
     playerMaxHp,
@@ -258,6 +271,9 @@ export default function GameCanvas({
     propsRef.current.debugColliders = debugColliders;
     propsRef.current.showGrid = showGrid;
     propsRef.current.equippedWings = equippedWings;
+    propsRef.current.equippedWeapon = equippedWeapon;
+    propsRef.current.weaponOffsets = weaponOffsets;
+    propsRef.current.overrideDirection = overrideDirection;
     propsRef.current.equippedSpellIds = equippedSpellIds;
     propsRef.current.playerHp = playerHp;
     propsRef.current.playerMaxHp = playerMaxHp;
@@ -270,7 +286,7 @@ export default function GameCanvas({
     propsRef.current.onOpenInventory = onOpenInventory;
     propsRef.current.onCollectLoot = onCollectLoot;
     propsRef.current.onCollectCoins = onCollectCoins;
-  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot, onCollectCoins]);
+  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedWeapon, weaponOffsets, overrideDirection, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot, onCollectCoins]);
 
   // Update particles on map change
   useEffect(() => {
@@ -1363,7 +1379,7 @@ export default function GameCanvas({
                 const isThunder = currentEquippedWings === 'thunder';
                 const wingsImg = isAngelic ? cached.items['wings_angelic'] : isThunder ? cached.items['wings_thunder'] : null;
 
-                const currentDirection = animator.direction;
+                const currentDirection = (propsRef.current.overrideDirection || animator.direction) as Direction;
                 const wingCfg = isAngelic
                   ? (WINGS_ANGELIC_CONFIG[currentDirection] || WINGS_ANGELIC_CONFIG.down)
                   : (WINGS_THUNDER_CONFIG[currentDirection] || WINGS_THUNDER_CONFIG.down);
@@ -1420,9 +1436,72 @@ export default function GameCanvas({
                   renderCtx.restore();
                 };
 
+                // Helper para desenhar Arma Equipada (Offsets do Tibia Sprite Offset Studio)
+                const currentEquippedWeapon = propsRef.current.equippedWeapon ?? null;
+                const weaponCfgRoot = propsRef.current.weaponOffsets || (currentEquippedWeapon ? ITEM_OFFSETS[currentEquippedWeapon] : null);
+                const weaponDirCfg = weaponCfgRoot ? weaponCfgRoot.offsets[currentDirection] : null;
+                const weaponImg = currentEquippedWeapon
+                  ? (cached.items[currentEquippedWeapon] || cached.items['sword_gold'] || cached.items['gold_sword'])
+                  : null;
+
+                const drawWeapon = () => {
+                  if (!weaponImg || !weaponDirCfg || !weaponDirCfg.visible) return;
+
+                  const resolution = weaponCfgRoot?.metadata?.resolution ?? 32;
+                  // Comprimento da lâmina com escala aplicada
+                  const swordLen = resolution * weaponDirCfg.scale;
+                  const swordW = swordLen * (weaponImg.naturalWidth / weaponImg.naturalHeight);
+
+                  // Ponto de pegada (grip / hilt) da espada: 50% largura, 85% altura (onde a mão segura)
+                  const pivotX = swordW * 0.5;
+                  const pivotY = swordLen * 0.85;
+
+                  // Centro da caixa 32x32 do personagem na cena
+                  const charBoxCenterX = -curCharDef.visCenterX + curCharDef.width / 2;
+                  const charBoxCenterY = -curCharDef.feetY + curCharDef.height / 2;
+
+                  // Posição do punho (hilt) conforme o offset cartesiano da ferramenta (Y positivo é para cima)
+                  const hiltX = charBoxCenterX + weaponDirCfg.x;
+                  const hiltY = charBoxCenterY - weaponDirCfg.y;
+
+                  renderCtx.save();
+                  renderCtx.translate(hiltX, hiltY);
+                  if (weaponDirCfg.rotation) {
+                    renderCtx.rotate((weaponDirCfg.rotation * Math.PI) / 180);
+                  }
+                  if (weaponDirCfg.flipX) {
+                    renderCtx.scale(-1, 1);
+                  }
+                  if (weaponDirCfg.flipY) {
+                    renderCtx.scale(1, -1);
+                  }
+
+                  if (weaponDirCfg.opacity !== undefined) {
+                    renderCtx.globalAlpha = Math.max(0, Math.min(1, weaponDirCfg.opacity / 100));
+                  }
+
+                  // Brilho dourado no item lendário
+                  renderCtx.shadowColor = 'rgba(250, 204, 21, 0.45)';
+                  renderCtx.shadowBlur = 4;
+
+                  renderCtx.drawImage(
+                    weaponImg,
+                    -pivotX,
+                    -pivotY,
+                    swordW,
+                    swordLen
+                  );
+                  renderCtx.restore();
+                };
+
                 // PROFUNDIDADE: Se behind for TRUE -> Desenha a asa ATRÁS do corpo do personagem
                 if (wingCfg.behind && currentEquippedWings !== 'none') {
                   drawWings();
+                }
+
+                // PROFUNDIDADE: Se layer for 'behind' -> Desenha a arma ATRÁS do corpo do personagem
+                if (weaponDirCfg && weaponDirCfg.layer === 'behind') {
+                  drawWeapon();
                 }
 
                 // Render Character Sprite
@@ -1456,7 +1535,7 @@ export default function GameCanvas({
                   }
                 } else {
                   // OTServ individual PNGs (archer, barbarian, magician, necromancer, paladin)
-                  const dirNum = dirToOtsNum(animator.direction);
+                  const dirNum = dirToOtsNum(currentDirection);
                   // During attack, use dynamic fighting stance step (frame 2)
                   const displayFrame = playerAttackAnimTimer > 0 ? 2 : otsWalkFrame;
                   const spriteKey = `${curCharDef.id}_${displayFrame}_${dirNum}`;
@@ -1471,6 +1550,11 @@ export default function GameCanvas({
                       curCharDef.height
                     );
                   }
+                }
+
+                // PROFUNDIDADE: Se layer for 'in_front' -> Desenha a arma NA FRENTE do corpo do personagem
+                if (weaponDirCfg && weaponDirCfg.layer === 'in_front') {
+                  drawWeapon();
                 }
 
                 // PROFUNDIDADE: Se behind for FALSE -> Desenha a asa NA FRENTE do corpo do personagem

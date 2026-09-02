@@ -68,6 +68,16 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
   },
 
   // ── Weapons (Armas) ────────────────────────────────────────────────────────
+  sword_gold: {
+    id: 'sword_gold',
+    name: 'Espada de Ouro',
+    slotType: 'weapon',
+    rarity: 'legendary',
+    icon: '🗡️',
+    image: '/assets/itens/gold_sword.webp',
+    stats: { attack: 45, speed: 12 },
+    description: 'Lâmina lendária forjada em puro ouro resplandecente. Desfere golpes velozes de poder avassalador.',
+  },
   sword_light: {
     id: 'sword_light',
     name: 'Espada Radiante',
@@ -191,6 +201,7 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
 export const DEFAULT_INVENTORY_ITEMS: ItemDef[] = [
   { ...ALL_ITEMS.wing_angelic },
   { ...ALL_ITEMS.wing_thunder },
+  { ...ALL_ITEMS.sword_gold },
   { ...ALL_ITEMS.sword_light },
   { ...ALL_ITEMS.armor_paladin },
   { ...ALL_ITEMS.shield_aegis },
@@ -204,7 +215,7 @@ export const DEFAULT_INVENTORY_ITEMS: ItemDef[] = [
 
 export const DEFAULT_EQUIPPED_GEAR: EquippedGear = {
   wings: 'angelic',
-  weapon: 'sword_light',
+  weapon: 'sword_gold',
   armor: 'armor_paladin',
   shield: 'shield_aegis',
   amulet: 'amulet_heart',

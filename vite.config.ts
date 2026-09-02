@@ -27,6 +27,27 @@ export default defineConfig({
               return;
             }
           }
+          if (urlPath === '/api/save-offsets' && req.method === 'POST') {
+            let body = '';
+            req.on('data', (chunk) => { body += chunk; });
+            req.on('end', () => {
+              try {
+                const data = JSON.parse(body);
+                const jsonPath = path.resolve(__dirname, 'public/assets/itens/positions/gold_sword_offsets.json');
+                fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf-8');
+
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ success: true }));
+              } catch (err: unknown) {
+                res.statusCode = 500;
+                res.setHeader('Content-Type', 'application/json');
+                const msg = err instanceof Error ? err.message : String(err);
+                res.end(JSON.stringify({ success: false, error: msg }));
+              }
+            });
+            return;
+          }
+
           next();
         });
       },

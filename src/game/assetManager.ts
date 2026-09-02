@@ -3,6 +3,7 @@ import { loadAllCharacterAssets, type CharacterImages } from './characters';
 import { loadMonsterSprites, MONSTER_CONFIGS, type MonsterImages } from './entities';
 import { ALL_MAGIC_IMAGE_PATHS } from './magic';
 import type { TilesetImages } from './renderer';
+import { ITEM_OFFSETS } from './itemOffsets';
 
 export const TILESET_ASSETS: Record<string, string> = {
   otsp_tiles_01: '/assets/tiles/otsp_tiles_01.png',
@@ -85,6 +86,25 @@ export async function preloadAllGameAssets(): Promise<GameAssetCache> {
 
     // 5. Load equipment item textures and coin sprite sheets
     const itemPromises = [
+      loadChromaKeyImage('/assets/itens/gold_sword.webp')
+        .then((img) => {
+          globalCache.items['sword_gold'] = img;
+          globalCache.items['gold_sword'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading gold sword texture:', err);
+        }),
+      fetch('/assets/itens/positions/gold_sword_offsets.json')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.offsets) {
+            ITEM_OFFSETS['sword_gold'] = data;
+            ITEM_OFFSETS['gold_sword'] = data;
+          }
+        })
+        .catch((err) => {
+          console.warn('Using static ITEM_OFFSETS for gold_sword:', err);
+        }),
       loadChromaKeyImage('/assets/itens/asas trovao.webp')
         .then((img) => {
           globalCache.items['wings_thunder'] = img;

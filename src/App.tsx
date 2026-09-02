@@ -19,6 +19,9 @@ import CharacterSelectScreen from './components/CharacterSelectScreen';
 import PlayerHUD from './components/PlayerHUD';
 import WorldLoadingScreen from './components/WorldLoadingScreen';
 import DeathModal from './components/DeathModal';
+import WeaponOffsetCalibrator from './components/WeaponOffsetCalibrator';
+import type { Direction } from './game/types';
+import { ITEM_OFFSETS, type ItemOffsetConfig } from './game/itemOffsets';
 import {
   type ItemDef,
   type EquippedGear,
@@ -73,6 +76,11 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isSpellbookOpen, setIsSpellbookOpen] = useState<boolean>(false);
   const [isInventoryOpen, setIsInventoryOpen] = useState<boolean>(false);
+  const [isCalibratorOpen, setIsCalibratorOpen] = useState<boolean>(false);
+  const [calibratorDirection, setCalibratorDirection] = useState<Direction | null>(null);
+  const [weaponOffsets, setWeaponOffsets] = useState<ItemOffsetConfig>(() =>
+    JSON.parse(JSON.stringify(ITEM_OFFSETS['sword_gold'] || ITEM_OFFSETS['gold_sword']))
+  );
 
   const [inventoryItems, setInventoryItems] = useState<ItemDef[]>(DEFAULT_INVENTORY_ITEMS);
   const [equippedGear, setEquippedGear] = useState<EquippedGear>(DEFAULT_EQUIPPED_GEAR);
@@ -107,6 +115,18 @@ export default function App() {
       const savedAccount = loadAccount(savedName);
       if (savedAccount) { handleLogin(savedAccount); }
     }
+  }, []);
+
+  // Shortcut to toggle weapon offset calibrator (Key 'O')
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'o' || e.key === 'O') {
+        setIsCalibratorOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // Map loading
@@ -579,6 +599,15 @@ export default function App() {
           </button>
 
           <button
+            className={`btn-header-action btn-header-calibrator ${isCalibratorOpen ? 'active' : ''}`}
+            onClick={() => setIsCalibratorOpen((prev) => !prev)}
+            title="Calibrador de Posição da Arma (Atalho: O)"
+          >
+            <span className="header-btn-icon">🎯</span>
+            <span className="header-btn-text">Calibrar</span>
+          </button>
+
+          <button
             className="btn-header-action btn-settings"
             onClick={() => setIsSettingsOpen(true)}
           >
@@ -599,6 +628,9 @@ export default function App() {
           debugColliders={debugColliders}
           showGrid={showGrid}
           equippedWings={equippedWings}
+          equippedWeapon={equippedGear.weapon}
+          weaponOffsets={weaponOffsets}
+          overrideDirection={isCalibratorOpen ? calibratorDirection : null}
           equippedSpellIds={equippedSpellIds}
           playerHp={playerHp}
           playerMaxHp={playerMaxHp}
@@ -682,6 +714,11 @@ export default function App() {
             <span className="key-desc">Mochila</span>
           </div>
           <div className="key-divider" />
+          <div className="key-hint" onClick={() => setIsCalibratorOpen((prev) => !prev)} style={{ cursor: 'pointer' }} title="Calibrador de Posição da Arma">
+            <kbd>O</kbd>
+            <span className="key-desc">Calibrar</span>
+          </div>
+          <div className="key-divider" />
           <div className="key-hint">
             <kbd>E</kbd>
             <span className="key-desc">Entrar</span>
@@ -694,6 +731,18 @@ export default function App() {
       </footer>
 
       {levelUpMsg && <div className="levelup-toast">{levelUpMsg}</div>}
+
+      <WeaponOffsetCalibrator
+        isOpen={isCalibratorOpen}
+        onClose={() => {
+          setIsCalibratorOpen(false);
+          setCalibratorDirection(null);
+        }}
+        currentDirection={calibratorDirection || 'down'}
+        onSetDirection={(dir) => setCalibratorDirection(dir)}
+        offsets={weaponOffsets}
+        onOffsetsChange={setWeaponOffsets}
+      />
 
       <SpellbookModal
         isOpen={isSpellbookOpen}
