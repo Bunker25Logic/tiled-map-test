@@ -383,12 +383,14 @@ export default function GameCanvas({
         animator.setState('idle', 'down');
 
         let playerAttackAnimTimer = 0;
-        const PLAYER_ATTACK_ANIM_DURATION = 0.26;
+        let playerMeleeAttackAnimTimer = 0;
+        const PLAYER_ATTACK_ANIM_DURATION = 0.32;
 
         const executeMeleeAttack = () => {
           if (animator.state === 'dead' || (propsRef.current.playerHp !== undefined && propsRef.current.playerHp <= 0)) return;
           animator.triggerAttack();
           playerAttackAnimTimer = PLAYER_ATTACK_ANIM_DURATION;
+          playerMeleeAttackAnimTimer = PLAYER_ATTACK_ANIM_DURATION;
 
           const px = playerRef.current.x + HITBOX_W / 2;
           const py = playerRef.current.y + HITBOX_H / 2;
@@ -695,9 +697,14 @@ export default function GameCanvas({
           }
         };
 
+        const handleCustomPlayerAttack = () => {
+          executeMeleeAttack();
+        };
+
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
         window.addEventListener('cast-magic-spell', handleCustomSpellCast);
+        window.addEventListener('player-attack', handleCustomPlayerAttack);
 
         // 5. Portals in this zone
         const mapPortals: PortalDef[] = getMapPortals(mapId, mapData);
@@ -707,6 +714,8 @@ export default function GameCanvas({
         let lastPosReportTime = 0;
         let otsWalkTimer = 0;
         let otsWalkFrame = 1;
+        let swordWalkTimer = 0;
+        let swordWalkWeight = 0;
         let fadeAlpha = 1.0; // Smooth fade-in on map spawn
 
         const loop = (now: number) => {
@@ -715,6 +724,9 @@ export default function GameCanvas({
 
           if (playerAttackAnimTimer > 0) {
             playerAttackAnimTimer = Math.max(0, playerAttackAnimTimer - dt);
+          }
+          if (playerMeleeAttackAnimTimer > 0) {
+            playerMeleeAttackAnimTimer = Math.max(0, playerMeleeAttackAnimTimer - dt);
           }
 
           // ── Read Player Movement Input (Virtual Joystick / Tap / Keyboard) ────
@@ -790,16 +802,28 @@ export default function GameCanvas({
           }
           animator.update(dt);
 
-          // OTServ Player step animation cycling
+          // OTServ Player step animation cycling sincronizado com o balanço da espada
+          const OTS_WALK_CYCLE = [1, 2, 1, 3];
+          const STEP_DURATION = 0.22; // 220ms por fase do passo (cadência suave e natural)
+          const FULL_CYCLE_DURATION = 4 * STEP_DURATION; // 0.88s para o ciclo completo dos dois passos
+
           if (isMoving) {
             otsWalkTimer += dt;
-            if (otsWalkTimer >= 0.16) {
-              otsWalkTimer = 0;
-              otsWalkFrame = (otsWalkFrame % 3) + 1;
-            }
+            const cycleTime = otsWalkTimer % FULL_CYCLE_DURATION;
+            const stepIndex = Math.floor(cycleTime / STEP_DURATION);
+            otsWalkFrame = OTS_WALK_CYCLE[stepIndex];
+
+            // swordWalkTimer sincronizado suavemente
+            swordWalkTimer = cycleTime;
+            swordWalkWeight = Math.min(1.0, swordWalkWeight + dt * 3.2);
           } else {
             otsWalkFrame = 1;
             otsWalkTimer = 0;
+            // Amortecimento suave ao parar de caminhar
+            if (swordWalkWeight > 0.001) {
+              swordWalkTimer = (swordWalkTimer + dt * 0.4) % FULL_CYCLE_DURATION;
+            }
+            swordWalkWeight = Math.max(0.0, swordWalkWeight - dt * 3.2);
           }
 
           // ── Player Physics & Collision Resolution ───────────────────────
@@ -1444,6 +1468,123 @@ export default function GameCanvas({
                   ? (cached.items[currentEquippedWeapon] || cached.items['sword_gold'] || cached.items['gold_sword'])
                   : null;
 
+                // Estado de calibração ativa (desliga oscilações de caminhada para precisão estática)
+                const isCalibratorActive = Boolean(propsRef.current.overrideDirection);
+
+                // 1. Animação de Balanço ao Caminhar (Walk Sway & Step Bobbing)
+                let walkRot = 0;
+                let walkOffX = 0;
+                let walkOffY = 0;
+
+                if (swordWalkWeight > 0.005 && !isCalibratorActive) {
+                  // Ângulo de fase do ciclo de 4 passos com cadência suave (0.88s por ciclo completo)
+                  // Frame 1 (0.00s): sway = 0 (posição neutra de repouso)
+                  // Frame 2 (0.22s): sway = +1 (Passo A: braço estende suavemente)
+                  // Frame 1 (0.44s): sway = 0 (passagem neutra central)
+                  // Frame 3 (0.66s): sway = -1 (Passo B: braço recua suavemente)
+                  const FULL_WALK_CYCLE = 4 * 0.22;
+                  const cycleProgress = (swordWalkTimer / FULL_WALK_CYCLE) * Math.PI * 2;
+                  const sway = Math.sin(cycleProgress) * swordWalkWeight;
+                  const stepBob = (1 - Math.cos(cycleProgress * 2)) * 0.35 * swordWalkWeight;
+
+                  if (currentDirection === 'down') {
+                    // No Frame 2 (sway > 0), a mão direita oscila suavemente para fora/esquerda (-X)
+                    // No Frame 3 (sway < 0), a mão direita oscila para dentro/direita (+X)
+                    walkOffX = -sway * 1.5;
+                    walkOffY = -sway * 0.4 + stepBob;
+                    walkRot = -sway * 6.5;
+                  } else if (currentDirection === 'right') {
+                    // No Frame 2 (sway > 0), o braço frontal recua suavemente (-X, -Y)
+                    // No Frame 3 (sway < 0), o braço frontal avança suavemente (+X, +Y)
+                    walkOffX = -sway * 1.4;
+                    walkOffY = -sway * 0.7 + stepBob;
+                    walkRot = -sway * 7.5;
+                  } else if (currentDirection === 'left') {
+                    // No Frame 2 (sway > 0), o braço frontal avança suavemente para a frente/esquerda (-X)
+                    // No Frame 3 (sway < 0), o braço frontal recua suavemente para trás/direita (+X)
+                    walkOffX = -sway * 1.4;
+                    walkOffY = sway * 0.7 + stepBob;
+                    walkRot = -sway * 7.5;
+                  } else if (currentDirection === 'up') {
+                    // Nas costas: balanço sutil do tronco acompanhando os passos
+                    walkOffX = sway * 1.0;
+                    walkOffY = -sway * 0.4 + stepBob;
+                    walkRot = sway * 4.5;
+                  }
+                } else if (!isCalibratorActive && playerMeleeAttackAnimTimer <= 0) {
+                  // Respiração calma e suave / Idle micro-sway
+                  const idleCycle = now * 0.0018;
+                  walkRot = Math.sin(idleCycle) * 1.0;
+                  walkOffY = Math.sin(idleCycle) * 0.35;
+                }
+
+                // 2. Animação de Golpe / Ataque com a Espada (Sword Slash Attack):
+                // Aciona APENAS no ataque físico com arma equipada (magias não cortam com a espada)
+                let attackRot = 0;
+                let attackOffX = 0;
+                let attackOffY = 0;
+                let attackGlow = false;
+                let attackScaleBoost = 1.0;
+
+                const isMeleeAttacking = playerMeleeAttackAnimTimer > 0 && Boolean(currentEquippedWeapon);
+
+                if (isMeleeAttacking) {
+                  // Progresso normalizado de 0.0 (início) a 1.0 (fim do golpe)
+                  const t = Math.min(1, Math.max(0, 1 - playerMeleeAttackAnimTimer / PLAYER_ATTACK_ANIM_DURATION));
+
+                  let slashProgress: number;
+                  let thrustProgress: number;
+
+                  if (t < 0.22) {
+                    // Fase 1: Preparação / Puxada para trás (wind-up)
+                    const p = t / 0.22;
+                    const ease = Math.sin(p * Math.PI * 0.5);
+                    slashProgress = -0.32 * ease;
+                    thrustProgress = -0.22 * ease;
+                  } else if (t < 0.62) {
+                    // Fase 2: Corte veloz em arco explosivo
+                    const p = (t - 0.22) / 0.40;
+                    // Cubic ease-out para aceleração extrema
+                    const ease = 1 - Math.pow(1 - p, 3);
+                    slashProgress = -0.32 + 1.32 * ease; // varre de -0.32 até +1.0
+                    thrustProgress = Math.sin(p * Math.PI) * 1.0;
+                    attackGlow = true;
+                    attackScaleBoost = 1.0 + Math.sin(p * Math.PI) * 0.12;
+                  } else {
+                    // Fase 3: Retorno elástico suave à postura neutra
+                    const p = (t - 0.62) / 0.38;
+                    const ease = Math.sin(p * Math.PI * 0.5);
+                    slashProgress = 1.0 * (1 - ease);
+                    thrustProgress = (1 - ease) * 0.12;
+                  }
+
+                  // Trajetória do corte e avanço por direção
+                  if (currentDirection === 'right') {
+                    attackRot = slashProgress * 82;
+                    attackOffX = thrustProgress * 13;
+                    attackOffY = thrustProgress * 4;
+                  } else if (currentDirection === 'left') {
+                    attackRot = -slashProgress * 82;
+                    attackOffX = -thrustProgress * 13;
+                    attackOffY = thrustProgress * 4;
+                  } else if (currentDirection === 'down') {
+                    attackRot = slashProgress * 88;
+                    attackOffX = Math.sin(t * Math.PI) * 6;
+                    attackOffY = thrustProgress * 14;
+                  } else if (currentDirection === 'up') {
+                    attackRot = -slashProgress * 70;
+                    attackOffX = -Math.sin(t * Math.PI) * 4;
+                    attackOffY = -thrustProgress * 13;
+                  }
+                }
+
+                // Camada dinâmica de profundidade:
+                // Durante o golpe para baixo ou esquerda, a lâmina corta à frente do corpo do personagem
+                let effectiveWeaponLayer = weaponDirCfg?.layer ?? 'in_front';
+                if (isMeleeAttacking && (currentDirection === 'down' || currentDirection === 'left')) {
+                  effectiveWeaponLayer = 'in_front';
+                }
+
                 const drawWeapon = () => {
                   if (!weaponImg || !weaponDirCfg || !weaponDirCfg.visible) return;
 
@@ -1460,14 +1601,19 @@ export default function GameCanvas({
                   const charBoxCenterX = -curCharDef.visCenterX + curCharDef.width / 2;
                   const charBoxCenterY = -curCharDef.feetY + curCharDef.height / 2;
 
-                  // Posição do punho (hilt) conforme o offset cartesiano da ferramenta (Y positivo é para cima)
-                  const hiltX = charBoxCenterX + weaponDirCfg.x;
-                  const hiltY = charBoxCenterY - weaponDirCfg.y;
+                  // Posição base do punho (hilt) conforme o offset cartesiano (Y positivo é para cima)
+                  const baseHiltX = charBoxCenterX + weaponDirCfg.x;
+                  const baseHiltY = charBoxCenterY - weaponDirCfg.y;
+
+                  // Aplica transformações dinâmicas de caminhada ou golpe
+                  const finalHiltX = baseHiltX + (isMeleeAttacking ? attackOffX : walkOffX);
+                  const finalHiltY = baseHiltY + (isMeleeAttacking ? attackOffY : walkOffY);
+                  const finalRotation = weaponDirCfg.rotation + (isMeleeAttacking ? attackRot : walkRot);
 
                   renderCtx.save();
-                  renderCtx.translate(hiltX, hiltY);
-                  if (weaponDirCfg.rotation) {
-                    renderCtx.rotate((weaponDirCfg.rotation * Math.PI) / 180);
+                  renderCtx.translate(finalHiltX, finalHiltY);
+                  if (finalRotation) {
+                    renderCtx.rotate((finalRotation * Math.PI) / 180);
                   }
                   if (weaponDirCfg.flipX) {
                     renderCtx.scale(-1, 1);
@@ -1475,14 +1621,23 @@ export default function GameCanvas({
                   if (weaponDirCfg.flipY) {
                     renderCtx.scale(1, -1);
                   }
+                  if (attackScaleBoost !== 1.0) {
+                    renderCtx.scale(attackScaleBoost, attackScaleBoost);
+                  }
 
                   if (weaponDirCfg.opacity !== undefined) {
                     renderCtx.globalAlpha = Math.max(0, Math.min(1, weaponDirCfg.opacity / 100));
                   }
 
-                  // Brilho dourado no item lendário
-                  renderCtx.shadowColor = 'rgba(250, 204, 21, 0.45)';
-                  renderCtx.shadowBlur = 4;
+                  // Efeito luminoso de corte e brilho no impacto
+                  const isWoodWeapon = currentEquippedWeapon?.includes('wood');
+                  if (attackGlow) {
+                    renderCtx.shadowColor = isWoodWeapon ? 'rgba(251, 191, 36, 0.95)' : 'rgba(255, 235, 120, 0.95)';
+                    renderCtx.shadowBlur = 14;
+                  } else {
+                    renderCtx.shadowColor = isWoodWeapon ? 'rgba(180, 110, 50, 0.40)' : 'rgba(250, 204, 21, 0.45)';
+                    renderCtx.shadowBlur = 4;
+                  }
 
                   renderCtx.drawImage(
                     weaponImg,
@@ -1491,6 +1646,22 @@ export default function GameCanvas({
                     swordW,
                     swordLen
                   );
+
+                  // Segunda passada aditiva de iluminação durante o golpe
+                  if (attackGlow) {
+                    renderCtx.save();
+                    renderCtx.globalCompositeOperation = 'lighter';
+                    renderCtx.globalAlpha = 0.55;
+                    renderCtx.drawImage(
+                      weaponImg,
+                      -pivotX,
+                      -pivotY,
+                      swordW,
+                      swordLen
+                    );
+                    renderCtx.restore();
+                  }
+
                   renderCtx.restore();
                 };
 
@@ -1500,7 +1671,7 @@ export default function GameCanvas({
                 }
 
                 // PROFUNDIDADE: Se layer for 'behind' -> Desenha a arma ATRÁS do corpo do personagem
-                if (weaponDirCfg && weaponDirCfg.layer === 'behind') {
+                if (weaponDirCfg && effectiveWeaponLayer === 'behind') {
                   drawWeapon();
                 }
 
@@ -1553,7 +1724,7 @@ export default function GameCanvas({
                 }
 
                 // PROFUNDIDADE: Se layer for 'in_front' -> Desenha a arma NA FRENTE do corpo do personagem
-                if (weaponDirCfg && weaponDirCfg.layer === 'in_front') {
+                if (weaponDirCfg && effectiveWeaponLayer === 'in_front') {
                   drawWeapon();
                 }
 
@@ -1918,6 +2089,7 @@ export default function GameCanvas({
           window.removeEventListener('keydown', handleKeyDown);
           window.removeEventListener('keyup', handleKeyUp);
           window.removeEventListener('cast-magic-spell', handleCustomSpellCast);
+          window.removeEventListener('player-attack', handleCustomPlayerAttack);
         };
       } catch (e) {
         if (!isCancelled) {

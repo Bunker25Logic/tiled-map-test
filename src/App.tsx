@@ -97,6 +97,7 @@ export default function App() {
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [isReloading, setIsReloading] = useState(false);
   const [activeCastId, setActiveCastId] = useState<string | null>(null);
+  const [isAttackActive, setIsAttackActive] = useState(false);
 
   const accountRef = useRef<PlayerAccount | null>(account);
   const activeCharIndexRef = useRef(activeCharIndex);
@@ -117,12 +118,16 @@ export default function App() {
     }
   }, []);
 
-  // Shortcut to toggle weapon offset calibrator (Key 'O')
+  // Shortcut to toggle weapon offset calibrator (Key 'O') and attack feedback
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.key === 'o' || e.key === 'O') {
         setIsCalibratorOpen((prev) => !prev);
+      }
+      if (e.key === ' ' || e.key === 'j' || e.key === 'J') {
+        setIsAttackActive(true);
+        setTimeout(() => setIsAttackActive(false), 260);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -389,6 +394,12 @@ export default function App() {
     window.dispatchEvent(new CustomEvent('cast-magic-spell', { detail: { spellId: spell.id } }));
   };
 
+  const handlePlayerAttack = () => {
+    setIsAttackActive(true);
+    setTimeout(() => setIsAttackActive(false), 260);
+    window.dispatchEvent(new CustomEvent('player-attack'));
+  };
+
   const handleEquipSpell = (slotIndex: number, spellId: string) => {
     if (slotIndex < 0 || slotIndex >= 3) return;
     setEquippedSpellIds((prev) => {
@@ -417,6 +428,12 @@ export default function App() {
       setEquippedWings(wType);
       setEquippedGear((prev) => ({ ...prev, wings: wType }));
       return;
+    }
+    if (item.slotType === 'weapon') {
+      const offsets = ITEM_OFFSETS[item.id] || ITEM_OFFSETS['sword_gold'] || ITEM_OFFSETS['gold_sword'];
+      if (offsets) {
+        setWeaponOffsets(JSON.parse(JSON.stringify(offsets)));
+      }
     }
     setEquippedGear((prev) => ({ ...prev, [item.slotType]: item.id }));
   };
@@ -657,6 +674,17 @@ export default function App() {
 
         <div className="action-bar-3slots action-bar-5slots">
           <div className="action-bar-slots-row">
+            {/* Botão de Ataque Físico com Espada */}
+            <button
+              className={`btn-action-slot btn-slot-attack ${isAttackActive ? 'attacking' : ''}`}
+              onClick={handlePlayerAttack}
+              title="Ataque Físico com Espada (Tecla Espaço / J)"
+            >
+              <span className="slot-key-hint">ESP</span>
+              <span className="slot-spell-icon">⚔️</span>
+              <span className="slot-spell-title">Atacar</span>
+            </button>
+
             {equippedSpellIds.slice(0, 3).map((spellId, idx) => {
               const spell = ALL_SPELLS.find((s) => s.id === spellId);
               if (!spell) return null;

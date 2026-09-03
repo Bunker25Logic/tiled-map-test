@@ -42,7 +42,11 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      tab === 'login' ? handleLogin() : handleRegister();
+      if (tab === 'login') {
+        handleLogin();
+      } else {
+        handleRegister();
+      }
     }
   };
 

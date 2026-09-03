@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Sword Complete Animation & Offset Specification",
+  "version": "2.0.0",
+  "description": "Especificação completa dos posicionamentos base, animação suave de caminhada sincronizada aos passos e animação de corte de ataque físico da espada.",
+  "meta": {
+    "engineTarget": "2D Pixel Art / Tile-Based RPG (Tibia/OTServ standard)",
+    "baseTileSize": 32,
+    "coordinateSystem": {
+      "type": "cartesian",
+      "positiveY": "upwards",
+      "positiveX": "rightwards",
+      "screenTransformFormula": "screenX = characterCenterX + offsetX; screenY = characterCenterY - offsetY;"
+    },
+    "pivotPoint": {
+      "normalizedX": 0.5,
+      "normalizedY": 0.85,
+      "description": "Ponto de empunhadura (grip) do punho: 50% na horizontal e 85% a partir do topo da lâmina."
+    }
+  },
+
+  "base_offsets": {
+    "down": {
+      "direction": "down",
+      "label": "Frente (Sul)",
+      "x": -9,
+      "y": -2,
+      "rotation": -177,
+      "scale": 1.0,
+      "flipX": false,
+      "flipY": false,
+      "layer": "behind",
+      "opacity": 100,
+      "visible": true,
+      "notes": "Espada embainhada/segurada na mão direita, apontada para baixo atrás do corpo."
+    },
+    "up": {
+      "direction": "up",
+      "label": "Costas (Norte)",
+      "x": 10,
+      "y": 4,
+      "rotation": 7,
+      "scale": 0.8,
+      "flipX": false,
+      "flipY": false,
+      "layer": "behind",
+      "opacity": 100,
+      "visible": true,
+      "notes": "Espada presa no ombro/costas, visível atrás do personagem."
+    },
+    "left": {
+      "direction": "left",
+      "label": "Esquerda (Oeste)",
+      "x": -3,
+      "y": -8,
+      "rotation": -85,
+      "scale": 0.8,
+      "flipX": true,
+      "flipY": false,
+      "layer": "behind",
+      "opacity": 100,
+      "visible": true,
+      "notes": "Lâmina espelhada horizontalmente segurada à frente do tronco."
+    },
+    "right": {
+      "direction": "right",
+      "label": "Direita (Leste)",
+      "x": 0,
+      "y": -10,
+      "rotation": 97,
+      "scale": 0.8,
+      "flipX": false,
+      "flipY": false,
+      "layer": "in_front",
+      "opacity": 100,
+      "visible": true,
+      "notes": "Espada desenhada na frente do corpo com rotação para o golpe."
+    }
+  },
+
+  "walk_animation": {
+    "description": "Animação contínua de balanço da espada sincronizada em fase com a mão e os passos.",
+    "stepDuration": 0.22,
+    "stepSequence": [1, 2, 1, 3],
+    "fullCycleDuration": 0.88,
+    "transitionEaseSpeed": 3.2,
+    "mathFormulas": {
+      "cycleProgress": "(walkTimer / fullCycleDuration) * 2 * Math.PI",
+      "sway": "Math.sin(cycleProgress) * walkWeight",
+      "stepBob": "(1 - Math.cos(cycleProgress * 2)) * 0.35 * walkWeight"
+    },
+    "directionalTrajectories": {
+      "down": {
+        "offsetX": "-sway * 1.5",
+        "offsetY": "-sway * 0.4 + stepBob",
+        "rotationDelta": "-sway * 6.5"
+      },
+      "right": {
+        "offsetX": "-sway * 1.4",
+        "offsetY": "-sway * 0.7 + stepBob",
+        "rotationDelta": "-sway * 7.5"
+      },
+      "left": {
+        "offsetX": "-sway * 1.4",
+        "offsetY": "sway * 0.7 + stepBob",
+        "rotationDelta": "-sway * 7.5"
+      },
+      "up": {
+        "offsetX": "sway * 1.0",
+        "offsetY": "-sway * 0.4 + stepBob",
+        "rotationDelta": "sway * 4.5"
+      }
+    },
+    "discreteKeyframes": {
+      "frame1_neutral": {
+        "stepIndex": 0,
+        "phaseProgress": 0.0,
+        "down": { "deltaX": 0.0, "deltaY": 0.0, "deltaRotation": 0.0 },
+        "right": { "deltaX": 0.0, "deltaY": 0.0, "deltaRotation": 0.0 },
+        "left": { "deltaX": 0.0, "deltaY": 0.0, "deltaRotation": 0.0 },
+        "up": { "deltaX": 0.0, "deltaY": 0.0, "deltaRotation": 0.0 }
+      },
+      "frame2_stepA": {
+        "stepIndex": 1,
+        "phaseProgress": 0.25,
+        "down": { "deltaX": -1.5, "deltaY": -0.4, "deltaRotation": -6.5 },
+        "right": { "deltaX": -1.4, "deltaY": -0.7, "deltaRotation": -7.5 },
+        "left": { "deltaX": -1.4, "deltaY": 0.7, "deltaRotation": -7.5 },
+        "up": { "deltaX": 1.0, "deltaY": -0.4, "deltaRotation": 4.5 }
+      },
+      "frame1_pass": {
+        "stepIndex": 2,
+        "phaseProgress": 0.5,
+        "down": { "deltaX": 0.0, "deltaY": 0.0, "deltaRotation": 0.0 },
+        "right": { "deltaX": 0.0, "deltaY": 0.0, "deltaRotation": 0.0 },
+        "left": { "deltaX": 0.0, "deltaY": 0.0, "deltaRotation": 0.0 },
+        "up": { "deltaX": 0.0, "deltaY": 0.0, "deltaRotation": 0.0 }
+      },
+      "frame3_stepB": {
+        "stepIndex": 3,
+        "phaseProgress": 0.75,
+        "down": { "deltaX": 1.5, "deltaY": 0.4, "deltaRotation": 6.5 },
+        "right": { "deltaX": 1.4, "deltaY": 0.7, "deltaRotation": 7.5 },
+        "left": { "deltaX": 1.4, "deltaY": -0.7, "deltaRotation": 7.5 },
+        "up": { "deltaX": -1.0, "deltaY": 0.4, "deltaRotation": -4.5 }
+      }
+    }
+  },
+
+  "attack_animation": {
+    "description": "Golpe físico de corte em arco com preparação (wind-up), aceleração cúbica e retorno elástico.",
+    "duration": 0.32,
+    "triggerCondition": "Apenas em ataque físico corpo a corpo com arma equipada (magias não acionam)",
+    "phases": [
+      {
+        "phaseName": "wind_up",
+        "timeRange": [0.0, 0.22],
+        "description": "Puxada para trás para carregar o golpe",
+        "progressFormula": "p = t / 0.22; ease = Math.sin(p * Math.PI * 0.5); slashProgress = -0.32 * ease; thrustProgress = -0.22 * ease;"
+      },
+      {
+        "phaseName": "slash_arc",
+        "timeRange": [0.22, 0.62],
+        "description": "Corte rápido em arco com aceleração cúbica e clarão luminoso",
+        "progressFormula": "p = (t - 0.22) / 0.40; ease = 1 - Math.pow(1 - p, 3); slashProgress = -0.32 + 1.32 * ease; thrustProgress = Math.sin(p * Math.PI); attackGlow = true; scaleBoost = 1.0 + Math.sin(p * Math.PI) * 0.12;"
+      },
+      {
+        "phaseName": "recovery",
+        "timeRange": [0.62, 1.0],
+        "description": "Desaceleração elástica e retorno à postura neutra",
+        "progressFormula": "p = (t - 0.62) / 0.38; ease = Math.sin(p * Math.PI * 0.5); slashProgress = 1.0 * (1 - ease); thrustProgress = (1 - ease) * 0.12;"
+      }
+    ],
+    "directionalTrajectories": {
+      "down": {
+        "rotationDelta": "slashProgress * 88",
+        "offsetX": "Math.sin(t * Math.PI) * 6",
+        "offsetY": "thrustProgress * 14",
+        "layerOverride": "in_front",
+        "notes": "A lâmina corta pela frente do corpo durante o golpe, descendo em arco vertical."
+      },
+      "right": {
+        "rotationDelta": "slashProgress * 82",
+        "offsetX": "thrustProgress * 13",
+        "offsetY": "thrustProgress * 4",
+        "layerOverride": "in_front",
+        "notes": "Estocada e corte horizontal para a direita com 82 graus de arco."
+      },
+      "left": {
+        "rotationDelta": "-slashProgress * 82",
+        "offsetX": "-thrustProgress * 13",
+        "offsetY": "thrustProgress * 4",
+        "layerOverride": "in_front",
+        "notes": "Estocada e corte horizontal para a esquerda (espelho)."
+      },
+      "up": {
+        "rotationDelta": "-slashProgress * 70",
+        "offsetX": "-Math.sin(t * Math.PI) * 4",
+        "offsetY": "-thrustProgress * 13",
+        "layerOverride": "behind",
+        "notes": "Corte ascendente voltado para o norte."
+      }
+    },
+    "keyframeCheckpoints": [
+      {
+        "timeNormalized": 0.0,
+        "slashProgress": 0.0,
+        "thrustProgress": 0.0,
+        "glow": false,
+        "scale": 1.0
+      },
+      {
+        "timeNormalized": 0.22,
+        "label": "Fim da Preparação (Wind-up)",
+        "slashProgress": -0.32,
+        "thrustProgress": -0.22,
+        "glow": false,
+        "scale": 1.0
+      },
+      {
+        "timeNormalized": 0.42,
+        "label": "Ápice do Corte & Clarão (Impact Strike)",
+        "slashProgress": 0.50,
+        "thrustProgress": 1.0,
+        "glow": true,
+        "scale": 1.12
+      },
+      {
+        "timeNormalized": 0.62,
+        "label": "Extensão Máxima do Arco",
+        "slashProgress": 1.0,
+        "thrustProgress": 0.0,
+        "glow": true,
+        "scale": 1.0
+      },
+      {
+        "timeNormalized": 1.0,
+        "label": "Retorno Neutro Concluído",
+        "slashProgress": 0.0,
+        "thrustProgress": 0.0,
+        "glow": false,
+        "scale": 1.0
+      }
+    ]
+  },
+
+  "idle_animation": {
+    "description": "Micro-oscilação calma de respiração ao ficar parado.",
+    "speedRadPerMs": 0.0018,
+    "rotationDelta": "Math.sin(timeMs * 0.0018) * 1.0",
+    "offsetY": "Math.sin(timeMs * 0.0018) * 0.35"
+  }
+}

@@ -257,11 +257,18 @@ export default function WeaponOffsetCalibrator({
       <div className="calibrator-footer">
         {saveStatus && <div className="save-status-msg">{saveStatus}</div>}
         <div className="calibrator-actions-row">
-          <button className="btn-action btn-save" onClick={handleSaveToServer} title="Salva diretamente no arquivo JSON e TypeScript">
-            💾 Salvar Posições
+          <button
+            className="btn-action btn-test-attack"
+            onClick={() => window.dispatchEvent(new CustomEvent('player-attack'))}
+            title="Testar animação de golpe da espada"
+          >
+            ⚔️ Testar Golpe
           </button>
-          <button className="btn-action btn-copy" onClick={handleCopyJson}>
-            {copied ? '✅ Copiado!' : '📋 Copiar JSON'}
+          <button className="btn-action btn-save" onClick={handleSaveToServer} title="Salva diretamente no arquivo JSON e TypeScript">
+            💾 Salvar
+          </button>
+          <button className="btn-action btn-copy" onClick={handleCopyJson} title="Copiar configuração JSON">
+            {copied ? '✅ Copiado' : '📋 Copiar'}
           </button>
         </div>
       </div>

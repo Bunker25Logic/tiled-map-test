@@ -68,6 +68,26 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
   },
 
   // ── Weapons (Armas) ────────────────────────────────────────────────────────
+  sword_wood: {
+    id: 'sword_wood',
+    name: 'Espada de Madeira',
+    slotType: 'weapon',
+    rarity: 'common',
+    icon: '🗡️',
+    image: '/assets/itens/wood_sword.webp',
+    stats: { attack: 18, speed: 6 },
+    description: 'Espada de treino esculpida em madeira maciça com empunhadura reforçada por cordas.',
+  },
+  wood_sword: {
+    id: 'wood_sword',
+    name: 'Espada de Madeira',
+    slotType: 'weapon',
+    rarity: 'common',
+    icon: '🗡️',
+    image: '/assets/itens/wood_sword.webp',
+    stats: { attack: 18, speed: 6 },
+    description: 'Espada de treino esculpida em madeira maciça com empunhadura reforçada por cordas.',
+  },
   sword_gold: {
     id: 'sword_gold',
     name: 'Espada de Ouro',
@@ -202,6 +222,7 @@ export const DEFAULT_INVENTORY_ITEMS: ItemDef[] = [
   { ...ALL_ITEMS.wing_angelic },
   { ...ALL_ITEMS.wing_thunder },
   { ...ALL_ITEMS.sword_gold },
+  { ...ALL_ITEMS.sword_wood },
   { ...ALL_ITEMS.sword_light },
   { ...ALL_ITEMS.armor_paladin },
   { ...ALL_ITEMS.shield_aegis },

@@ -105,6 +105,25 @@ export async function preloadAllGameAssets(): Promise<GameAssetCache> {
         .catch((err) => {
           console.warn('Using static ITEM_OFFSETS for gold_sword:', err);
         }),
+      loadChromaKeyImage('/assets/itens/wood_sword.webp')
+        .then((img) => {
+          globalCache.items['sword_wood'] = img;
+          globalCache.items['wood_sword'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading wood sword texture:', err);
+        }),
+      fetch('/assets/itens/positions/wood_sword_offsets.json')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.offsets) {
+            ITEM_OFFSETS['sword_wood'] = data;
+            ITEM_OFFSETS['wood_sword'] = data;
+          }
+        })
+        .catch((err) => {
+          console.warn('Using static ITEM_OFFSETS for wood_sword:', err);
+        }),
       loadChromaKeyImage('/assets/itens/asas trovao.webp')
         .then((img) => {
           globalCache.items['wings_thunder'] = img;

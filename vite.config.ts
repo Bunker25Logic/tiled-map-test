@@ -33,7 +33,9 @@ export default defineConfig({
             req.on('end', () => {
               try {
                 const data = JSON.parse(body);
-                const jsonPath = path.resolve(__dirname, 'public/assets/itens/positions/gold_sword_offsets.json');
+                const itemName = data?.metadata?.itemName || 'gold_sword';
+                const fileName = itemName.includes('wood') ? 'wood_sword_offsets.json' : 'gold_sword_offsets.json';
+                const jsonPath = path.resolve(__dirname, `public/assets/itens/positions/${fileName}`);
                 fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf-8');
 
                 res.setHeader('Content-Type', 'application/json');

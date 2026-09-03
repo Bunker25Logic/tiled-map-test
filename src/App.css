@@ -409,6 +409,25 @@ html {
   box-shadow: 0 0 20px #ffffff;
 }
 
+.btn-slot-attack {
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.28) 0%, rgba(185, 28, 28, 0.45) 100%),
+              linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+  border-color: rgba(239, 68, 68, 0.55);
+}
+
+.btn-slot-attack:hover {
+  border-color: #f87171;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.65), 0 0 4px rgba(250, 204, 21, 0.4);
+}
+
+.btn-slot-attack:active,
+.btn-slot-attack.attacking {
+  transform: scale(0.92);
+  border-color: #fef08a;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.4) 0%, rgba(220, 38, 38, 0.6) 100%);
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.85);
+}
+
 .slot-key-hint {
   position: absolute;
   top: 3px;
@@ -5529,6 +5548,18 @@ html {
   justify-content: center;
   gap: 6px;
   transition: all 0.15s ease;
+}
+
+.btn-action.btn-test-attack {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  color: #ffffff;
+  border: 1px solid #fca5a5;
+  box-shadow: 0 3px 12px rgba(239, 68, 68, 0.4);
+}
+
+.btn-action.btn-test-attack:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
 }
 
 .btn-action.btn-save {
