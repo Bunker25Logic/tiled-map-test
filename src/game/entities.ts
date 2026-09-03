@@ -2,6 +2,7 @@ import type { Rect, TiledMap } from './types';
 import { loadChromaKeyImage } from './imageLoader';
 import { moveAndSlide } from './mapUtils';
 import { type CoinType, getCoinFrameIndex } from './currency';
+import { type SpawnPoint, createZoneSpawnPoints } from './spawnSystem';
 import rawConfigs from './entitiesConfig.json';
 
 export interface MonsterConfig {
@@ -167,7 +168,7 @@ function getCombat(type: string): MonsterCombatDef {
   };
 }
 
-type MonsterAIState = 'wander' | 'idle' | 'chase' | 'attack' | 'dead';
+type MonsterAIState = 'wander' | 'idle' | 'chase' | 'attack' | 'returning_home' | 'dead';
 
 /** Death animation state — Tibia corpse style */
 export interface MonsterCorpse {
@@ -194,6 +195,13 @@ export class Monster {
   public mapId = 'map1';
   public islandBounds?: IslandBounds;
 
+  public spawnPointId?: string;
+  public homeX: number;
+  public homeY: number;
+  public roamRadius: number;
+  public maxChaseDistance: number;
+  public isReturningHome = false;
+
   public hp: number;
   public maxHp: number;
   public aiState: MonsterAIState = 'idle';
@@ -212,11 +220,30 @@ export class Monster {
   /** Called when this monster successfully hits the player */
   public onAttackPlayer?: (damage: number) => void;
 
-  constructor(id: string, type: string, x: number, y: number, mapId = 'map1', islandBounds?: IslandBounds) {
+  constructor(
+    id: string,
+    type: string,
+    x: number,
+    y: number,
+    mapId = 'map1',
+    islandBounds?: IslandBounds,
+    spawnOpts?: {
+      spawnPointId?: string;
+      homeX?: number;
+      homeY?: number;
+      roamRadius?: number;
+      maxChaseDistance?: number;
+    }
+  ) {
     this.id = id;
     this.type = type;
     this.mapId = mapId;
     this.islandBounds = islandBounds;
+    this.spawnPointId = spawnOpts?.spawnPointId;
+    this.homeX = spawnOpts?.homeX ?? x;
+    this.homeY = spawnOpts?.homeY ?? y;
+    this.roamRadius = spawnOpts?.roamRadius ?? 50;
+    this.maxChaseDistance = spawnOpts?.maxChaseDistance ?? 260;
     this.config = MONSTER_CONFIGS[type] || {
       name: type,
       width: 32, height: 32,
@@ -254,7 +281,27 @@ export class Monster {
 
   private pickNextAction() {
     this.stateTimer = 0;
-    if (Math.random() < 0.4) {
+    const distToHome = Math.hypot(this.x - this.homeX, this.y - this.homeY);
+
+    // Se se afastou além do roamRadius da sua casa, prioriza caminhar de volta para o ninho
+    if (distToHome > this.roamRadius) {
+      this.aiState = 'wander';
+      this.isMoving = true;
+      this.stateDuration = 1.0 + Math.random() * 1.5;
+      const dx = this.homeX - this.x;
+      const dy = this.homeY - this.y;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        this.dir = dx > 0 ? 2 : 4;
+      } else {
+        this.dir = dy > 0 ? 3 : 1;
+      }
+      const spd = this.config.speed * 0.85;
+      this.currentVx = this.dir === 2 ? spd : this.dir === 4 ? -spd : 0;
+      this.currentVy = this.dir === 3 ? spd : this.dir === 1 ? -spd : 0;
+      return;
+    }
+
+    if (Math.random() < 0.42) {
       this.aiState = 'wander';
       this.isMoving = true;
       this.stateDuration = 1.2 + Math.random() * 2.0;
@@ -273,7 +320,7 @@ export class Monster {
       this.currentVx = 0;
       this.currentVy = 0;
       this.frame = 1;
-      this.stateDuration = 2.0 + Math.random() * 4.0;
+      this.stateDuration = 2.0 + Math.random() * 3.5;
     }
   }
 
@@ -303,43 +350,73 @@ export class Monster {
       ? Math.hypot(playerCenterX - myCenterX, playerCenterY - myCenterY)
       : Infinity;
 
-    const shouldChase =
-      playerHitbox &&
-      (
-        (this.combat.behavior === 'aggressive' && distToPlayer <= this.combat.aggroRadius) ||
-        (this.isProvoked && distToPlayer <= this.combat.aggroRadius * 2)
-      );
+    const distToHome = Math.hypot(this.x - this.homeX, this.y - this.homeY);
 
-    const inAttackRange = distToPlayer <= this.combat.attackRange + 4;
-
-    if (this.attackCooldownTimer > 0) {
-      this.attackCooldownTimer = Math.max(0, this.attackCooldownTimer - dt);
-    }
-
-    if (shouldChase && inAttackRange) {
-      this.aiState = 'attack';
-      this.isMoving = false;
-      this.currentVx = 0;
-      this.currentVy = 0;
-      if (playerHitbox) this.faceTowardsPlayer(playerCenterX, playerCenterY);
-      if (this.attackCooldownTimer <= 0) {
-        this.attackCooldownTimer = this.combat.attackCooldown;
-        this.onAttackPlayer?.(this.combat.attack);
-      }
-    } else if (shouldChase) {
-      this.aiState = 'chase';
-      this.isMoving = true;
-      if (playerHitbox) this.faceTowardsPlayer(playerCenterX, playerCenterY);
-      const chaseSpd = this.config.speed * this.combat.chaseSpeed;
-      const norm = distToPlayer > 0.1 ? distToPlayer : 1;
-      this.currentVx = ((playerCenterX - myCenterX) / norm) * chaseSpd;
-      this.currentVy = ((playerCenterY - myCenterY) / norm) * chaseSpd;
-    } else {
-      if (this.aiState === 'chase' || this.aiState === 'attack') {
+    // ── Home Leashing / De-aggro (Tibia mechanic) ─────────────────────────────
+    if (this.isReturningHome) {
+      if (distToHome <= Math.max(16, this.roamRadius * 0.8)) {
+        this.isReturningHome = false;
+        this.isProvoked = false;
         this.pickNextAction();
       } else {
-        this.stateTimer += dt;
-        if (this.stateTimer >= this.stateDuration) this.pickNextAction();
+        this.aiState = 'returning_home';
+        this.isMoving = true;
+        const dx = this.homeX - this.x;
+        const dy = this.homeY - this.y;
+        const dist = Math.max(0.1, Math.hypot(dx, dy));
+        const returnSpd = this.config.speed * 1.15;
+        this.currentVx = (dx / dist) * returnSpd;
+        this.currentVy = (dy / dist) * returnSpd;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          this.dir = dx > 0 ? 2 : 4;
+        } else {
+          this.dir = dy > 0 ? 3 : 1;
+        }
+      }
+    } else if (distToHome > this.maxChaseDistance) {
+      // Ultrapassou a distância máxima do ninho: desiste da perseguição e volta
+      this.isReturningHome = true;
+      this.isProvoked = false;
+      this.aiState = 'returning_home';
+    } else {
+      const shouldChase =
+        playerHitbox &&
+        (
+          (this.combat.behavior === 'aggressive' && distToPlayer <= this.combat.aggroRadius) ||
+          (this.isProvoked && distToPlayer <= this.combat.aggroRadius * 2)
+        );
+
+      const inAttackRange = distToPlayer <= this.combat.attackRange + 4;
+
+      if (this.attackCooldownTimer > 0) {
+        this.attackCooldownTimer = Math.max(0, this.attackCooldownTimer - dt);
+      }
+
+      if (shouldChase && inAttackRange) {
+        this.aiState = 'attack';
+        this.isMoving = false;
+        this.currentVx = 0;
+        this.currentVy = 0;
+        if (playerHitbox) this.faceTowardsPlayer(playerCenterX, playerCenterY);
+        if (this.attackCooldownTimer <= 0) {
+          this.attackCooldownTimer = this.combat.attackCooldown;
+          this.onAttackPlayer?.(this.combat.attack);
+        }
+      } else if (shouldChase) {
+        this.aiState = 'chase';
+        this.isMoving = true;
+        if (playerHitbox) this.faceTowardsPlayer(playerCenterX, playerCenterY);
+        const chaseSpd = this.config.speed * this.combat.chaseSpeed;
+        const norm = distToPlayer > 0.1 ? distToPlayer : 1;
+        this.currentVx = ((playerCenterX - myCenterX) / norm) * chaseSpd;
+        this.currentVy = ((playerCenterY - myCenterY) / norm) * chaseSpd;
+      } else {
+        if (this.aiState === 'chase' || this.aiState === 'attack') {
+          this.pickNextAction();
+        } else {
+          this.stateTimer += dt;
+          if (this.stateTimer >= this.stateDuration) this.pickNextAction();
+        }
       }
     }
 
@@ -957,130 +1034,33 @@ export function buildWalkableLandSet(mapData: TiledMap): Set<string> {
   return landSet;
 }
 
-// ── Biome Configurations ───────────────────────────────────────────────────────
-interface BiomeIslandDef {
-  id: string;
-  name: string;
-  bounds: IslandBounds;
-  pool: string[];
-  targetCount: number;
-}
-
-const BIOME_ISLANDS: BiomeIslandDef[] = [
-  { id: 'ilha1', name: 'Ilha 1 (Floresta & Ruínas)', bounds: SURFACE_ISLAND_BOUNDS.ilha1,
-    pool: ['esquilo', 'alce', 'vead', 'piggi', 'dog', 'dodo', 'hiena', 'elf', 'anao', 'duende', 'orc', 'pand'], targetCount: 10 },
-  { id: 'ilha2', name: 'Ilha 2 (Deserto de Areia)', bounds: SURFACE_ISLAND_BOUNDS.ilha2,
-    pool: ['skedesert', 'lacost', 'mumia', 'serpent', 'mummi', 'mummi2', 'golen-magma', 'genie', 'scarnsabre'], targetCount: 10 },
-  { id: 'ilha3', name: 'Ilha 3 (Montanhas Rochosas)', bounds: SURFACE_ISLAND_BOUNDS.ilha3,
-    pool: ['tiguersabre', 'bufao', 'centgreen', 'centongg', 'centon', 'whitewolf', 'golen', 'golen2', 'trolol', 'drago', 'orc', 'lobisonem'], targetCount: 10 },
-  { id: 'ilha4', name: 'Ilha 4 (Santuário Místico)', bounds: SURFACE_ISLAND_BOUNDS.ilha4,
-    pool: ['draertis', 'dragis', 'medusa', 'fantasn', 'aparition', 'thedeath', 'golen', 'magmal', 'drago', 'centon', 'fera'], targetCount: 10 },
-  { id: 'ilha5', name: 'Ilha 5 (Terras Dracônicas)', bounds: SURFACE_ISLAND_BOUNDS.ilha5,
-    pool: ['draertis', 'dragis', 'bat rei', 'medusa', 'triron', 'glacis', 'ins', 'token', 'cavern creature'], targetCount: 10 },
-];
-
-const CAVE1_POOL = ['bat', 'zombie', 'aparition', 'goblin', 'soni', 'trolol', 'centostone', 'stonemonster'];
-
 export function createMapMonsters(
   mapId = 'map1',
   mapData?: TiledMap,
-  colliders?: Rect[]
+  _colliders?: Rect[],
+  spawnPoints?: SpawnPoint[]
 ): Monster[] {
-  const monsters: Monster[] = [];
-  let monsterIdCounter = 1;
-
-  if (mapId === 'caverna-zona-1') {
-    const caveSegments = [
-      { minX: 120, maxX: 280, minY: 90, maxY: 180 },
-      { minX: 300, maxX: 500, minY: 90, maxY: 190 },
-      { minX: 520, maxX: 720, minY: 90, maxY: 190 },
-      { minX: 740, maxX: 940, minY: 90, maxY: 190 },
-      { minX: 960, maxX: 1120, minY: 90, maxY: 180 },
-    ];
-    for (let i = 0; i < 8; i++) {
-      const seg = caveSegments[i % caveSegments.length];
-      const type = CAVE1_POOL[i % CAVE1_POOL.length];
-      monsters.push(new Monster(
-        `cave1_mob_${i}_${type}`, type,
-        Math.round(seg.minX + Math.random() * (seg.maxX - seg.minX)),
-        Math.round(seg.minY + Math.random() * (seg.maxY - seg.minY)),
-        'caverna-zona-1'
-      ));
-    }
-    return monsters;
+  if (mapData && !activeWalkableLandSet) {
+    activeWalkableLandSet = buildWalkableLandSet(mapData);
   }
-
-  if (mapId === 'caverna2') {
-    const c2Spawns = [
-      { type: 'bat', x: 130, y: 110 }, { type: 'aparition', x: 210, y: 140 },
-      { type: 'soni', x: 280, y: 100 }, { type: 'goblin', x: 350, y: 145 },
-      { type: 'stonemonster', x: 230, y: 115 },
-    ];
-    for (let i = 0; i < c2Spawns.length; i++) {
-      const s = c2Spawns[i];
-      monsters.push(new Monster(`cave2_mob_${i}_${s.type}`, s.type, s.x, s.y, 'caverna2'));
-    }
-    return monsters;
-  }
-
-  if (mapId === 'caverna3') {
-    const c3Spawns = [
-      { type: 'bat rei', x: 140, y: 120 },
-      { type: 'cavern creature', x: 220, y: 140 },
-      { type: 'skeleton', x: 300, y: 110 },
-      { type: 'draertis', x: 380, y: 150 },
-      { type: 'fantasn', x: 260, y: 130 },
-    ];
-    for (let i = 0; i < c3Spawns.length; i++) {
-      const s = c3Spawns[i];
-      monsters.push(new Monster(`cave3_mob_${i}_${s.type}`, s.type, s.x, s.y, 'caverna3'));
-    }
-    return monsters;
-  }
-
-  if (!mapData) return monsters;
-
-  activeWalkableLandSet = buildWalkableLandSet(mapData);
-  const islandEligibleTiles: Record<string, Array<{ x: number; y: number }>> = {
-    ilha1: [], ilha2: [], ilha3: [], ilha4: [], ilha5: [],
-  };
-
-  activeWalkableLandSet.forEach((tileKey) => {
-    const [tx, ty] = tileKey.split(',').map(Number);
-    let solidNeighbors = 0;
-    for (const [dx, dy] of [[1,0], [-1,0], [0,1], [0,-1], [1,1], [-1,-1], [1,-1], [-1,1]]) {
-      if (activeWalkableLandSet!.has(`${tx + dx},${ty + dy}`)) solidNeighbors++;
-    }
-    if (solidNeighbors < 4) return;
-    const wx = tx * 32, wy = ty * 32;
-    if (colliders) {
-      if (colliders.some((c) => wx < c.x + c.width && wx + 16 > c.x && wy < c.y + c.height && wy + 12 > c.y)) return;
-    }
-    for (const isl of BIOME_ISLANDS) {
-      if (wx >= isl.bounds.minX + 32 && wx <= isl.bounds.maxX - 32 &&
-          wy >= isl.bounds.minY + 32 && wy <= isl.bounds.maxY - 32) {
-        if (isl.id === 'ilha1' && Math.hypot(wx, wy) < 120) return;
-        islandEligibleTiles[isl.id].push({ x: wx, y: wy });
-        break;
+  const points = spawnPoints || createZoneSpawnPoints(mapId);
+  return points.map((sp, idx) => {
+    const mob = new Monster(
+      `${sp.id}_${idx}_${sp.monsterType}`,
+      sp.monsterType,
+      sp.homeX,
+      sp.homeY,
+      mapId,
+      undefined,
+      {
+        spawnPointId: sp.id,
+        homeX: sp.homeX,
+        homeY: sp.homeY,
+        roamRadius: sp.roamRadius,
+        maxChaseDistance: sp.maxChaseDistance,
       }
-    }
+    );
+    sp.currentMonsterId = mob.id;
+    return mob;
   });
-
-  for (const isl of BIOME_ISLANDS) {
-    const tiles = islandEligibleTiles[isl.id];
-    if (!tiles || tiles.length === 0) continue;
-    const count = Math.min(isl.targetCount, tiles.length);
-    const step = Math.max(1, Math.floor(tiles.length / count));
-    for (let i = 0; i < count; i++) {
-      const tileIndex = (i * step + Math.floor(Math.random() * step)) % tiles.length;
-      const tile = tiles[tileIndex];
-      const type = isl.pool[i % isl.pool.length];
-      monsters.push(new Monster(
-        `surf_${isl.id}_${monsterIdCounter++}_${type}`,
-        type, tile.x + 8, tile.y + 8, mapId, isl.bounds
-      ));
-    }
-  }
-
-  return monsters;
 }

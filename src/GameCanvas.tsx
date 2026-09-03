@@ -13,6 +13,7 @@ import {
   Monster,
   createMapMonsters,
   type MonsterCorpse,
+  updateCorpse,
   type LootBox,
   type CoinDrop,
   generateLootBox,
@@ -22,6 +23,7 @@ import {
   drawCoinDrop,
   canCollectCoinDrop,
 } from './game/entities';
+import { type SpawnPoint, createZoneSpawnPoints } from './game/spawnSystem';
 import { ALL_ITEMS, type EquippedGear } from './game/items';
 import { ITEM_OFFSETS, type ItemOffsetConfig } from './game/itemOffsets';
 import {
@@ -218,6 +220,8 @@ export default function GameCanvas({
   // Persistent monsters, corpses, loot boxes, coin drops, spells, floating numbers, slashes, targeted mob
   const monstersRef = useRef<Monster[]>([]);
   const corpsesRef = useRef<MonsterCorpse[]>([]);
+  const spawnPointsRef = useRef<SpawnPoint[]>([]);
+  const respawnCheckTimerRef = useRef(0);
   const lootBoxesRef = useRef<LootBox[]>([]);
   const coinDropsRef = useRef<CoinDrop[]>([]);
   const activeSpellsRef = useRef<ActiveSpell[]>([]);
@@ -333,54 +337,82 @@ export default function GameCanvas({
         // 3. Tile animation map (water wave cycles and Tiled animations)
         const animMap = buildTileAnimationMap(mapData.tilesets);
 
-        // 4. Initialize monsters for this specific zone (procedural map-wide spawner)
+        // 4. Initialize spawn points, corpses, and monsters for this zone
         corpsesRef.current = [];
         lootBoxesRef.current = [];
         coinDropsRef.current = [];
         floatingNumbersRef.current = [];
+        respawnCheckTimerRef.current = 0;
+
+        spawnPointsRef.current = createZoneSpawnPoints(mapId);
+
+        const attachMonsterCallbacks = (mob: Monster, sp?: SpawnPoint) => {
+          mob.onDeath = (xpReward, deathX, deathY) => {
+            // Mark spawn point as dead for respawn timer
+            const targetSp = sp || spawnPointsRef.current.find((s) => s.id === mob.spawnPointId);
+            if (targetSp) {
+              targetSp.currentMonsterId = null;
+              targetSp.deathTimestamp = performance.now();
+            }
+
+            // Create monster corpse on the ground (Tibia style)
+            corpsesRef.current.push({
+              x: deathX - mob.config.hitboxW / 2,
+              y: deathY - mob.config.hitboxH / 2,
+              type: mob.type,
+              config: mob.config,
+              dir: mob.dir,
+              alpha: 1.0,
+              timer: 0,
+            });
+
+            // 1. Spawn authentic stackable Tibia coin drops on the ground
+            const coins = generateMonsterCoinDrops(mob.id, deathX, deathY, xpReward);
+            coinDropsRef.current.push(...coins);
+
+            // 2. Extra equipment or potion loot box if rare item rolled
+            const loot = generateLootBox(mob.id, deathX, deathY - 8, xpReward);
+            if (loot.itemId || loot.rarity !== 'common') {
+              lootBoxesRef.current.push(loot);
+            }
+
+            // 3. Floating XP number
+            floatingNumbersRef.current.push({
+              id: `xp_${Date.now()}_${Math.random()}`,
+              x: deathX,
+              y: deathY - 20,
+              text: `+${xpReward} XP`,
+              color: '#facc15',
+              alpha: 1,
+              vy: -28,
+              timer: 0,
+              duration: 2.0,
+            });
+            onMonsterKillRef.current?.(xpReward);
+          };
+
+          mob.onAttackPlayer = (damage: number) => {
+            // Floating damage number on player
+            floatingNumbersRef.current.push({
+              id: `dmg_p_${Date.now()}`,
+              x: playerRef.current.x + HITBOX_W / 2,
+              y: playerRef.current.y - 8,
+              text: `-${damage}`,
+              color: '#ef4444',
+              alpha: 1,
+              vy: -32,
+              timer: 0,
+              duration: 1.5,
+            });
+            onPlayerDamageRef.current?.(damage);
+          };
+        };
+
         const spawnMonsters = () => {
-          const mobs = createMapMonsters(mapId, mapData, colliders);
+          const mobs = createMapMonsters(mapId, mapData, colliders, spawnPointsRef.current);
           for (const mob of mobs) {
-            mob.onDeath = (xpReward, deathX, deathY) => {
-              // 1. Spawn authentic stackable Tibia coin drops on the ground
-              const coins = generateMonsterCoinDrops(mob.id, deathX, deathY, xpReward);
-              coinDropsRef.current.push(...coins);
-
-              // 2. Extra equipment or potion loot box if rare item rolled
-              const loot = generateLootBox(mob.id, deathX, deathY - 8, xpReward);
-              if (loot.itemId || loot.rarity !== 'common') {
-                lootBoxesRef.current.push(loot);
-              }
-
-              // 3. Floating XP number
-              floatingNumbersRef.current.push({
-                id: `xp_${Date.now()}_${Math.random()}`,
-                x: deathX,
-                y: deathY - 20,
-                text: `+${xpReward} XP`,
-                color: '#facc15',
-                alpha: 1,
-                vy: -28,
-                timer: 0,
-                duration: 2.0,
-              });
-              onMonsterKillRef.current?.(xpReward);
-            };
-            mob.onAttackPlayer = (damage: number) => {
-              // Floating damage number on player
-              floatingNumbersRef.current.push({
-                id: `dmg_p_${Date.now()}`,
-                x: playerRef.current.x + HITBOX_W / 2,
-                y: playerRef.current.y - 8,
-                text: `-${damage}`,
-                color: '#ef4444',
-                alpha: 1,
-                vy: -32,
-                timer: 0,
-                duration: 1.5,
-              });
-              onPlayerDamageRef.current?.(damage);
-            };
+            const sp = spawnPointsRef.current.find((s) => s.id === mob.spawnPointId);
+            attachMonsterCallbacks(mob, sp);
           }
           return mobs;
         };
@@ -1067,6 +1099,66 @@ export default function GameCanvas({
           // Remove dead monsters after a brief delay (corpse already spawned)
           monstersRef.current = monstersRef.current.filter((m) => !m.isDead);
 
+          // ── Update Corpses (Tibia-style fade out) ────────────────────────
+          for (let i = corpsesRef.current.length - 1; i >= 0; i--) {
+            const corpse = corpsesRef.current[i];
+            if (updateCorpse(corpse, dt)) {
+              corpsesRef.current.splice(i, 1);
+            }
+          }
+
+          // ── Continuous Monster Respawn with Anti-Pop-in (Tibia rules) ─────
+          respawnCheckTimerRef.current += dt;
+          if (respawnCheckTimerRef.current >= 0.5) {
+            respawnCheckTimerRef.current = 0;
+            const now = performance.now();
+
+            const dpr = window.devicePixelRatio || 1;
+            const zoom = getResponsiveCameraZoom();
+            const scale = zoom * dpr;
+            const viewW = canvas.width / scale;
+            const viewH = canvas.height / scale;
+            const camMinX = cameraRef.current.x - 72;
+            const camMaxX = cameraRef.current.x + viewW + 72;
+            const camMinY = cameraRef.current.y - 72;
+            const camMaxY = cameraRef.current.y + viewH + 72;
+
+            for (const sp of spawnPointsRef.current) {
+              if (sp.deathTimestamp === null || sp.currentMonsterId !== null) continue;
+
+              const elapsedMs = now - sp.deathTimestamp;
+              if (elapsedMs < sp.respawnSeconds * 1000) continue;
+
+              // Regra de Ouro do Tibia: Se o ponto de spawn estiver visível na tela, adia o renascimento!
+              const isInsideScreen = (
+                sp.homeX >= camMinX && sp.homeX <= camMaxX &&
+                sp.homeY >= camMinY && sp.homeY <= camMaxY
+              );
+              if (isInsideScreen) continue;
+
+              // Renasce nova criatura com vida cheia no ninho
+              const newMob = new Monster(
+                `${sp.id}_${Date.now()}_${sp.monsterType}`,
+                sp.monsterType,
+                sp.homeX,
+                sp.homeY,
+                mapId,
+                undefined,
+                {
+                  spawnPointId: sp.id,
+                  homeX: sp.homeX,
+                  homeY: sp.homeY,
+                  roamRadius: sp.roamRadius,
+                  maxChaseDistance: sp.maxChaseDistance,
+                }
+              );
+              attachMonsterCallbacks(newMob, sp);
+              sp.currentMonsterId = newMob.id;
+              sp.deathTimestamp = null;
+              monstersRef.current.push(newMob);
+            }
+          }
+
           // ── Update Coin Drops (Collect on player proximity) ──────────────
           for (const coin of coinDropsRef.current) {
             coin.animTimer += dt * 3.0;
@@ -1392,6 +1484,55 @@ export default function GameCanvas({
               sortY: loot.y + 4,
               draw: (renderCtx) => {
                 drawLootBox(renderCtx, loot, camX, camY);
+              },
+            });
+          }
+
+          // Add Monster Corpses to depth sorting (lying on ground under living creatures)
+          for (const corpse of corpsesRef.current) {
+            if (
+              corpse.x + corpse.config.width < camX ||
+              corpse.x > camX + worldViewW ||
+              corpse.y + corpse.config.height < camY ||
+              corpse.y > camY + worldViewH
+            ) {
+              continue;
+            }
+
+            depthObjects.push({
+              type: 'tiled-obj',
+              sortY: corpse.y + corpse.config.hitboxH - 6,
+              draw: (renderCtx) => {
+                const corpseFootCenterX = corpse.x + corpse.config.hitboxW / 2 - camX;
+                const corpseFootBottomY = corpse.y + corpse.config.hitboxH - camY;
+
+                // Faded shadow
+                renderCtx.save();
+                renderCtx.globalAlpha = corpse.alpha * 0.3;
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                renderCtx.beginPath();
+                renderCtx.ellipse(
+                  corpseFootCenterX,
+                  corpseFootBottomY - 1,
+                  corpse.config.shadowRadiusX * 1.1,
+                  corpse.config.shadowRadiusY * 0.8,
+                  0, 0, Math.PI * 2
+                );
+                renderCtx.fill();
+                renderCtx.restore();
+
+                // Corpse Sprite
+                const spriteKey = `${corpse.type}_1_${corpse.dir}`;
+                const spr = cached.monsters[spriteKey] || cached.monsters[`${corpse.type}_1_3`];
+                const drawX = corpse.x + corpse.config.hitboxW / 2 - corpse.config.visCenterX - camX;
+                const drawY = corpse.y + corpse.config.hitboxH - corpse.config.feetY - camY;
+
+                if (spr) {
+                  renderCtx.save();
+                  renderCtx.globalAlpha = corpse.alpha * 0.75;
+                  renderCtx.drawImage(spr, drawX, drawY, corpse.config.width, corpse.config.height);
+                  renderCtx.restore();
+                }
               },
             });
           }
