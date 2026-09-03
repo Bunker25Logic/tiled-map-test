@@ -1,6 +1,7 @@
 import { getLevelFromXP, getLevelProgress, getXPToNextLevel } from '../game/playerStore';
 import type { PlayerCharacter } from '../game/playerStore';
 import { PLAYABLE_CHARACTERS } from '../game/characters';
+import { getTotalSilverValue, formatGoldNumber } from '../game/currency';
 import CoinIcon from './CoinIcon';
 
 interface PlayerHUDProps {
@@ -29,6 +30,7 @@ export default function PlayerHUD({
   const mpPercent = maxMp > 0 ? mp / maxMp : 1;
   const charDef = PLAYABLE_CHARACTERS.find((c) => c.id === character.characterId);
   const wallet = character.wallet || { gold: 0, silver: 0, basalt: 0 };
+  const totalSilver = getTotalSilverValue(wallet);
 
   // Color for HP bar based on percentage
   const hpColor =
@@ -86,20 +88,32 @@ export default function PlayerHUD({
         <span className="hud-bar-value hud-xp-value">{character.xp.toLocaleString()}</span>
       </div>
 
-      {/* Coin Wallet */}
-      <div className="hud-wallet">
+      {/* Coin Wallet com Denominações e Total Geral */}
+      <div
+        className="hud-wallet"
+        title={`Valor Total: ${formatGoldNumber(totalSilver)} Pratas\n(100 Prata = 1 Ouro | 100 Ouro = 1 Cristal)`}
+      >
         {wallet.basalt > 0 && (
-          <div className="hud-coin-slot" title={`${wallet.basalt} Moeda(s) de Cristal`}>
-            <CoinIcon type="basalt" amount={wallet.basalt} size={20} showAmount />
+          <div className="hud-coin-slot" title={`${wallet.basalt}x Moeda(s) de Cristal (${formatGoldNumber(wallet.basalt * 100)} Ouro)`}>
+            <CoinIcon type="basalt" amount={wallet.basalt} size={18} showAmount />
           </div>
         )}
-        {wallet.silver > 0 && (
-          <div className="hud-coin-slot" title={`${wallet.silver} Moeda(s) de Prata`}>
-            <CoinIcon type="silver" amount={wallet.silver} size={20} showAmount />
+        {wallet.gold > 0 && (
+          <div className="hud-coin-slot" title={`${wallet.gold}x Moeda(s) de Ouro (${formatGoldNumber(wallet.gold * 100)} Prata)`}>
+            <CoinIcon type="gold" amount={wallet.gold} size={18} showAmount />
           </div>
         )}
-        <div className="hud-coin-slot" title={`${wallet.gold} Moeda(s) de Ouro`}>
-          <CoinIcon type="gold" amount={wallet.gold} size={20} showAmount />
+        <div className="hud-coin-slot" title={`${wallet.silver}x Moeda(s) de Prata`}>
+          <CoinIcon type="silver" amount={wallet.silver} size={18} showAmount />
+        </div>
+        <div className="hud-wallet-total" title="Saldo total convertido">
+          <span className="hud-total-label">Total:</span>
+          <span className="hud-total-value">
+            {wallet.gold > 0 || wallet.basalt > 0
+              ? `${formatGoldNumber(wallet.gold + wallet.basalt * 100)}o ${wallet.silver}p`
+              : `${wallet.silver}p`}
+          </span>
+          <span className="hud-total-symbol">🪙</span>
         </div>
       </div>
     </div>

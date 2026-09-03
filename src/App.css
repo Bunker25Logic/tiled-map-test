@@ -223,6 +223,44 @@ html {
   cursor: crosshair;
 }
 
+/* ─── Unarmed Pound Attack SVG Animation Layer ───────────────────────────── */
+.pound-overlay-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 18;
+}
+
+.pound-world-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.pound-effect-node {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  margin-left: -48px;
+  margin-top: -48px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.65));
+}
+
+.pound-effect-node svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
 /* ─── Minimap Radar HUD (Top-Right) ─────────────────────────────────────── */
 .minimap-hud-container {
   position: absolute;
@@ -2082,22 +2120,50 @@ html {
 }
 
 .item-icon-wing.angelic {
-  background-image: url('/assets/itens/asas angelicais.webp');
+  background-image: url('/assets/itens/asas/asas angelicais.webp');
   background-size: 200% 200%;
   background-position: 0% 100%;
   filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.6));
 }
 
-.item-icon-wing.thunder {
-  background-image: url('/assets/itens/asas angelicais.webp');
-  background-size: 200% 200%;
-  background-position: 0% 100%;
-  filter: hue-rotate(180deg) drop-shadow(0 0 6px rgba(56, 189, 248, 0.8));
+@keyframes ringGleamCycle {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: calc(-4 * var(--ring-size, 32px)) 0;
+  }
+}
+
+.item-icon-animated-ring {
+  display: inline-block;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: ringGleamCycle 0.8s steps(4) infinite;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.45));
+}
+
+.item-icon-animated-ring:hover {
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.85)) brightness(1.15);
 }
 
 .item-icon-img {
   object-fit: contain;
   filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes radiantNeonPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 7px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 14px rgba(255, 255, 255, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 11px #ffffff) drop-shadow(0 0 22px rgba(255, 255, 255, 0.95));
+  }
+}
+
+.item-icon-radiant {
+  animation: radiantNeonPulse 2s ease-in-out infinite;
+  display: inline-block;
 }
 
 .item-icon-emoji {
@@ -2246,8 +2312,8 @@ html {
 }
 
 .inspector-icon-frame {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   border: 2px solid #f59e0b;
   display: flex;
@@ -4687,6 +4753,63 @@ html {
 .hud-coin-slot {
   display: flex;
   align-items: center;
+}
+
+.hud-wallet-total {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 4px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(250, 204, 21, 0.3);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: help;
+}
+
+.hud-total-label {
+  color: #94a3b8;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.hud-total-value {
+  color: #fde047;
+  font-family: 'JetBrains Mono', monospace, sans-serif;
+  text-shadow: 0 0 6px rgba(250, 204, 21, 0.4);
+}
+
+.hud-total-symbol {
+  font-size: 12px;
+}
+
+.header-coin-total {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(245, 158, 11, 0.35);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: help;
+}
+
+.header-coin-total .total-label {
+  color: #94a3b8;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.header-coin-total .total-amount {
+  color: #fde047;
+  font-family: 'JetBrains Mono', monospace, sans-serif;
+  text-shadow: 0 0 8px rgba(250, 204, 21, 0.45);
+}
+
+.header-coin-total .total-gold-icon {
+  font-size: 13px;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════

@@ -255,3 +255,7 @@ export const ITEM_OFFSETS: Record<string, ItemOffsetConfig> = {
     },
   },
 };
+
+// Aliases for Radiant Sword
+ITEM_OFFSETS['sword_light'] = ITEM_OFFSETS['sword_gold'];
+ITEM_OFFSETS['radiant_sword'] = ITEM_OFFSETS['sword_gold'];

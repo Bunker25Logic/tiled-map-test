@@ -22,7 +22,7 @@ import {
   drawCoinDrop,
   canCollectCoinDrop,
 } from './game/entities';
-import { ALL_ITEMS } from './game/items';
+import { ALL_ITEMS, type EquippedGear } from './game/items';
 import { ITEM_OFFSETS, type ItemOffsetConfig } from './game/itemOffsets';
 import {
   PLAYABLE_CHARACTERS,
@@ -42,6 +42,7 @@ import {
   type GraphicStyle,
 } from './game/graphics';
 import VirtualJoystick from './components/VirtualJoystick';
+import { createPoundElement } from './game/poundAnimation';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -57,6 +58,11 @@ const HITBOX_H = 12;
 
 // Walk speed (world pixels per second)
 const MOVE_SPEED = 120;
+
+// Distância máxima de ação e combate (~6 tiles = 192px)
+const ACTION_DISTANCE = 192;
+// Cadência entre ataques básicos automáticos (em segundos)
+const AUTO_ATTACK_INTERVAL = 1.25;
 
 // ─── CONFIGURAÇÃO DE ASAS ─────────────────────────────────────────────────────
 interface WingDirectionConfig {
@@ -78,13 +84,6 @@ const WINGS_ANGELIC_CONFIG: Record<Direction, WingDirectionConfig> = {
   up:    { sx: 8, sy: -15,   sw: 355, sh: 175, offX: -3, offY: -12, baseW: 68, baseH: 34, scale: 1.0, rot: 0, behind: false },
   left:  { sx: 533, sy: 0, sw: 178, sh: 175, offX: 14, offY: -6, baseW: 56, baseH: 28, scale: 1.0, rot: -13, behind: false },
   right: { sx: 355, sy: 0, sw: 178, sh: 175, offX: -21, offY: -6, baseW: 48, baseH: 28, scale: 1.0, rot: 0, behind: true },
-};
-
-const WINGS_THUNDER_CONFIG: Record<Direction, WingDirectionConfig> = {
-  down:  { sx: 960,  sy: 0, sw: 480, sh: 509, offX: 3,  offY: -10, baseW: 66, baseH: 38, scale: 1.0, rot: 0, behind: true },
-  up:    { sx: 1440, sy: 0, sw: 480, sh: 509, offX: -1, offY: -8,  baseW: 56, baseH: 58, scale: 1.0, rot: 0, behind: false },
-  left:  { sx: 480,  sy: 0, sw: 480, sh: 509, offX: 15, offY: -14, baseW: 46, baseH: 48, scale: 1.0, rot: 0, behind: true },
-  right: { sx: 0,    sy: 0, sw: 480, sh: 509, offX: -23,offY: -16, baseW: 46, baseH: 48, scale: 1.0, rot: 0, behind: true },
 };
 
 /**
@@ -126,6 +125,12 @@ interface GameCanvasProps {
   equippedWings?: WingType;
   /** Currently equipped weapon item ID */
   equippedWeapon?: string | null;
+  /** Full player equipped gear (wings, weapon, ring, etc.) */
+  equippedGear?: EquippedGear | null;
+  /** Whether automatic melee attack is enabled */
+  autoAttackEnabled?: boolean;
+  /** Whether automatic target locking on approaching an enemy is enabled */
+  autoTargetNearbyEnabled?: boolean;
   /** Live weapon offsets (e.g. from real-time calibrator) */
   weaponOffsets?: ItemOffsetConfig | null;
   /** Force a player facing direction (for weapon offset calibrator) */
@@ -169,6 +174,9 @@ export default function GameCanvas({
   showGrid,
   equippedWings = 'angelic',
   equippedWeapon = null,
+  equippedGear = null,
+  autoAttackEnabled = true,
+  autoTargetNearbyEnabled = true,
   weaponOffsets = null,
   overrideDirection = null,
   equippedSpellIds = [],
@@ -215,6 +223,7 @@ export default function GameCanvas({
   const activeSpellsRef = useRef<ActiveSpell[]>([]);
   const floatingNumbersRef = useRef<FloatingNumber[]>([]);
   const slashEffectsRef = useRef<Array<{ x: number; y: number; dir: Direction; timer: number; duration: number }>>([]);
+  const poundWorldContainerRef = useRef<HTMLDivElement>(null);
   const selectedTargetIdRef = useRef<string | null>(null);
 
   // Refs so callbacks inside the game loop always get fresh values
@@ -247,6 +256,9 @@ export default function GameCanvas({
     showGrid,
     equippedWings,
     equippedWeapon,
+    equippedGear,
+    autoAttackEnabled,
+    autoTargetNearbyEnabled,
     weaponOffsets,
     overrideDirection,
     equippedSpellIds,
@@ -272,6 +284,9 @@ export default function GameCanvas({
     propsRef.current.showGrid = showGrid;
     propsRef.current.equippedWings = equippedWings;
     propsRef.current.equippedWeapon = equippedWeapon;
+    propsRef.current.equippedGear = equippedGear;
+    propsRef.current.autoAttackEnabled = autoAttackEnabled;
+    propsRef.current.autoTargetNearbyEnabled = autoTargetNearbyEnabled;
     propsRef.current.weaponOffsets = weaponOffsets;
     propsRef.current.overrideDirection = overrideDirection;
     propsRef.current.equippedSpellIds = equippedSpellIds;
@@ -286,7 +301,7 @@ export default function GameCanvas({
     propsRef.current.onOpenInventory = onOpenInventory;
     propsRef.current.onCollectLoot = onCollectLoot;
     propsRef.current.onCollectCoins = onCollectCoins;
-  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedWeapon, weaponOffsets, overrideDirection, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot, onCollectCoins]);
+  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedWeapon, equippedGear, autoAttackEnabled, autoTargetNearbyEnabled, weaponOffsets, overrideDirection, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot, onCollectCoins]);
 
   // Update particles on map change
   useEffect(() => {
@@ -384,10 +399,21 @@ export default function GameCanvas({
 
         let playerAttackAnimTimer = 0;
         let playerMeleeAttackAnimTimer = 0;
+        let autoAttackCooldown = 0;
+        let lastMeleeAttackTime = 0;
         const PLAYER_ATTACK_ANIM_DURATION = 0.32;
+        const MELEE_ATTACK_COOLDOWN = 0.45; // Cooldown leve de 450ms no ataque básico
 
         const executeMeleeAttack = () => {
           if (animator.state === 'dead' || (propsRef.current.playerHp !== undefined && propsRef.current.playerHp <= 0)) return;
+
+          const nowSec = performance.now() / 1000;
+          if (nowSec - lastMeleeAttackTime < MELEE_ATTACK_COOLDOWN) {
+            return; // Bloqueia ataque duplo acidental / disparos rápidos no mobile
+          }
+          lastMeleeAttackTime = nowSec;
+
+          autoAttackCooldown = AUTO_ATTACK_INTERVAL;
           animator.triggerAttack();
           playerAttackAnimTimer = PLAYER_ATTACK_ANIM_DURATION;
           playerMeleeAttackAnimTimer = PLAYER_ATTACK_ANIM_DURATION;
@@ -404,21 +430,54 @@ export default function GameCanvas({
           else if (curCharId === 'magician' || curCharId === 'necromancer') baseDamage = 26 + Math.floor(Math.random() * 14);
           else if (curCharId === 'paladin') baseDamage = 35 + Math.floor(Math.random() * 18);
 
-          // Add slash effect in front of player
-          let slashX = px;
-          let slashY = py;
-          if (curDir === 'up') slashY -= 20;
-          else if (curDir === 'down') slashY += 20;
-          else if (curDir === 'left') slashX -= 20;
-          else if (curDir === 'right') slashX += 20;
+          // Bônus de ataque de armas e anéis de poder equipados
+          let gearAttack = 0;
+          const gear = propsRef.current.equippedGear;
+          if (gear) {
+            for (const slot of Object.keys(gear) as (keyof EquippedGear)[]) {
+              const itemId = gear[slot];
+              if (itemId && ALL_ITEMS[itemId]?.stats?.attack) {
+                gearAttack += ALL_ITEMS[itemId].stats!.attack!;
+              }
+            }
+          }
+          baseDamage += gearAttack;
 
-          slashEffectsRef.current.push({
-            x: slashX,
-            y: slashY,
-            dir: curDir,
-            timer: 0,
-            duration: 0.26,
-          });
+          // Check if player has sword equipped
+          const currentWeaponId = propsRef.current.equippedWeapon ?? propsRef.current.equippedGear?.weapon ?? null;
+          const hasSword = Boolean(
+            currentWeaponId &&
+            ALL_ITEMS[currentWeaponId]?.slotType === 'weapon' &&
+            (currentWeaponId.includes('sword') || !currentWeaponId.startsWith('staff'))
+          );
+
+          // Impact position in front of player
+          let impactX = px;
+          let impactY = py;
+          if (curDir === 'up') impactY -= 20;
+          else if (curDir === 'down') impactY += 20;
+          else if (curDir === 'left') impactX -= 20;
+          else if (curDir === 'right') impactX += 20;
+
+          if (hasSword) {
+            // Sword equipped: blade slice effect
+            slashEffectsRef.current.push({
+              x: impactX,
+              y: impactY,
+              dir: curDir,
+              timer: 0,
+              duration: 0.26,
+            });
+          } else {
+            // Unarmed: animated SVG pound ("Pancada com as Mãos") with CSS
+            if (poundWorldContainerRef.current) {
+              const poundEl = createPoundElement(impactX, impactY, curDir);
+              poundWorldContainerRef.current.appendChild(poundEl);
+              setTimeout(() => {
+                poundEl.remove();
+              }, 420);
+            }
+          }
 
           // Check if explicit target is in range
           const targetMob = selectedTargetIdRef.current
@@ -481,14 +540,75 @@ export default function GameCanvas({
         const castSpell = (spellDef: SpellDef) => {
           if (animator.state === 'dead' || (propsRef.current.playerHp !== undefined && propsRef.current.playerHp <= 0)) return;
 
+          const px = playerRef.current.x;
+          const py = playerRef.current.y;
+          const pCenterX = px + HITBOX_W / 2;
+          const pCenterY = py + HITBOX_H / 2;
+          const pTorsoX = pCenterX;
+          const pTorsoY = py + HITBOX_H - 18;
+          const pFeetY = py + HITBOX_H;
+
+          // 1. Check if the player has a valid target within ACTION_DISTANCE
+          let targetMob = selectedTargetIdRef.current
+            ? monstersRef.current.find((m) => m.id === selectedTargetIdRef.current && !m.isDead)
+            : null;
+
+          if (targetMob) {
+            const dist = Math.hypot(
+              pCenterX - (targetMob.x + targetMob.config.hitboxW / 2),
+              pCenterY - (targetMob.y + targetMob.config.hitboxH / 2)
+            );
+            if (dist > ACTION_DISTANCE) {
+              // Target is too far away to cast!
+              selectedTargetIdRef.current = null;
+              targetMob = null;
+            }
+          }
+
+          // If no target and auto-target is enabled, try locking onto closest monster within ACTION_DISTANCE
+          if (!targetMob && propsRef.current.autoTargetNearbyEnabled) {
+            let closestDist = ACTION_DISTANCE;
+            for (const mob of monstersRef.current) {
+              if (mob.isDead) continue;
+              const d = Math.hypot(
+                pCenterX - (mob.x + mob.config.hitboxW / 2),
+                pCenterY - (mob.y + mob.config.hitboxH / 2)
+              );
+              if (d <= closestDist) {
+                closestDist = d;
+                targetMob = mob;
+              }
+            }
+            if (targetMob) {
+              selectedTargetIdRef.current = targetMob.id;
+            }
+          }
+
+          // 2. REQUIRE A VALID TARGET TO CAST!
+          if (!targetMob) {
+            floatingNumbersRef.current.push({
+              id: `notarget_${Date.now()}`,
+              x: pCenterX,
+              y: py - 18,
+              text: '⚠️ Selecione um inimigo!',
+              color: '#f87171',
+              alpha: 1,
+              vy: -32,
+              timer: 0,
+              duration: 1.6,
+            });
+            return; // Abort: no mana consumed, no animation played!
+          }
+
+          // 3. Check and consume mana
           const manaCost = spellDef.manaCost || 0;
           if (manaCost > 0) {
             const currentMp = propsRef.current.playerMp ?? 100;
             if (currentMp < manaCost) {
               floatingNumbersRef.current.push({
                 id: `nomana_${Date.now()}`,
-                x: playerRef.current.x + HITBOX_W / 2,
-                y: playerRef.current.y - 14,
+                x: pCenterX,
+                y: py - 14,
                 text: 'Sem mana!',
                 color: '#38bdf8',
                 alpha: 1,
@@ -506,33 +626,6 @@ export default function GameCanvas({
           playerAttackAnimTimer = PLAYER_ATTACK_ANIM_DURATION;
 
           let dir = animator.direction;
-          const px = playerRef.current.x;
-          const py = playerRef.current.y;
-
-          // Player positions: feet level vs torso level
-          const pTorsoX = px + HITBOX_W / 2;
-          const pTorsoY = py + HITBOX_H - 18;
-          const pFeetY = py + HITBOX_H;
-
-          // Find targeted monster or closest monster in range (340px)
-          let targetMob = selectedTargetIdRef.current
-            ? monstersRef.current.find((m) => m.id === selectedTargetIdRef.current && !m.isDead)
-            : null;
-
-          if (!targetMob) {
-            let closestDist = 340;
-            for (const mob of monstersRef.current) {
-              if (mob.isDead) continue;
-              const d = Math.hypot(pTorsoX - (mob.x + mob.config.hitboxW / 2), pTorsoY - (mob.y + mob.config.hitboxH / 2));
-              if (d < closestDist) {
-                closestDist = d;
-                targetMob = mob;
-              }
-            }
-            if (targetMob) {
-              selectedTargetIdRef.current = targetMob.id;
-            }
-          }
 
           // Orient caster towards target
           if (targetMob) {
@@ -729,6 +822,69 @@ export default function GameCanvas({
             playerMeleeAttackAnimTimer = Math.max(0, playerMeleeAttackAnimTimer - dt);
           }
 
+          const px = playerRef.current.x + HITBOX_W / 2;
+          const py = playerRef.current.y + HITBOX_H / 2;
+
+          // ── Validate Current Target Within ACTION_DISTANCE ───────────
+          if (selectedTargetIdRef.current) {
+            const currentTarget = monstersRef.current.find(
+              (m) => m.id === selectedTargetIdRef.current && !m.isDead
+            );
+            if (!currentTarget) {
+              selectedTargetIdRef.current = null;
+            } else {
+              const d = Math.hypot(
+                px - (currentTarget.x + currentTarget.config.hitboxW / 2),
+                py - (currentTarget.y + currentTarget.config.hitboxH / 2)
+              );
+              // Deselect if target leaves action range + buffer (230px)
+              if (d > ACTION_DISTANCE + 38) {
+                selectedTargetIdRef.current = null;
+              }
+            }
+          }
+
+          // ── Auto-Target Nearby Enemy if Enabled ──────────────────────
+          if (!selectedTargetIdRef.current && propsRef.current.autoTargetNearbyEnabled && animator.state !== 'dead') {
+            let closestDist = ACTION_DISTANCE;
+            let closestMob: Monster | null = null;
+            for (const mob of monstersRef.current) {
+              if (mob.isDead) continue;
+              const d = Math.hypot(
+                px - (mob.x + mob.config.hitboxW / 2),
+                py - (mob.y + mob.config.hitboxH / 2)
+              );
+              if (d <= closestDist) {
+                closestDist = d;
+                closestMob = mob;
+              }
+            }
+            if (closestMob) {
+              selectedTargetIdRef.current = closestMob.id;
+            }
+          }
+
+          // ── Auto-Attack Cooldown & Auto-Trigger ───────────────────────
+          if (autoAttackCooldown > 0) {
+            autoAttackCooldown = Math.max(0, autoAttackCooldown - dt);
+          }
+
+          if (propsRef.current.autoAttackEnabled && autoAttackCooldown <= 0 && animator.state !== 'dead') {
+            const targetMob = selectedTargetIdRef.current
+              ? monstersRef.current.find((m) => m.id === selectedTargetIdRef.current && !m.isDead)
+              : null;
+
+            if (targetMob) {
+              const mx = targetMob.x + targetMob.config.hitboxW / 2;
+              const my = targetMob.y + targetMob.config.hitboxH / 2;
+              const dist = Math.hypot(px - mx, py - my);
+              // Melee range (within 65px of target)
+              if (dist <= 65) {
+                executeMeleeAttack();
+              }
+            }
+          }
+
           // ── Read Player Movement Input (Virtual Joystick / Tap / Keyboard) ────
           let moveX = 0;
           let moveY = 0;
@@ -828,9 +984,20 @@ export default function GameCanvas({
 
           // ── Player Physics & Collision Resolution ───────────────────────
           if (isMoving && animator.state !== 'dead') {
+            let gearSpeedBonus = 0;
+            const gear = propsRef.current.equippedGear;
+            if (gear) {
+              for (const slot of Object.keys(gear) as (keyof EquippedGear)[]) {
+                const itemId = gear[slot];
+                if (itemId && ALL_ITEMS[itemId]?.stats?.speed) {
+                  gearSpeedBonus += ALL_ITEMS[itemId].stats!.speed!;
+                }
+              }
+            }
             const speedMultiplier = propsRef.current.equippedWings !== 'none' ? 1.45 : 1.0;
-            const dx = moveX * MOVE_SPEED * speedMultiplier * dt;
-            const dy = moveY * MOVE_SPEED * speedMultiplier * dt;
+            const effectiveSpeed = (MOVE_SPEED + gearSpeedBonus) * speedMultiplier;
+            const dx = moveX * effectiveSpeed * dt;
+            const dy = moveY * effectiveSpeed * dt;
 
             // Collect static colliders + nearby monsters as obstacles for the player
             const effectiveObstacles: Rect[] = [];
@@ -1099,6 +1266,12 @@ export default function GameCanvas({
           const camY = pCenterY - worldViewH / 2;
 
           cameraRef.current = { x: camX, y: camY, scale };
+
+          // Synchronize unarmed pound SVG layer with camera & world scale
+          if (poundWorldContainerRef.current) {
+            const factor = scale / dpr;
+            poundWorldContainerRef.current.style.transform = `translate(${-camX * factor}px, ${-camY * factor}px) scale(${factor})`;
+          }
 
           // Update ambient particles
           if (propsRef.current.enableParticles) {
@@ -1397,16 +1570,13 @@ export default function GameCanvas({
                   renderCtx.rotate(attackRotate);
                 }
 
-                // Helper para desenhar as Asas Equipadas (Angelicais ou Trovão)
+                // Helper para desenhar as Asas Equipadas (Angelicais)
                 const currentEquippedWings = propsRef.current.equippedWings ?? 'none';
                 const isAngelic = currentEquippedWings === 'angelic';
-                const isThunder = currentEquippedWings === 'thunder';
-                const wingsImg = isAngelic ? cached.items['wings_angelic'] : isThunder ? cached.items['wings_thunder'] : null;
+                const wingsImg = isAngelic ? cached.items['wings_angelic'] : null;
 
                 const currentDirection = (propsRef.current.overrideDirection || animator.direction) as Direction;
-                const wingCfg = isAngelic
-                  ? (WINGS_ANGELIC_CONFIG[currentDirection] || WINGS_ANGELIC_CONFIG.down)
-                  : (WINGS_THUNDER_CONFIG[currentDirection] || WINGS_THUNDER_CONFIG.down);
+                const wingCfg = WINGS_ANGELIC_CONFIG[currentDirection] || WINGS_ANGELIC_CONFIG.down;
 
                 const drawWings = () => {
                   if (!wingsImg || currentEquippedWings === 'none') return;
@@ -1465,7 +1635,10 @@ export default function GameCanvas({
                 const weaponCfgRoot = propsRef.current.weaponOffsets || (currentEquippedWeapon ? ITEM_OFFSETS[currentEquippedWeapon] : null);
                 const weaponDirCfg = weaponCfgRoot ? weaponCfgRoot.offsets[currentDirection] : null;
                 const weaponImg = currentEquippedWeapon
-                  ? (cached.items[currentEquippedWeapon] || cached.items['sword_gold'] || cached.items['gold_sword'])
+                  ? (cached.items[currentEquippedWeapon] ||
+                     (currentEquippedWeapon.includes('wood') ? cached.items['sword_wood'] || cached.items['wood_sword'] : null) ||
+                     (currentEquippedWeapon.includes('light') || currentEquippedWeapon.includes('radiant') ? cached.items['sword_light'] || cached.items['radiant_sword'] : null) ||
+                     cached.items['sword_gold'] || cached.items['gold_sword'])
                   : null;
 
                 // Estado de calibração ativa (desliga oscilações de caminhada para precisão estática)
@@ -1631,12 +1804,33 @@ export default function GameCanvas({
 
                   // Efeito luminoso de corte e brilho no impacto
                   const isWoodWeapon = currentEquippedWeapon?.includes('wood');
-                  if (attackGlow) {
+                  const isRadiantWeapon = currentEquippedWeapon?.includes('light') || currentEquippedWeapon?.includes('radiant');
+
+                  if (isRadiantWeapon) {
+                    // White neon glow around the radiant blade
+                    renderCtx.shadowColor = '#ffffff';
+                    renderCtx.shadowBlur = attackGlow ? 18 : 10;
+                  } else if (attackGlow) {
                     renderCtx.shadowColor = isWoodWeapon ? 'rgba(251, 191, 36, 0.95)' : 'rgba(255, 235, 120, 0.95)';
                     renderCtx.shadowBlur = 14;
                   } else {
                     renderCtx.shadowColor = isWoodWeapon ? 'rgba(180, 110, 50, 0.40)' : 'rgba(250, 204, 21, 0.45)';
                     renderCtx.shadowBlur = 4;
+                  }
+
+                  // Camada de aura branca neon translúcida ao redor da lâmina radiante
+                  if (isRadiantWeapon) {
+                    renderCtx.save();
+                    renderCtx.shadowColor = '#ffffff';
+                    renderCtx.shadowBlur = attackGlow ? 22 : 14;
+                    renderCtx.drawImage(
+                      weaponImg,
+                      -pivotX,
+                      -pivotY,
+                      swordW,
+                      swordLen
+                    );
+                    renderCtx.restore();
                   }
 
                   renderCtx.drawImage(
@@ -1647,11 +1841,11 @@ export default function GameCanvas({
                     swordLen
                   );
 
-                  // Segunda passada aditiva de iluminação durante o golpe
-                  if (attackGlow) {
+                  // Segunda passada aditiva de iluminação durante o golpe ou brilho radiante constante
+                  if (attackGlow || isRadiantWeapon) {
                     renderCtx.save();
                     renderCtx.globalCompositeOperation = 'lighter';
-                    renderCtx.globalAlpha = 0.55;
+                    renderCtx.globalAlpha = isRadiantWeapon ? (attackGlow ? 0.75 : 0.35) : 0.55;
                     renderCtx.drawImage(
                       weaponImg,
                       -pivotX,
@@ -2132,6 +2326,24 @@ export default function GameCanvas({
       const mobCenterX = mob.x + mob.config.hitboxW / 2;
       const mobCenterY = mob.y + mob.config.hitboxH / 2;
       if (Math.hypot(clickWorldX - mobCenterX, clickWorldY - mobCenterY) < 32) {
+        const distToPlayer = Math.hypot(
+          (playerRef.current.x + HITBOX_W / 2) - mobCenterX,
+          (playerRef.current.y + HITBOX_H / 2) - mobCenterY
+        );
+        if (distToPlayer > ACTION_DISTANCE) {
+          floatingNumbersRef.current.push({
+            id: `toofar_${Date.now()}`,
+            x: mobCenterX,
+            y: mob.y - 12,
+            text: 'Muito longe!',
+            color: '#f59e0b',
+            alpha: 1,
+            vy: -24,
+            timer: 0,
+            duration: 1.2,
+          });
+          return;
+        }
         selectedTargetIdRef.current = selectedTargetIdRef.current === mob.id ? null : mob.id;
         tapTargetRef.current = null;
         return;
@@ -2230,6 +2442,11 @@ export default function GameCanvas({
         className="game-canvas"
         onClick={handleCanvasClick}
       />
+
+      {/* Unarmed Pound Attack SVG Animation Layer */}
+      <div className="pound-overlay-layer">
+        <div ref={poundWorldContainerRef} className="pound-world-container" />
+      </div>
 
       {/* Mobile Virtual Joystick & Touch Action Controls */}
       <VirtualJoystick

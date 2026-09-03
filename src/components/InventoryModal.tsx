@@ -7,6 +7,7 @@ import {
 } from '../game/items';
 import { PLAYABLE_CHARACTERS, type CharacterId } from '../game/characters';
 import type { PlayerWallet } from '../game/playerStore';
+import { getTotalSilverValue, formatGoldNumber } from '../game/currency';
 import CoinIcon from './CoinIcon';
 import ItemIcon from './ItemIcon';
 
@@ -53,6 +54,7 @@ export default function InventoryModal({
 
   if (!isOpen) return null;
 
+  const totalSilver = getTotalSilverValue(playerWallet);
   const charDef = PLAYABLE_CHARACTERS.find((c) => c.id === characterId);
 
   const showToast = (message: string, type: 'success' | 'warn' | 'info', icon: string) => {
@@ -151,16 +153,30 @@ export default function InventoryModal({
             </div>
           </div>
 
-          {/* Compact Currency Wallet Chips */}
-          <div className="inventory-header-wallet">
-            <div className="header-coin-chip" title="Moedas de Cristal (1 = 100 Prata = 10.000 Ouro)">
-              <CoinIcon type="basalt" amount={playerWallet.basalt} size={18} showAmount />
-            </div>
-            <div className="header-coin-chip" title="Moedas de Prata (1 = 100 Ouro)">
-              <CoinIcon type="silver" amount={playerWallet.silver} size={18} showAmount />
-            </div>
+          {/* Compact Currency Wallet Chips with Total */}
+          <div
+            className="inventory-header-wallet"
+            title={`Valor Total: ${formatGoldNumber(totalSilver)} Pratas\n(100 Prata = 1 Ouro | 100 Ouro = 1 Cristal)`}
+          >
+            {playerWallet.basalt > 0 && (
+              <div className="header-coin-chip" title={`Moedas de Cristal (${formatGoldNumber(playerWallet.basalt * 100)} Ouro)`}>
+                <CoinIcon type="basalt" amount={playerWallet.basalt} size={18} showAmount />
+              </div>
+            )}
             <div className="header-coin-chip" title="Moedas de Ouro">
               <CoinIcon type="gold" amount={playerWallet.gold} size={18} showAmount />
+            </div>
+            <div className="header-coin-chip" title="Moedas de Prata">
+              <CoinIcon type="silver" amount={playerWallet.silver} size={18} showAmount />
+            </div>
+            <div className="header-coin-total" title="Saldo total">
+              <span className="total-label">Total:</span>
+              <span className="total-amount">
+                {playerWallet.gold > 0 || playerWallet.basalt > 0
+                  ? `${formatGoldNumber(playerWallet.gold + playerWallet.basalt * 100)}o ${playerWallet.silver}p`
+                  : `${playerWallet.silver}p`}
+              </span>
+              <span className="total-gold-icon">🪙</span>
             </div>
           </div>
 

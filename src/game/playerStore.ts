@@ -8,6 +8,12 @@
  */
 
 import type { CharacterId } from './characters';
+import {
+  DEFAULT_EQUIPPED_GEAR,
+  DEFAULT_INVENTORY_ITEMS,
+  type EquippedGear,
+  type ItemDef,
+} from './items';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -31,6 +37,8 @@ export interface PlayerCharacter {
   wallet?: PlayerWallet;
   lastZone: string;
   lastPos: { x: number; y: number } | null;
+  equippedGear?: EquippedGear;
+  inventory?: ItemDef[];
   createdAt: number;
 }
 
@@ -182,6 +190,8 @@ export function createCharacter(
     wallet: getDefaultWallet(),
     lastZone: 'map1',
     lastPos: null,
+    equippedGear: { ...DEFAULT_EQUIPPED_GEAR },
+    inventory: DEFAULT_INVENTORY_ITEMS.map((it) => ({ ...it })),
     createdAt: Date.now(),
   };
   account.characters.push(newChar);
@@ -204,27 +214,39 @@ export function addCoinsToCharacter(
 ): { account: PlayerAccount; wallet: PlayerWallet } {
   const char = account.characters[charIndex];
   if (!char) return { account, wallet: getDefaultWallet() };
-  if (!char.wallet) {
-    char.wallet = getDefaultWallet();
-  }
-  char.wallet.gold = Math.max(0, (char.wallet.gold || 0) + (coins.gold || 0));
-  char.wallet.silver = Math.max(0, (char.wallet.silver || 0) + (coins.silver || 0));
-  char.wallet.basalt = Math.max(0, (char.wallet.basalt || 0) + (coins.basalt || 0));
 
-  // Auto-convert standard Tibia denomination (100 gold = 1 silver, 100 silver = 1 basalt)
-  if (char.wallet.gold >= 100) {
-    const extraSilver = Math.floor(char.wallet.gold / 100);
-    char.wallet.silver += extraSilver;
-    char.wallet.gold %= 100;
+  const currentWallet = char.wallet || getDefaultWallet();
+  const wallet: PlayerWallet = {
+    gold: Math.max(0, (currentWallet.gold || 0) + (coins.gold || 0)),
+    silver: Math.max(0, (currentWallet.silver || 0) + (coins.silver || 0)),
+    basalt: Math.max(0, (currentWallet.basalt || 0) + (coins.basalt || 0)),
+  };
+
+  // 100 Moedas de Prata viram 1 Moeda de Ouro!
+  if (wallet.silver >= 100) {
+    const extraGold = Math.floor(wallet.silver / 100);
+    wallet.gold += extraGold;
+    wallet.silver %= 100;
   }
-  if (char.wallet.silver >= 100) {
-    const extraBasalt = Math.floor(char.wallet.silver / 100);
-    char.wallet.basalt += extraBasalt;
-    char.wallet.silver %= 100;
+  // 100 Moedas de Ouro viram 1 Moeda de Cristal!
+  if (wallet.gold >= 100) {
+    const extraBasalt = Math.floor(wallet.gold / 100);
+    wallet.basalt += extraBasalt;
+    wallet.gold %= 100;
   }
 
-  saveAccount(account);
-  return { account, wallet: { ...char.wallet } };
+  const updatedCharacters = [...account.characters];
+  updatedCharacters[charIndex] = {
+    ...char,
+    wallet: { ...wallet },
+  };
+  const updatedAccount: PlayerAccount = {
+    ...account,
+    characters: updatedCharacters,
+  };
+
+  saveAccount(updatedAccount);
+  return { account: updatedAccount, wallet: { ...wallet } };
 }
 
 export function savePlayerWallet(
@@ -269,6 +291,28 @@ export function savePlayerPosition(
   if (!char) return;
   char.lastZone = zone;
   char.lastPos = pos;
+  saveAccount(account);
+}
+
+export function savePlayerGear(
+  account: PlayerAccount,
+  charIndex: number,
+  gear: EquippedGear
+): void {
+  const char = account.characters[charIndex];
+  if (!char) return;
+  char.equippedGear = { ...gear };
+  saveAccount(account);
+}
+
+export function savePlayerInventory(
+  account: PlayerAccount,
+  charIndex: number,
+  inventory: ItemDef[]
+): void {
+  const char = account.characters[charIndex];
+  if (!char) return;
+  char.inventory = inventory.map((it) => ({ ...it }));
   saveAccount(account);
 }
 

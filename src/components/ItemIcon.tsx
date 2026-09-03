@@ -28,32 +28,13 @@ export default function ItemIcon({
           style={{
             width: `${size}px`,
             height: `${size}px`,
-            backgroundImage: "url('/assets/itens/asas angelicais.webp')",
+            backgroundImage: "url('/assets/itens/asas/asas angelicais.webp')",
             backgroundSize: '200% 200%',
             backgroundPosition: '0% 100%', // Frame frontal (down)
             backgroundRepeat: 'no-repeat',
             imageRendering: 'pixelated',
             flexShrink: 0,
             filter: 'drop-shadow(0 0 6px rgba(250, 204, 21, 0.6))',
-          }}
-        />
-      );
-    }
-
-    if (currentWingType === 'thunder' || item?.id === 'wing_thunder') {
-      return (
-        <div
-          className={`item-icon-wing thunder ${className}`}
-          style={{
-            width: `${size}px`,
-            height: `${size}px`,
-            backgroundImage: "url('/assets/itens/asas angelicais.webp')",
-            backgroundSize: '200% 200%',
-            backgroundPosition: '0% 100%',
-            backgroundRepeat: 'no-repeat',
-            imageRendering: 'pixelated',
-            flexShrink: 0,
-            filter: 'hue-rotate(180deg) drop-shadow(0 0 6px rgba(56, 189, 248, 0.8))',
           }}
         />
       );
@@ -66,18 +47,48 @@ export default function ItemIcon({
     );
   }
 
-  // 2. Regular item with image (non-spritesheet)
+  // 2. Animated 4-frame power rings
+  if (item?.image && item?.frameCount === 4) {
+    // Rings have transparent padding in 32x32 frames (actual sprite is ~11-13px).
+    // Scaling by 1.35x makes the ring prominent, crisp, and well-sized in slots.
+    const ringSize = Math.round(size * 1.35);
+
+    return (
+      <div
+        className={`item-icon-animated-ring ${className}`}
+        style={
+          {
+            '--ring-size': `${ringSize}px`,
+            width: `${ringSize}px`,
+            height: `${ringSize}px`,
+            backgroundImage: `url('${item.image}')`,
+            backgroundSize: `${ringSize * 4}px ${ringSize}px`,
+            backgroundRepeat: 'no-repeat',
+            imageRendering: 'pixelated',
+            flexShrink: 0,
+          } as React.CSSProperties
+        }
+      />
+    );
+  }
+
+  // 3. Regular item with image (non-spritesheet)
   if (item?.image) {
+    const isRadiantSword = item?.id === 'sword_light' || item?.id === 'radiant_sword';
+
     return (
       <img
         src={item.image}
         alt={item.name}
-        className={`item-icon-img ${className}`}
+        className={`item-icon-img ${isRadiantSword ? 'item-icon-radiant' : ''} ${className}`}
         style={{
           width: `${size}px`,
           height: `${size}px`,
           objectFit: 'contain',
           flexShrink: 0,
+          filter: isRadiantSword
+            ? 'drop-shadow(0 0 3px #ffffff) drop-shadow(0 0 8px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 15px rgba(255, 255, 255, 0.65))'
+            : undefined,
         }}
       />
     );

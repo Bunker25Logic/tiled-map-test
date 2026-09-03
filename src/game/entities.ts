@@ -491,26 +491,26 @@ const LOOT_TABLE: { rarity: LootRarity; weight: number; goldRange: [number, numb
   {
     rarity: 'common',
     weight: 55,
-    goldRange: [5, 25],
+    goldRange: [5, 20],
     itemPool: [],
   },
   {
     rarity: 'rare',
     weight: 30,
-    goldRange: [20, 60],
-    itemPool: ['potion_hp_large', 'potion_mp_large'],
+    goldRange: [15, 45],
+    itemPool: ['potion_hp_large', 'potion_mp_large', 'ring_life', 'ring_time', 'ring_dwarven', 'ring_stealth', 'ring_energy'],
   },
   {
     rarity: 'epic',
     weight: 12,
-    goldRange: [50, 120],
-    itemPool: ['elixir_fury', 'sword_light', 'bow_elven'],
+    goldRange: [35, 90],
+    itemPool: ['elixir_fury', 'sword_light', 'ring_healing', 'ring_amethyst', 'ring_power', 'ring_crystal'],
   },
   {
     rarity: 'legendary',
     weight: 3,
-    goldRange: [100, 300],
-    itemPool: ['staff_shadow', 'armor_paladin', 'ring_storm'],
+    goldRange: [100, 250],
+    itemPool: ['staff_shadow', 'armor_paladin', 'ring_might', 'sword_gold'],
   },
 ];
 
@@ -783,36 +783,38 @@ export function generateMonsterCoinDrops(
 ): CoinDrop[] {
   const drops: CoinDrop[] = [];
 
-  // 1. Gold coins: Almost all monsters drop gold
-  const minGold = Math.max(1, Math.floor(xpReward * 0.35));
-  const maxGold = Math.max(4, Math.floor(xpReward * 1.3));
-  const goldAmount = Math.min(100, minGold + Math.floor(Math.random() * (maxGold - minGold + 1)));
+  // 1. Moedas de Prata (Silver): Moeda base comum que todos os monstros derrubam (100 Prata = 1 Ouro)
+  const minSilver = Math.max(4, Math.floor(xpReward * 0.25));
+  const maxSilver = Math.max(10, Math.floor(xpReward * 0.70));
+  const silverAmount = Math.min(100, minSilver + Math.floor(Math.random() * (maxSilver - minSilver + 1)));
 
   drops.push({
-    id: `coin_gold_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    id: `coin_silver_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     x: x + (Math.random() - 0.5) * 6,
     y: y + (Math.random() - 0.5) * 6,
-    coinType: 'gold',
-    amount: goldAmount,
-    frameIndex: getCoinFrameIndex(goldAmount),
+    coinType: 'silver',
+    amount: silverAmount,
+    frameIndex: getCoinFrameIndex(silverAmount),
     animTimer: Math.random() * Math.PI * 2,
     collected: false,
     collectAnim: 0,
   });
 
-  // 2. Silver coins (Tier 2 / stronger mobs, xp >= 55)
-  if (xpReward >= 55) {
-    const silverChance = Math.min(0.85, (xpReward - 35) / 200);
-    if (Math.random() < silverChance) {
-      const maxSilver = Math.min(30, Math.max(1, Math.floor(xpReward / 40)));
-      const silverAmount = 1 + Math.floor(Math.random() * maxSilver);
+  // 2. Moedas de Ouro (Gold):
+  // Monstros intermediários (xp >= 100) têm 25% de chance de dropar 1 ou 2 ouros diretamente.
+  // Chefes (xp >= 350) têm 60% de chance de dropar 1 a 4 ouros.
+  if (xpReward >= 100) {
+    const goldChance = xpReward >= 350 ? 0.60 : 0.25;
+    if (Math.random() < goldChance) {
+      const maxGold = xpReward >= 350 ? Math.min(4, 1 + Math.floor(xpReward / 150)) : 2;
+      const goldAmount = 1 + Math.floor(Math.random() * maxGold);
       drops.push({
-        id: `coin_silver_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        id: `coin_gold_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         x: x + 12 + (Math.random() - 0.5) * 4,
         y: y + (Math.random() - 0.5) * 6,
-        coinType: 'silver',
-        amount: silverAmount,
-        frameIndex: getCoinFrameIndex(silverAmount),
+        coinType: 'gold',
+        amount: goldAmount,
+        frameIndex: getCoinFrameIndex(goldAmount),
         animTimer: Math.random() * Math.PI * 2,
         collected: false,
         collectAnim: 0,
@@ -820,19 +822,18 @@ export function generateMonsterCoinDrops(
     }
   }
 
-  // 3. Basalt / Crystal coins (Tier 3 / bosses, dragons, xp >= 220)
-  if (xpReward >= 220) {
-    const basaltChance = Math.min(0.75, (xpReward - 180) / 350);
+  // 3. Moedas de Cristal (Crystal):
+  // 100 Ouros = 1 Cristal. Apenas grandes chefes (xp >= 350) possuem chance rara (10% a 15%) de dropar 1 cristal!
+  if (xpReward >= 350) {
+    const basaltChance = Math.min(0.15, 0.08 + (xpReward - 350) / 3000);
     if (Math.random() < basaltChance) {
-      const maxBasalt = Math.min(8, Math.max(1, Math.floor(xpReward / 180)));
-      const basaltAmount = 1 + Math.floor(Math.random() * maxBasalt);
       drops.push({
         id: `coin_basalt_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         x: x - 12 + (Math.random() - 0.5) * 4,
         y: y + (Math.random() - 0.5) * 6,
         coinType: 'basalt',
-        amount: basaltAmount,
-        frameIndex: getCoinFrameIndex(basaltAmount),
+        amount: 1,
+        frameIndex: getCoinFrameIndex(1),
         animTimer: Math.random() * Math.PI * 2,
         collected: false,
         collectAnim: 0,

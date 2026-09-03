@@ -112,4 +112,4 @@ export interface Vec2 {
   y: number;
 }
 
-export type WingType = 'none' | 'thunder' | 'angelic';
+export type WingType = 'none' | 'angelic';

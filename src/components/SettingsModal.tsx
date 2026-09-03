@@ -12,6 +12,10 @@ interface SettingsModalProps {
   onToggleGrid: () => void;
   debugColliders: boolean;
   onToggleDebugColliders: () => void;
+  autoAttackEnabled: boolean;
+  onToggleAutoAttack: () => void;
+  autoTargetNearbyEnabled: boolean;
+  onToggleAutoTargetNearby: () => void;
   equippedWings?: WingType;
   onSelectWings?: (wings: WingType) => void;
   onReloadMap: () => void;
@@ -30,6 +34,10 @@ export default function SettingsModal({
   onToggleGrid,
   debugColliders,
   onToggleDebugColliders,
+  autoAttackEnabled,
+  onToggleAutoAttack,
+  autoTargetNearbyEnabled,
+  onToggleAutoTargetNearby,
   equippedWings = 'angelic',
   onSelectWings,
   onReloadMap,
@@ -130,18 +138,6 @@ export default function SettingsModal({
 
                     <button
                       type="button"
-                      className={`btn-wing-select thunder ${equippedWings === 'thunder' ? 'active' : ''}`}
-                      onClick={() => onSelectWings && onSelectWings('thunder')}
-                    >
-                      <span className="wing-ico">⚡</span>
-                      <div className="wing-select-meta">
-                        <strong>Asas Trovão</strong>
-                        <small>+45% Vel • Tempestade</small>
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
                       className={`btn-wing-select none ${equippedWings === 'none' ? 'active' : ''}`}
                       onClick={() => onSelectWings && onSelectWings('none')}
                     >
@@ -189,6 +185,35 @@ export default function SettingsModal({
                     <small>Exibe caixas vermelhas de colisão</small>
                   </div>
                 </label>
+
+                {/* Combate & Seleção de Alvo */}
+                <div style={{ marginTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '8px' }}>
+                  <span className="settings-section-title">Combate & Mira</span>
+
+                  <label className="settings-toggle-item" style={{ marginTop: '6px' }}>
+                    <input
+                      type="checkbox"
+                      checked={autoAttackEnabled}
+                      onChange={onToggleAutoAttack}
+                    />
+                    <div className="toggle-info">
+                      <strong>Ataque Básico Automático</strong>
+                      <small>Desfere golpes automaticamente corpo a corpo com o alvo</small>
+                    </div>
+                  </label>
+
+                  <label className="settings-toggle-item" style={{ marginTop: '6px' }}>
+                    <input
+                      type="checkbox"
+                      checked={autoTargetNearbyEnabled}
+                      onChange={onToggleAutoTargetNearby}
+                    />
+                    <div className="toggle-info">
+                      <strong>Alvo Automático por Proximidade</strong>
+                      <small>Mira automaticamente no monstro mais próximo ao se aproximar</small>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
 

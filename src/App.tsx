@@ -34,6 +34,8 @@ import {
   applyDeathPenalty,
   createCharacter,
   savePlayerPosition,
+  savePlayerGear,
+  savePlayerInventory,
   savePlayerVitals,
   saveSession,
   clearSession,
@@ -73,6 +75,32 @@ export default function App() {
   const [showGrid, setShowGrid] = useState<boolean>(false);
   const [equippedWings, setEquippedWings] = useState<WingType>('angelic');
 
+  // Combat & Targeting settings
+  const [autoAttackEnabled, setAutoAttackEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem('rpg_setting_auto_attack');
+    return saved !== null ? saved === 'true' : true;
+  });
+  const [autoTargetNearbyEnabled, setAutoTargetNearbyEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem('rpg_setting_auto_target');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const handleToggleAutoAttack = () => {
+    setAutoAttackEnabled((prev) => {
+      const next = !prev;
+      localStorage.setItem('rpg_setting_auto_attack', String(next));
+      return next;
+    });
+  };
+
+  const handleToggleAutoTargetNearby = () => {
+    setAutoTargetNearbyEnabled((prev) => {
+      const next = !prev;
+      localStorage.setItem('rpg_setting_auto_target', String(next));
+      return next;
+    });
+  };
+
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isSpellbookOpen, setIsSpellbookOpen] = useState<boolean>(false);
   const [isInventoryOpen, setIsInventoryOpen] = useState<boolean>(false);
@@ -98,16 +126,20 @@ export default function App() {
   const [isReloading, setIsReloading] = useState(false);
   const [activeCastId, setActiveCastId] = useState<string | null>(null);
   const [isAttackActive, setIsAttackActive] = useState(false);
+  const lastAttackTimeRef = useRef(0);
+  const lastCastTimeRef = useRef(0);
 
   const accountRef = useRef<PlayerAccount | null>(account);
   const activeCharIndexRef = useRef(activeCharIndex);
   const currentZoneRef = useRef(currentZoneId);
   const playerCoordsRef = useRef(playerCoords);
+  const equippedGearRef = useRef(equippedGear);
 
   useEffect(() => { accountRef.current = account; }, [account]);
   useEffect(() => { activeCharIndexRef.current = activeCharIndex; }, [activeCharIndex]);
   useEffect(() => { currentZoneRef.current = currentZoneId; }, [currentZoneId]);
   useEffect(() => { playerCoordsRef.current = playerCoords; }, [playerCoords]);
+  useEffect(() => { equippedGearRef.current = equippedGear; }, [equippedGear]);
 
   // Auto-login from session
   useEffect(() => {
@@ -149,22 +181,49 @@ export default function App() {
     return () => { ignore = true; };
   }, [currentZoneId, reloadTrigger, screen]);
 
-  // Periodic position saving
+  // Periodic & unload position saving
   useEffect(() => {
     if (screen !== 'game') return;
-    const interval = setInterval(() => {
+
+    const saveCurrentState = () => {
       const acc = accountRef.current;
       if (!acc) return;
       const pos = playerCoordsRef.current;
-      savePlayerPosition(acc, activeCharIndexRef.current, currentZoneRef.current, { x: pos.x, y: pos.y });
-    }, 5000);
-    return () => clearInterval(interval);
+      if (pos) {
+        savePlayerPosition(acc, activeCharIndexRef.current, currentZoneRef.current, { x: pos.x, y: pos.y });
+      }
+    };
+
+    const interval = setInterval(saveCurrentState, 2000);
+    window.addEventListener('beforeunload', saveCurrentState);
+    window.addEventListener('pagehide', saveCurrentState);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('beforeunload', saveCurrentState);
+      window.removeEventListener('pagehide', saveCurrentState);
+      saveCurrentState();
+    };
   }, [screen]);
 
-  // Passive HP & Mana regeneration over time (Tibia classic mechanic)
+  // Passive HP & Mana regeneration over time (Tibia classic mechanic com bônus de anéis)
   useEffect(() => {
     if (screen !== 'game') return;
     const regenInterval = setInterval(() => {
+      // Calcula bônus de regeneração concedidos por anéis (ex: Ring of Healing, Life Ring)
+      let bonusHpRegen = 0;
+      let bonusMpRegen = 0;
+      const gear = equippedGearRef.current;
+      if (gear) {
+        for (const slot of Object.keys(gear) as (keyof EquippedGear)[]) {
+          const itemId = gear[slot];
+          if (itemId && ALL_ITEMS[itemId]?.stats) {
+            bonusHpRegen += ALL_ITEMS[itemId].stats!.hpRegen || 0;
+            bonusMpRegen += ALL_ITEMS[itemId].stats!.mpRegen || 0;
+          }
+        }
+      }
+
       setPlayerMp((curMp) => {
         const acc = accountRef.current;
         if (!acc) return curMp;
@@ -172,7 +231,7 @@ export default function App() {
         if (!char) return curMp;
         const maxMp = char.maxMp || 80;
         if (curMp >= maxMp) return curMp;
-        const nextMp = Math.min(maxMp, curMp + 2);
+        const nextMp = Math.min(maxMp, curMp + 2 + bonusMpRegen);
         char.mp = nextMp;
         savePlayerVitals(acc, activeCharIndexRef.current, char.hp, nextMp);
         return nextMp;
@@ -185,7 +244,7 @@ export default function App() {
         if (!char) return curHp;
         const maxHp = char.maxHp || 100;
         if (curHp <= 0 || curHp >= maxHp) return curHp;
-        const nextHp = Math.min(maxHp, curHp + 1);
+        const nextHp = Math.min(maxHp, curHp + 1 + bonusHpRegen);
         char.hp = nextHp;
         savePlayerVitals(acc, activeCharIndexRef.current, nextHp, char.mp);
         return nextHp;
@@ -205,7 +264,29 @@ export default function App() {
     }
   }
 
+  const handleReturnToCharacterSelect = useCallback(() => {
+    const acc = accountRef.current;
+    if (acc && screen === 'game') {
+      const pos = playerCoordsRef.current;
+      const zone = currentZoneRef.current;
+      if (pos) {
+        savePlayerPosition(acc, activeCharIndexRef.current, zone, { x: pos.x, y: pos.y });
+      }
+      savePlayerVitals(acc, activeCharIndexRef.current, playerHp, playerMp);
+    }
+    setScreen('character-select');
+  }, [playerHp, playerMp, screen]);
+
   function handleLogout() {
+    const acc = accountRef.current;
+    if (acc && screen === 'game') {
+      const pos = playerCoordsRef.current;
+      const zone = currentZoneRef.current;
+      if (pos) {
+        savePlayerPosition(acc, activeCharIndexRef.current, zone, { x: pos.x, y: pos.y });
+      }
+      savePlayerVitals(acc, activeCharIndexRef.current, playerHp, playerMp);
+    }
     clearSession();
     setAccount(null);
     accountRef.current = null;
@@ -225,10 +306,46 @@ export default function App() {
     setPlayerMaxHp(char.maxHp);
     setPlayerMp(char.mp);
     setPlayerMaxMp(char.maxMp);
+
+    // 1. Restore or initialize equipped gear
+    const savedGear: EquippedGear = char.equippedGear
+      ? { ...char.equippedGear }
+      : { ...DEFAULT_EQUIPPED_GEAR };
+    setEquippedGear(savedGear);
+    equippedGearRef.current = savedGear;
+    setEquippedWings(savedGear.wings || 'none');
+    if (savedGear.weapon) {
+      const offsets = ITEM_OFFSETS[savedGear.weapon] || ITEM_OFFSETS['sword_gold'] || ITEM_OFFSETS['gold_sword'];
+      if (offsets) {
+        setWeaponOffsets(JSON.parse(JSON.stringify(offsets)));
+      }
+    }
+    if (!char.equippedGear) {
+      savePlayerGear(resolvedAcc, charIndex, savedGear);
+    }
+
+    // 2. Restore or initialize inventory
+    const savedInventory: ItemDef[] = char.inventory && char.inventory.length > 0
+      ? char.inventory.map((item) => ({ ...item }))
+      : DEFAULT_INVENTORY_ITEMS.map((item) => ({ ...item }));
+    setInventoryItems(savedInventory);
+    if (!char.inventory) {
+      savePlayerInventory(resolvedAcc, charIndex, savedInventory);
+    }
+
+    // 3. Restore last location & zone
     const zone = char.lastZone || 'map1';
-    const pos = char.lastPos || { x: 0, y: 0 };
+    const pos = char.lastPos || (ZONES[zone]?.defaultSpawn ?? { x: 0, y: 0 });
     setCurrentZoneId(zone);
-    setInitialSpawnCoords(pos);
+    currentZoneRef.current = zone;
+    setInitialSpawnCoords({ x: pos.x, y: pos.y });
+    playerCoordsRef.current = {
+      x: pos.x,
+      y: pos.y,
+      tileX: Math.floor(pos.x / 32),
+      tileY: Math.floor(pos.y / 32),
+    };
+
     setScreen('loading');
   }
 
@@ -254,12 +371,24 @@ export default function App() {
   }, []);
 
   const handlePosChange = useCallback((x: number, y: number, tileX: number, tileY: number) => {
+    playerCoordsRef.current = { x, y, tileX, tileY };
     setPlayerCoords({ x, y, tileX, tileY });
   }, []);
 
   const handleZoneTransition = useCallback((targetMapId: string, spawnX: number, spawnY: number) => {
     setInitialSpawnCoords({ x: spawnX, y: spawnY });
     setCurrentZoneId(targetMapId);
+    currentZoneRef.current = targetMapId;
+    playerCoordsRef.current = {
+      x: spawnX,
+      y: spawnY,
+      tileX: Math.floor(spawnX / 32),
+      tileY: Math.floor(spawnY / 32),
+    };
+    const acc = accountRef.current;
+    if (acc) {
+      savePlayerPosition(acc, activeCharIndexRef.current, targetMapId, { x: spawnX, y: spawnY });
+    }
   }, []);
 
   const handlePlayerDeath = useCallback(() => {
@@ -297,8 +426,22 @@ export default function App() {
   }, []);
 
   const handlePlayerDamage = useCallback((amount: number) => {
+    let defense = 0;
+    const gear = equippedGearRef.current;
+    if (gear) {
+      for (const slot of Object.keys(gear) as (keyof EquippedGear)[]) {
+        const itemId = gear[slot];
+        if (itemId && ALL_ITEMS[itemId]?.stats?.defense) {
+          defense += ALL_ITEMS[itemId].stats!.defense!;
+        }
+      }
+    }
+    // Mitigação de dano por armaduras, escudos e anéis de poder (ex: Might Ring com +25 def)
+    const mitigation = Math.min(0.65, defense / (defense + 100));
+    const finalDamage = Math.max(1, Math.round(amount * (1 - mitigation)));
+
     setPlayerHp((prev) => {
-      const next = Math.max(0, prev - amount);
+      const next = Math.max(0, prev - finalDamage);
       const acc = accountRef.current;
       if (acc) {
         const char = acc.characters[activeCharIndexRef.current];
@@ -335,35 +478,48 @@ export default function App() {
     }
   }, []);
 
-  const handleCollectLoot = useCallback((_gold: number, itemId?: string) => {
-    if (itemId && ALL_ITEMS[itemId]) {
-      const itemDef = ALL_ITEMS[itemId];
-      setInventoryItems((prev) => {
-        const existing = prev.find((i) => i.id === itemDef.id);
-        if (existing && existing.slotType === 'potion') {
-          return prev.map((i) =>
-            i.id === itemDef.id ? { ...i, quantity: (i.quantity || 1) + 1 } : i
-          );
-        }
-        if (!existing) {
-          return [...prev, { ...itemDef, quantity: 1 }];
-        }
-        return prev;
-      });
-    }
-  }, []);
-
   const handleCollectCoins = useCallback(
     (coins: { gold?: number; silver?: number; basalt?: number }) => {
-      const acc = accountRef.current;
-      if (!acc || acc.characters.length === 0) return;
-      const charIdx = activeCharIndexRef.current;
-      const { account: updatedAccount } = addCoinsToCharacter(acc, charIdx, coins);
-      const cloned = { ...updatedAccount, characters: [...updatedAccount.characters] };
-      setAccount(cloned);
-      accountRef.current = cloned;
+      setAccount((currentAcc) => {
+        const acc = currentAcc || accountRef.current;
+        if (!acc || acc.characters.length === 0) return currentAcc;
+        const charIdx = activeCharIndexRef.current;
+        const { account: updatedAccount } = addCoinsToCharacter(acc, charIdx, coins);
+        accountRef.current = updatedAccount;
+        return updatedAccount;
+      });
     },
     []
+  );
+
+  const handleCollectLoot = useCallback(
+    (silver: number, itemId?: string) => {
+      if (silver > 0) {
+        handleCollectCoins({ silver });
+      }
+      if (itemId && ALL_ITEMS[itemId]) {
+        const itemDef = ALL_ITEMS[itemId];
+        setInventoryItems((prev) => {
+          let next: ItemDef[];
+          const existing = prev.find((i) => i.id === itemDef.id);
+          if (existing && existing.slotType === 'potion') {
+            next = prev.map((i) =>
+              i.id === itemDef.id ? { ...i, quantity: (i.quantity || 1) + 1 } : i
+            );
+          } else if (!existing) {
+            next = [...prev, { ...itemDef, quantity: 1 }];
+          } else {
+            next = prev;
+          }
+          const acc = accountRef.current;
+          if (acc) {
+            savePlayerInventory(acc, activeCharIndexRef.current, next);
+          }
+          return next;
+        });
+      }
+    },
+    [handleCollectCoins]
   );
 
   const handleConsumeMana = useCallback((amount: number): boolean => {
@@ -383,6 +539,10 @@ export default function App() {
   }, []);
 
   const handleCastSpell = (spell: SpellDef) => {
+    const now = performance.now();
+    if (now - lastCastTimeRef.current < 350) return;
+    lastCastTimeRef.current = now;
+
     const cost = spell.manaCost || 0;
     if (cost > 0 && playerMp < cost) {
       setLevelUpMsg(`⚠️ Mana insuficiente! (${playerMp}/${cost} MP)`);
@@ -395,6 +555,10 @@ export default function App() {
   };
 
   const handlePlayerAttack = () => {
+    const now = performance.now();
+    if (now - lastAttackTimeRef.current < 450) return; // Cooldown de 450ms no ataque básico
+    lastAttackTimeRef.current = now;
+
     setIsAttackActive(true);
     setTimeout(() => setIsAttackActive(false), 260);
     window.dispatchEvent(new CustomEvent('player-attack'));
@@ -423,28 +587,42 @@ export default function App() {
   };
 
   const handleEquipItem = (item: ItemDef) => {
+    let nextGear: EquippedGear;
     if (item.slotType === 'wings') {
       const wType = item.wingType || 'none';
       setEquippedWings(wType);
-      setEquippedGear((prev) => ({ ...prev, wings: wType }));
-      return;
-    }
-    if (item.slotType === 'weapon') {
-      const offsets = ITEM_OFFSETS[item.id] || ITEM_OFFSETS['sword_gold'] || ITEM_OFFSETS['gold_sword'];
-      if (offsets) {
-        setWeaponOffsets(JSON.parse(JSON.stringify(offsets)));
+      nextGear = { ...equippedGearRef.current, wings: wType };
+    } else {
+      if (item.slotType === 'weapon') {
+        const offsets = ITEM_OFFSETS[item.id] || ITEM_OFFSETS['sword_gold'] || ITEM_OFFSETS['gold_sword'];
+        if (offsets) {
+          setWeaponOffsets(JSON.parse(JSON.stringify(offsets)));
+        }
       }
+      nextGear = { ...equippedGearRef.current, [item.slotType]: item.id };
     }
-    setEquippedGear((prev) => ({ ...prev, [item.slotType]: item.id }));
+    setEquippedGear(nextGear);
+    equippedGearRef.current = nextGear;
+    const acc = accountRef.current;
+    if (acc) {
+      savePlayerGear(acc, activeCharIndexRef.current, nextGear);
+    }
   };
 
   const handleUnequipSlot = (slot: keyof EquippedGear) => {
+    let nextGear: EquippedGear;
     if (slot === 'wings') {
       setEquippedWings('none');
-      setEquippedGear((prev) => ({ ...prev, wings: 'none' }));
-      return;
+      nextGear = { ...equippedGearRef.current, wings: 'none' };
+    } else {
+      nextGear = { ...equippedGearRef.current, [slot]: null };
     }
-    setEquippedGear((prev) => ({ ...prev, [slot]: null }));
+    setEquippedGear(nextGear);
+    equippedGearRef.current = nextGear;
+    const acc = accountRef.current;
+    if (acc) {
+      savePlayerGear(acc, activeCharIndexRef.current, nextGear);
+    }
   };
 
   const handleUsePotion = (item: ItemDef) => {
@@ -455,7 +633,7 @@ export default function App() {
       setPlayerMp((cur) => Math.min(playerMaxMp, cur + (item.effect?.healMp || 0)));
     }
     setInventoryItems((prev) => {
-      return prev
+      const next = prev
         .map((it) => {
           if (it.id === item.id) {
             const nextQty = (it.quantity || 1) - 1;
@@ -464,13 +642,24 @@ export default function App() {
           return it;
         })
         .filter(Boolean) as ItemDef[];
+      const acc = accountRef.current;
+      if (acc) {
+        savePlayerInventory(acc, activeCharIndexRef.current, next);
+      }
+      return next;
     });
   };
 
   const handleCycleWings = () => {
-    const nextWing: WingType = equippedWings === 'angelic' ? 'thunder' : equippedWings === 'thunder' ? 'none' : 'angelic';
+    const nextWing: WingType = equippedWings === 'angelic' ? 'none' : 'angelic';
     setEquippedWings(nextWing);
-    setEquippedGear((prev) => ({ ...prev, wings: nextWing }));
+    const nextGear: EquippedGear = { ...equippedGearRef.current, wings: nextWing };
+    setEquippedGear(nextGear);
+    equippedGearRef.current = nextGear;
+    const acc = accountRef.current;
+    if (acc) {
+      savePlayerGear(acc, activeCharIndexRef.current, nextGear);
+    }
   };
 
   const currentZoneDef = ZONES[currentZoneId] || ZONES['map1'];
@@ -563,7 +752,7 @@ export default function App() {
         <div className="header-left">
           <button
             className="btn-header-hero"
-            onClick={() => setScreen('character-select')}
+            onClick={handleReturnToCharacterSelect}
             title="Voltar ao Lobby / Trocar Herói"
           >
             <div className="hero-avatar-header-box">
@@ -597,13 +786,13 @@ export default function App() {
           <button
             className={`btn-header-action btn-wings ${equippedWings}`}
             onClick={handleCycleWings}
-            title="Trocar Asas (Angelicais / Trovão / Sem Asas)"
+            title="Alternar Asas Angelicais"
           >
             <span className="header-btn-icon">
-              {equippedWings === 'angelic' ? '🪽' : equippedWings === 'thunder' ? '⚡' : '❌'}
+              {equippedWings === 'angelic' ? '🪽' : '❌'}
             </span>
             <span className="header-btn-text">
-              {equippedWings === 'angelic' ? 'Asas Angelicais' : equippedWings === 'thunder' ? 'Asas Trovão' : 'Sem Asas'}
+              {equippedWings === 'angelic' ? 'Asas Angelicais' : 'Sem Asas'}
             </span>
           </button>
 
@@ -646,6 +835,9 @@ export default function App() {
           showGrid={showGrid}
           equippedWings={equippedWings}
           equippedWeapon={equippedGear.weapon}
+          equippedGear={equippedGear}
+          autoAttackEnabled={autoAttackEnabled}
+          autoTargetNearbyEnabled={autoTargetNearbyEnabled}
           weaponOffsets={weaponOffsets}
           overrideDirection={isCalibratorOpen ? calibratorDirection : null}
           equippedSpellIds={equippedSpellIds}
@@ -678,6 +870,10 @@ export default function App() {
             <button
               className={`btn-action-slot btn-slot-attack ${isAttackActive ? 'attacking' : ''}`}
               onClick={handlePlayerAttack}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                handlePlayerAttack();
+              }}
               title="Ataque Físico com Espada (Tecla Espaço / J)"
             >
               <span className="slot-key-hint">ESP</span>
@@ -696,6 +892,10 @@ export default function App() {
                   key={spell.id}
                   className={`btn-action-slot ${isCasting ? 'casting' : ''} ${notEnoughMana ? 'no-mana' : ''}`}
                   onClick={() => handleCastSpell(spell)}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    handleCastSpell(spell);
+                  }}
                   style={{ '--slot-glow': spell.color } as React.CSSProperties}
                   title={`${spell.name} (${manaCost} MP - Tecla ${idx + 1})`}
                 >
@@ -809,11 +1009,15 @@ export default function App() {
         onToggleGrid={() => setShowGrid((g) => !g)}
         debugColliders={debugColliders}
         onToggleDebugColliders={() => setDebugColliders((d) => !d)}
+        autoAttackEnabled={autoAttackEnabled}
+        onToggleAutoAttack={handleToggleAutoAttack}
+        autoTargetNearbyEnabled={autoTargetNearbyEnabled}
+        onToggleAutoTargetNearby={handleToggleAutoTargetNearby}
         equippedWings={equippedWings}
         onSelectWings={setEquippedWings}
         onReloadMap={handleReloadClick}
         isReloadingMap={isReloading}
-        onReturnToLobby={() => setScreen('character-select')}
+        onReturnToLobby={handleReturnToCharacterSelect}
       />
       {deathResult && account && (
         <DeathModal

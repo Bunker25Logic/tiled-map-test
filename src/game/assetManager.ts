@@ -86,7 +86,7 @@ export async function preloadAllGameAssets(): Promise<GameAssetCache> {
 
     // 5. Load equipment item textures and coin sprite sheets
     const itemPromises = [
-      loadChromaKeyImage('/assets/itens/gold_sword.webp')
+      loadChromaKeyImage('/assets/itens/swords/gold_sword.webp')
         .then((img) => {
           globalCache.items['sword_gold'] = img;
           globalCache.items['gold_sword'] = img;
@@ -105,7 +105,7 @@ export async function preloadAllGameAssets(): Promise<GameAssetCache> {
         .catch((err) => {
           console.warn('Using static ITEM_OFFSETS for gold_sword:', err);
         }),
-      loadChromaKeyImage('/assets/itens/wood_sword.webp')
+      loadChromaKeyImage('/assets/itens/swords/wood_sword.webp')
         .then((img) => {
           globalCache.items['sword_wood'] = img;
           globalCache.items['wood_sword'] = img;
@@ -124,14 +124,15 @@ export async function preloadAllGameAssets(): Promise<GameAssetCache> {
         .catch((err) => {
           console.warn('Using static ITEM_OFFSETS for wood_sword:', err);
         }),
-      loadChromaKeyImage('/assets/itens/asas trovao.webp')
+      loadChromaKeyImage('/assets/itens/swords/radiant_sword.webp')
         .then((img) => {
-          globalCache.items['wings_thunder'] = img;
+          globalCache.items['sword_light'] = img;
+          globalCache.items['radiant_sword'] = img;
         })
         .catch((err) => {
-          console.warn('Failed loading thunder wings:', err);
+          console.warn('Failed loading radiant sword texture:', err);
         }),
-      loadChromaKeyImage('/assets/itens/asas angelicais.webp')
+      loadChromaKeyImage('/assets/itens/asas/asas angelicais.webp')
         .then((img) => {
           globalCache.items['wings_angelic'] = img;
         })
