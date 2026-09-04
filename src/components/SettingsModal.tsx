@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import type { GraphicStyle } from '../game/graphics';
 import type { WingType } from '../game/types';
+import { ALL_ITEMS } from '../game/items';
+import type { EquippedGear, ItemDef } from '../game/items';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -17,7 +20,7 @@ interface SettingsModalProps {
   autoTargetNearbyEnabled: boolean;
   onToggleAutoTargetNearby: () => void;
   equippedWings?: WingType;
-  onSelectWings?: (wings: WingType) => void;
+  equippedGear?: EquippedGear | null;
   onReloadMap: () => void;
   isReloadingMap: boolean;
   onReturnToLobby: () => void;
@@ -39,11 +42,65 @@ export default function SettingsModal({
   autoTargetNearbyEnabled,
   onToggleAutoTargetNearby,
   equippedWings = 'angelic',
-  onSelectWings,
+  equippedGear,
   onReloadMap,
   isReloadingMap,
   onReturnToLobby,
 }: SettingsModalProps) {
+  // Lista de itens equipados com efeitos ativos positivos no jogo
+  const equippedItemsList = useMemo(() => {
+    const list: Array<{ slotLabel: string; item: ItemDef; customNote?: string }> = [];
+
+    // Asas
+    if (equippedWings === 'angelic' || equippedGear?.wings === 'angelic') {
+      list.push({
+        slotLabel: 'Asas',
+        item: ALL_ITEMS.wing_angelic,
+        customNote: '+45% Vel. Movimento • Voo Sagrado',
+      });
+    }
+
+    if (equippedGear) {
+      const slotMap: Array<{ key: keyof EquippedGear; label: string }> = [
+        { key: 'weapon', label: 'Arma' },
+        { key: 'armor', label: 'Armadura' },
+        { key: 'shield', label: 'Escudo' },
+        { key: 'boots', label: 'Botas' },
+        { key: 'ring', label: 'Anel' },
+        { key: 'amulet', label: 'Amuleto' },
+      ];
+
+      for (const { key, label } of slotMap) {
+        const itemId = equippedGear[key];
+        if (itemId && ALL_ITEMS[itemId]) {
+          list.push({ slotLabel: label, item: ALL_ITEMS[itemId] });
+        }
+      }
+    }
+
+    return list;
+  }, [equippedGear, equippedWings]);
+
+  // Soma de todos os bônus passivos providos pelos itens
+  const totalStats = useMemo(() => {
+    let atk = 0;
+    let def = 0;
+    let spd = (equippedWings === 'angelic' || equippedGear?.wings === 'angelic') ? 45 : 0;
+    let maxHp = 0;
+    let maxMp = 0;
+
+    for (const entry of equippedItemsList) {
+      if (entry.item.stats) {
+        if (entry.item.stats.attack) atk += entry.item.stats.attack;
+        if (entry.item.stats.defense) def += entry.item.stats.defense;
+        if (entry.item.stats.speed) spd += entry.item.stats.speed;
+        if (entry.item.stats.maxHp) maxHp += entry.item.stats.maxHp;
+        if (entry.item.stats.maxMp) maxMp += entry.item.stats.maxMp;
+      }
+    }
+    return { atk, def, spd, maxHp, maxMp };
+  }, [equippedItemsList, equippedWings, equippedGear]);
+
   if (!isOpen) return null;
 
   return (
@@ -115,41 +172,88 @@ export default function SettingsModal({
             </div>
           </div>
 
-          {/* 2. Visual Effects & Actions */}
+          {/* 2. Visual Effects, Active Gear & Actions */}
           <div className="settings-two-columns">
-            {/* Visual Toggles & Wings */}
+            {/* Visual Toggles & Gear Effects */}
             <div className="settings-column">
-              <span className="settings-section-title">Efeitos & Equipamento</span>
-              <div className="toggle-list">
-                {/* 3-Option Wings Selector */}
-                <div className="wings-selector-box">
-                  <div className="wings-selector-grid">
-                    <button
-                      type="button"
-                      className={`btn-wing-select angelic ${equippedWings === 'angelic' ? 'active' : ''}`}
-                      onClick={() => onSelectWings && onSelectWings('angelic')}
-                    >
-                      <span className="wing-ico">🪽</span>
-                      <div className="wing-select-meta">
-                        <strong>Asas Angelicais</strong>
-                        <small>+50% Vel • Sagrado</small>
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      className={`btn-wing-select none ${equippedWings === 'none' ? 'active' : ''}`}
-                      onClick={() => onSelectWings && onSelectWings('none')}
-                    >
-                      <span className="wing-ico">❌</span>
-                      <div className="wing-select-meta">
-                        <strong>Desequipar</strong>
-                        <small>A pé (Vel Normal)</small>
-                      </div>
-                    </button>
-                  </div>
+              <span className="settings-section-title">✨ Bônus & Efeitos de Equipamentos</span>
+              <div className="gear-effects-panel">
+                <div className="gear-stats-summary-grid">
+                  {totalStats.atk > 0 && (
+                    <div className="gear-stat-pill atk" title="Bônus Total de Ataque Físico">
+                      <span className="pill-ico">⚔️</span>
+                      <span className="pill-lbl">Ataque</span>
+                      <strong className="pill-val">+{totalStats.atk}</strong>
+                    </div>
+                  )}
+                  {totalStats.def > 0 && (
+                    <div className="gear-stat-pill def" title="Bônus Total de Defesa">
+                      <span className="pill-ico">🛡️</span>
+                      <span className="pill-lbl">Defesa</span>
+                      <strong className="pill-val">+{totalStats.def}</strong>
+                    </div>
+                  )}
+                  {totalStats.spd > 0 && (
+                    <div className="gear-stat-pill spd" title="Bônus Total de Velocidade de Movimento">
+                      <span className="pill-ico">⚡</span>
+                      <span className="pill-lbl">Velocidade</span>
+                      <strong className="pill-val">+{totalStats.spd}%</strong>
+                    </div>
+                  )}
+                  {totalStats.maxHp > 0 && (
+                    <div className="gear-stat-pill hp" title="Bônus Total de Vida Máxima">
+                      <span className="pill-ico">❤️</span>
+                      <span className="pill-lbl">Vida Máx</span>
+                      <strong className="pill-val">+{totalStats.maxHp}</strong>
+                    </div>
+                  )}
+                  {totalStats.maxMp > 0 && (
+                    <div className="gear-stat-pill mp" title="Bônus Total de Mana Máxima">
+                      <span className="pill-ico">🔷</span>
+                      <span className="pill-lbl">Mana Máx</span>
+                      <strong className="pill-val">+{totalStats.maxMp}</strong>
+                    </div>
+                  )}
+                  {totalStats.atk === 0 && totalStats.def === 0 && totalStats.spd === 0 && totalStats.maxHp === 0 && (
+                    <div className="gear-stat-empty">
+                      <span>Nenhum bônus passivo de item ativo no momento</span>
+                    </div>
+                  )}
                 </div>
 
+                {/* Lista compacta de itens com efeitos ativos */}
+                <div className="gear-active-items-list">
+                  {equippedItemsList.length === 0 ? (
+                    <div className="gear-item-none">
+                      <span>Abra a Mochila (B) para equipar armas e armaduras!</span>
+                    </div>
+                  ) : (
+                    equippedItemsList.map(({ slotLabel, item, customNote }) => (
+                      <div key={`${slotLabel}-${item.id}`} className="gear-active-item-row" title={item.description}>
+                        <span className="gear-item-slot-tag">{slotLabel}</span>
+                        <span className="gear-item-icon">{item.icon}</span>
+                        <div className="gear-item-meta">
+                          <strong className={`gear-item-name rarity-${item.rarity}`}>{item.name}</strong>
+                          <span className="gear-item-bonus">
+                            {customNote || (
+                              <>
+                                {item.stats?.attack ? `+${item.stats.attack} ATK ` : ''}
+                                {item.stats?.defense ? `+${item.stats.defense} DEF ` : ''}
+                                {item.stats?.speed ? `+${item.stats.speed} VEL ` : ''}
+                                {item.stats?.maxHp ? `+${item.stats.maxHp} HP ` : ''}
+                                {item.stats?.maxMp ? `+${item.stats.maxMp} MP ` : ''}
+                              </>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <span className="settings-section-title" style={{ marginTop: '12px' }}>Auxílios Visuais</span>
+              <div className="toggle-list">
                 <label className="settings-toggle-item">
                   <input
                     type="checkbox"
@@ -234,8 +338,9 @@ export default function SettingsModal({
                     onClose();
                     onReturnToLobby();
                   }}
+                  title="Salva o progresso e retorna à seleção de personagens"
                 >
-                  <span>🏰 Trocar Personagem / Voltar ao Lobby</span>
+                  <span>🏰 Voltar ao Lobby</span>
                 </button>
               </div>
             </div>

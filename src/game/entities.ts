@@ -524,22 +524,58 @@ export class Monster {
   }
 }
 
-// ─── Corpse (Tibia-style death animation) ─────────────────────────────────────
+// ─── Corpse (Fade-out death effect) ──────────────────────────────────────────
 
 /**
  * Updates a corpse fade-out. Returns true when it should be removed.
- * Tibia-style: solid for ~3s, then fade over ~2s
+ * Dissolves smoothly over 1.2 seconds, leaving the blood pool on the ground.
  */
 export function updateCorpse(corpse: MonsterCorpse, dt: number): boolean {
   corpse.timer += dt;
-  const solidDuration = 3.0;
-  const fadeDuration = 2.0;
-  if (corpse.timer <= solidDuration) {
-    corpse.alpha = 1.0;
+  const fadeDuration = 1.2;
+  corpse.alpha = Math.max(0, 1.0 - corpse.timer / fadeDuration);
+  return corpse.timer >= fadeDuration;
+}
+
+// ─── Blood Stain Decal System ────────────────────────────────────────────────
+
+export interface BloodStain {
+  id: string;
+  x: number;
+  y: number;
+  stage: 1 | 2 | 3;
+  timer: number;
+  alpha: number;
+}
+
+/**
+ * Updates a blood stain decaying on the ground.
+ * Cycles through stage 1 -> stage 2 -> stage 3 every 3.0 seconds.
+ * During the end of stage 3 (from 7.8s to 9.0s), it smoothly fades away to 0.
+ * Returns true when it should be removed (timer >= 9.0s).
+ */
+export function updateBloodStain(stain: BloodStain, dt: number): boolean {
+  stain.timer += dt;
+
+  if (stain.timer < 3.0) {
+    stain.stage = 1;
+    stain.alpha = 1.0;
+  } else if (stain.timer < 6.0) {
+    stain.stage = 2;
+    stain.alpha = 1.0;
+  } else if (stain.timer < 9.0) {
+    stain.stage = 3;
+    // Smooth fade-out in final 1.2 seconds of stage 3
+    if (stain.timer >= 7.8) {
+      stain.alpha = Math.max(0, 1.0 - (stain.timer - 7.8) / 1.2);
+    } else {
+      stain.alpha = 1.0;
+    }
   } else {
-    corpse.alpha = Math.max(0, 1.0 - (corpse.timer - solidDuration) / fadeDuration);
+    return true; // Expired, remove from world
   }
-  return corpse.timer >= solidDuration + fadeDuration;
+
+  return false;
 }
 
 // ─── Loot Box System ──────────────────────────────────────────────────────────
@@ -860,10 +896,10 @@ export function generateMonsterCoinDrops(
 ): CoinDrop[] {
   const drops: CoinDrop[] = [];
 
-  // 1. Moedas de Prata (Silver): Moeda base comum que todos os monstros derrubam (100 Prata = 1 Ouro)
-  const minSilver = Math.max(4, Math.floor(xpReward * 0.25));
-  const maxSilver = Math.max(10, Math.floor(xpReward * 0.70));
-  const silverAmount = Math.min(100, minSilver + Math.floor(Math.random() * (maxSilver - minSilver + 1)));
+  // 1. Moedas de Prata (Silver): Prática e comum, todos os monstros derrubam
+  const minSilver = Math.max(3, Math.floor(xpReward * 0.20));
+  const maxSilver = Math.max(8, Math.floor(xpReward * 0.60));
+  const silverAmount = minSilver + Math.floor(Math.random() * (maxSilver - minSilver + 1));
 
   drops.push({
     id: `coin_silver_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -877,13 +913,12 @@ export function generateMonsterCoinDrops(
     collectAnim: 0,
   });
 
-  // 2. Moedas de Ouro (Gold):
-  // Monstros intermediários (xp >= 100) têm 25% de chance de dropar 1 ou 2 ouros diretamente.
-  // Chefes (xp >= 350) têm 60% de chance de dropar 1 a 4 ouros.
-  if (xpReward >= 100) {
-    const goldChance = xpReward >= 350 ? 0.60 : 0.25;
+  // 2. Moedas de Ouro (Gold): Mais rara (100 Pratas = 1 Ouro)
+  // Apenas monstros com certa força (xp >= 60) com chance baixa (12%), e chefes (xp >= 350) com chance de 25%
+  if (xpReward >= 60) {
+    const goldChance = xpReward >= 350 ? 0.25 : 0.12;
     if (Math.random() < goldChance) {
-      const maxGold = xpReward >= 350 ? Math.min(4, 1 + Math.floor(xpReward / 150)) : 2;
+      const maxGold = xpReward >= 350 ? Math.min(3, 1 + Math.floor(xpReward / 200)) : 1;
       const goldAmount = 1 + Math.floor(Math.random() * maxGold);
       drops.push({
         id: `coin_gold_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -899,10 +934,10 @@ export function generateMonsterCoinDrops(
     }
   }
 
-  // 3. Moedas de Cristal (Crystal):
-  // 100 Ouros = 1 Cristal. Apenas grandes chefes (xp >= 350) possuem chance rara (10% a 15%) de dropar 1 cristal!
+  // 3. Moedas de Cristal (Crystal): Muito mais rara! (500 Ouros = 1 Cristal)
+  // Apenas grandes chefes (xp >= 350) possuem chance ínfima (~2.5%) de derrubar 1 moeda de cristal
   if (xpReward >= 350) {
-    const basaltChance = Math.min(0.15, 0.08 + (xpReward - 350) / 3000);
+    const basaltChance = 0.025; // 2.5% ultra-raro em chefes
     if (Math.random() < basaltChance) {
       drops.push({
         id: `coin_basalt_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,

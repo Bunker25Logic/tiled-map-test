@@ -24,7 +24,7 @@ export interface ZoneDef {
 export const ZONES: Record<string, ZoneDef> = {
   'map1': {
     id: 'map1',
-    name: 'Superf�cie de Tibia',
+    name: 'Superfície de Tibia',
     file: '/map1.tmj',
     defaultSpawn: { x: 0, y: 0 },
   },

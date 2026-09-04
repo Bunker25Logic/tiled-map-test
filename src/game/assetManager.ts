@@ -160,6 +160,27 @@ export async function preloadAllGameAssets(): Promise<GameAssetCache> {
         .catch((err) => {
           console.warn('Failed loading basalt coin sheet:', err);
         }),
+      loadChromaKeyImage('/assets/itens/blood/1.png', '#ff00ff')
+        .then((img) => {
+          globalCache.items['blood_1'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading blood stage 1:', err);
+        }),
+      loadChromaKeyImage('/assets/itens/blood/2.png', '#ff00ff')
+        .then((img) => {
+          globalCache.items['blood_2'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading blood stage 2:', err);
+        }),
+      loadChromaKeyImage('/assets/itens/blood/3.png', '#ff00ff')
+        .then((img) => {
+          globalCache.items['blood_3'] = img;
+        })
+        .catch((err) => {
+          console.warn('Failed loading blood stage 3:', err);
+        }),
     ];
 
     await Promise.all([

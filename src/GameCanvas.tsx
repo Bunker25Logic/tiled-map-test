@@ -14,6 +14,8 @@ import {
   createMapMonsters,
   type MonsterCorpse,
   updateCorpse,
+  type BloodStain,
+  updateBloodStain,
   type LootBox,
   type CoinDrop,
   generateLootBox,
@@ -139,6 +141,8 @@ interface GameCanvasProps {
   overrideDirection?: Direction | null;
   /** Currently equipped spell IDs (5 slots) */
   equippedSpellIds?: string[];
+  /** Current player level */
+  playerLevel?: number;
   /** Current player HP (from account) */
   playerHp?: number;
   /** Max player HP (from account) */
@@ -182,6 +186,7 @@ export default function GameCanvas({
   weaponOffsets = null,
   overrideDirection = null,
   equippedSpellIds = [],
+  playerLevel = 1,
   playerHp,
   playerMaxHp,
   playerMp,
@@ -220,6 +225,7 @@ export default function GameCanvas({
   // Persistent monsters, corpses, loot boxes, coin drops, spells, floating numbers, slashes, targeted mob
   const monstersRef = useRef<Monster[]>([]);
   const corpsesRef = useRef<MonsterCorpse[]>([]);
+  const bloodStainsRef = useRef<BloodStain[]>([]);
   const spawnPointsRef = useRef<SpawnPoint[]>([]);
   const respawnCheckTimerRef = useRef(0);
   const lootBoxesRef = useRef<LootBox[]>([]);
@@ -266,6 +272,7 @@ export default function GameCanvas({
     weaponOffsets,
     overrideDirection,
     equippedSpellIds,
+    playerLevel,
     playerHp,
     playerMaxHp,
     playerMp,
@@ -294,6 +301,7 @@ export default function GameCanvas({
     propsRef.current.weaponOffsets = weaponOffsets;
     propsRef.current.overrideDirection = overrideDirection;
     propsRef.current.equippedSpellIds = equippedSpellIds;
+    propsRef.current.playerLevel = playerLevel;
     propsRef.current.playerHp = playerHp;
     propsRef.current.playerMaxHp = playerMaxHp;
     propsRef.current.playerMp = playerMp;
@@ -305,7 +313,7 @@ export default function GameCanvas({
     propsRef.current.onOpenInventory = onOpenInventory;
     propsRef.current.onCollectLoot = onCollectLoot;
     propsRef.current.onCollectCoins = onCollectCoins;
-  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedWeapon, equippedGear, autoAttackEnabled, autoTargetNearbyEnabled, weaponOffsets, overrideDirection, equippedSpellIds, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot, onCollectCoins]);
+  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedWeapon, equippedGear, autoAttackEnabled, autoTargetNearbyEnabled, weaponOffsets, overrideDirection, equippedSpellIds, playerLevel, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot, onCollectCoins]);
 
   // Update particles on map change
   useEffect(() => {
@@ -339,6 +347,7 @@ export default function GameCanvas({
 
         // 4. Initialize spawn points, corpses, and monsters for this zone
         corpsesRef.current = [];
+        bloodStainsRef.current = [];
         lootBoxesRef.current = [];
         coinDropsRef.current = [];
         floatingNumbersRef.current = [];
@@ -355,7 +364,7 @@ export default function GameCanvas({
               targetSp.deathTimestamp = performance.now();
             }
 
-            // Create monster corpse on the ground (Tibia style)
+            // Create monster corpse on the ground (fading out smoothly)
             corpsesRef.current.push({
               x: deathX - mob.config.hitboxW / 2,
               y: deathY - mob.config.hitboxH / 2,
@@ -364,6 +373,16 @@ export default function GameCanvas({
               dir: mob.dir,
               alpha: 1.0,
               timer: 0,
+            });
+
+            // Spawn blood stain on the ground (cycles stage 1 -> 2 -> 3 every 3s)
+            bloodStainsRef.current.push({
+              id: `blood_${mob.id}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              x: deathX - 16,
+              y: deathY - 16,
+              stage: 1,
+              timer: 0,
+              alpha: 1.0,
             });
 
             // 1. Spawn authentic stackable Tibia coin drops on the ground
@@ -843,9 +862,62 @@ export default function GameCanvas({
         let swordWalkWeight = 0;
         let fadeAlpha = 1.0; // Smooth fade-in on map spawn
 
+        // ── Player Overhead Status Bar Juiciness State ──
+        let overheadDisplayedHp = propsRef.current.playerHp ?? 100;
+        let overheadGhostHp = propsRef.current.playerHp ?? 100;
+        let overheadGhostHpDelay = 0;
+        let overheadDisplayedMp = propsRef.current.playerMp ?? 50;
+        let overheadGhostMp = propsRef.current.playerMp ?? 50;
+        let overheadGhostMpDelay = 0;
+        let overheadLastKnownHp = propsRef.current.playerHp ?? 100;
+        let overheadLastKnownMp = propsRef.current.playerMp ?? 50;
+        let overheadDamageFlash = 0;
+        let overheadDangerPulse = 0;
+
         const loop = (now: number) => {
           const dt = Math.min((now - lastTime) / 1000, 0.05);
           lastTime = now;
+
+          // ── Update Player Overhead Bars Smooth Lerp & Juiciness ──
+          const curHp = propsRef.current.playerHp ?? 100;
+          const curMp = propsRef.current.playerMp ?? 50;
+
+          if (curHp < overheadLastKnownHp) {
+            overheadGhostHpDelay = 0.35; // Mantém a barra fantasma por 350ms antes de drenar
+            overheadDamageFlash = 0.2;   // Flash de impacto de dano
+          } else if (curHp > overheadLastKnownHp) {
+            overheadGhostHp = curHp;     // Ao curar, emparelha imediatamente
+          }
+          overheadLastKnownHp = curHp;
+
+          if (curMp < overheadLastKnownMp) {
+            overheadGhostMpDelay = 0.25;
+          } else if (curMp > overheadLastKnownMp) {
+            overheadGhostMp = curMp;
+          }
+          overheadLastKnownMp = curMp;
+
+          // Interpolação visual suave da barra de vida e mana
+          overheadDisplayedHp += (curHp - overheadDisplayedHp) * Math.min(1, dt * 14);
+          overheadDisplayedMp += (curMp - overheadDisplayedMp) * Math.min(1, dt * 14);
+
+          // Efeito de queda atrasada da barra fantasma (lag bar)
+          if (overheadGhostHpDelay > 0) {
+            overheadGhostHpDelay -= dt;
+          } else {
+            overheadGhostHp += (curHp - overheadGhostHp) * Math.min(1, dt * 5.5);
+          }
+
+          if (overheadGhostMpDelay > 0) {
+            overheadGhostMpDelay -= dt;
+          } else {
+            overheadGhostMp += (curMp - overheadGhostMp) * Math.min(1, dt * 6.5);
+          }
+
+          if (overheadDamageFlash > 0) {
+            overheadDamageFlash = Math.max(0, overheadDamageFlash - dt);
+          }
+          overheadDangerPulse += dt * 5.5;
 
           if (playerAttackAnimTimer > 0) {
             playerAttackAnimTimer = Math.max(0, playerAttackAnimTimer - dt);
@@ -1099,11 +1171,19 @@ export default function GameCanvas({
           // Remove dead monsters after a brief delay (corpse already spawned)
           monstersRef.current = monstersRef.current.filter((m) => !m.isDead);
 
-          // ── Update Corpses (Tibia-style fade out) ────────────────────────
+          // ── Update Corpses (Smooth death dissolve) ──────────────────────
           for (let i = corpsesRef.current.length - 1; i >= 0; i--) {
             const corpse = corpsesRef.current[i];
             if (updateCorpse(corpse, dt)) {
               corpsesRef.current.splice(i, 1);
+            }
+          }
+
+          // ── Update Blood Stains (Stages 1 -> 2 -> 3 -> vanish) ─────────
+          for (let i = bloodStainsRef.current.length - 1; i >= 0; i--) {
+            const stain = bloodStainsRef.current[i];
+            if (updateBloodStain(stain, dt)) {
+              bloodStainsRef.current.splice(i, 1);
             }
           }
 
@@ -1484,6 +1564,32 @@ export default function GameCanvas({
               sortY: loot.y + 4,
               draw: (renderCtx) => {
                 drawLootBox(renderCtx, loot, camX, camY);
+              },
+            });
+          }
+
+          // Add Blood Stains to depth sorting (flat on ground under creatures and corpses)
+          for (const stain of bloodStainsRef.current) {
+            if (
+              stain.x + 32 < camX ||
+              stain.x > camX + worldViewW ||
+              stain.y + 32 < camY ||
+              stain.y > camY + worldViewH
+            ) {
+              continue;
+            }
+
+            const bloodImg = cached.items[`blood_${stain.stage}`];
+            if (!bloodImg) continue;
+
+            depthObjects.push({
+              type: 'tiled-obj',
+              sortY: stain.y - 12,
+              draw: (renderCtx) => {
+                renderCtx.save();
+                renderCtx.globalAlpha = stain.alpha;
+                renderCtx.drawImage(bloodImg, stain.x - camX, stain.y - camY, 32, 32);
+                renderCtx.restore();
               },
             });
           }
@@ -2070,16 +2176,167 @@ export default function GameCanvas({
 
                 renderCtx.restore();
 
-                // Player Name tag (drawn above character, unaffected by squash/stretch)
+                // ── Player Overhead: Level Badge, Name & Juicy HP / Mana Bars ──
                 renderCtx.save();
-                const pNameX = px + HITBOX_W / 2 - camX + attackOffsetX * 0.5;
-                const pNameY = py + HITBOX_H - curCharDef.height - 4 - camY + attackOffsetY * 0.5;
+                const pCenterX = px + HITBOX_W / 2 - camX + attackOffsetX * 0.5;
+                const headTopY = py + HITBOX_H - curCharDef.height - camY + attackOffsetY * 0.5;
+
+                // Geometria compacta e equilibrada
+                const barW = 38;
+                const hpBarH = 4;
+                const mpBarH = 3;
+                const barGap = 1.5;
+
+                // Posições verticais (de baixo para cima da cabeça)
+                const mpY = headTopY - 4;                  // Mana imediatamente sobre a cabeça
+                const hpY = mpY - hpBarH - barGap;         // HP logo acima da Mana
+                const textY = hpY - 4;                     // Nome e Nível acima do HP
+                const barX = Math.round(pCenterX - barW / 2);
+
+                // 1. Nível & Nome
+                const lvl = propsRef.current.playerLevel ?? 1;
+                const lvlText = `${lvl}`;
+                renderCtx.font = 'bold 8px Tahoma, system-ui, sans-serif';
+                const lvlTextW = renderCtx.measureText(lvlText).width;
+                const badgePadX = 3;
+                const badgeW = Math.max(13, lvlTextW + badgePadX * 2);
+                const badgeH = 10;
+                const badgeY = Math.round(textY - 8);
+
+                renderCtx.font = 'bold 9px Tahoma, Verdana, sans-serif';
+                const nameW = renderCtx.measureText(curCharDef.name).width;
+                const headerGap = 3;
+                const totalHeaderW = badgeW + headerGap + nameW;
+                const headerStartX = Math.round(pCenterX - totalHeaderW / 2);
+
+                // Badge de Nível (Estilo Escudo Dourado Dark Fantasy)
+                const badgeX = headerStartX;
+                // Sombra do badge
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                renderCtx.fillRect(badgeX, badgeY + 1, badgeW, badgeH);
+                // Borda escura
+                renderCtx.fillStyle = '#0a0a0c';
+                renderCtx.fillRect(badgeX - 0.5, badgeY - 0.5, badgeW + 1, badgeH + 1);
+                // Fundo gradiente dourado metálico
+                const goldGrad = renderCtx.createLinearGradient(0, badgeY, 0, badgeY + badgeH);
+                goldGrad.addColorStop(0, '#f59e0b');
+                goldGrad.addColorStop(1, '#92400e');
+                renderCtx.fillStyle = goldGrad;
+                renderCtx.fillRect(badgeX, badgeY, badgeW, badgeH);
+                // Micro-highlight do badge
+                renderCtx.fillStyle = 'rgba(254, 240, 138, 0.45)';
+                renderCtx.fillRect(badgeX, badgeY, badgeW, 1);
+                // Texto do nível
+                renderCtx.font = 'bold 8px Tahoma, system-ui, sans-serif';
+                renderCtx.textAlign = 'center';
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                renderCtx.fillText(lvlText, badgeX + badgeW / 2 + 0.5, badgeY + 8);
+                renderCtx.fillStyle = '#ffffff';
+                renderCtx.fillText(lvlText, badgeX + badgeW / 2, badgeY + 7.5);
+
+                // Nome do Personagem
+                const nameDrawX = headerStartX + badgeW + headerGap + nameW / 2;
                 renderCtx.font = 'bold 9px Tahoma, Verdana, sans-serif';
                 renderCtx.textAlign = 'center';
-                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-                renderCtx.fillText(curCharDef.name, pNameX + 1, pNameY + 1);
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                renderCtx.fillText(curCharDef.name, nameDrawX + 1, textY + 1);
                 renderCtx.fillStyle = '#38bdf8';
-                renderCtx.fillText(curCharDef.name, pNameX, pNameY);
+                renderCtx.fillText(curCharDef.name, nameDrawX, textY);
+
+                // 2. Barra de HP (Vida)
+                const maxHpVal = Math.max(1, propsRef.current.playerMaxHp ?? 100);
+                const hpPct = Math.max(0, Math.min(1, overheadDisplayedHp / maxHpVal));
+                const ghostHpPct = Math.max(0, Math.min(1, overheadGhostHp / maxHpVal));
+
+                // Sombra da barra de HP
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+                renderCtx.fillRect(barX - 1, hpY, barW + 2, hpBarH + 1.5);
+                // Contorno escuro
+                renderCtx.fillStyle = '#09090b';
+                renderCtx.fillRect(barX - 1, hpY - 1, barW + 2, hpBarH + 2);
+                // Fundo da barra
+                renderCtx.fillStyle = '#1c1917';
+                renderCtx.fillRect(barX, hpY, barW, hpBarH);
+
+                // Ghost Bar de Dano Recente (sangramento/lag suave)
+                if (ghostHpPct > hpPct) {
+                  const gStartX = barX + hpPct * barW;
+                  const gWidth = (ghostHpPct - hpPct) * barW;
+                  renderCtx.fillStyle = '#ef4444';
+                  renderCtx.fillRect(gStartX, hpY, gWidth, hpBarH);
+                }
+
+                // Barra Principal de HP com Gradiente Juiciness
+                const currentHpFillW = hpPct * barW;
+                if (currentHpFillW > 0) {
+                  const hpGrad = renderCtx.createLinearGradient(0, hpY, 0, hpY + hpBarH);
+                  if (hpPct > 0.5) {
+                    hpGrad.addColorStop(0, '#4ade80');
+                    hpGrad.addColorStop(1, '#15803d');
+                  } else if (hpPct > 0.25) {
+                    hpGrad.addColorStop(0, '#facc15');
+                    hpGrad.addColorStop(1, '#b45309');
+                  } else {
+                    hpGrad.addColorStop(0, '#f87171');
+                    hpGrad.addColorStop(1, '#991b1b');
+                  }
+                  renderCtx.fillStyle = hpGrad;
+                  renderCtx.fillRect(barX, hpY, currentHpFillW, hpBarH);
+
+                  // Micro Glass Highlight (1px)
+                  renderCtx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+                  renderCtx.fillRect(barX, hpY, currentHpFillW, 1);
+                }
+
+                // Flash de Dano de Impacto (Brilho branco)
+                if (overheadDamageFlash > 0) {
+                  renderCtx.fillStyle = `rgba(255, 255, 255, ${(overheadDamageFlash / 0.2) * 0.5})`;
+                  renderCtx.fillRect(barX, hpY, barW, hpBarH);
+                }
+
+                // Alerta de Perigo Pulsante quando Vida <= 25%
+                if (hpPct <= 0.25 && hpPct > 0) {
+                  const pulseA = 0.35 + 0.35 * Math.sin(overheadDangerPulse);
+                  renderCtx.strokeStyle = `rgba(239, 68, 68, ${pulseA})`;
+                  renderCtx.lineWidth = 1;
+                  renderCtx.strokeRect(barX - 1.5, hpY - 1.5, barW + 3, hpBarH + 3);
+                }
+
+                // 3. Barra de Mana (MP) - Compacta, abaixo do HP
+                const maxMpVal = Math.max(1, propsRef.current.playerMaxMp ?? 50);
+                const mpPct = Math.max(0, Math.min(1, overheadDisplayedMp / maxMpVal));
+                const ghostMpPct = Math.max(0, Math.min(1, overheadGhostMp / maxMpVal));
+
+                // Sombra e contorno da barra de mana
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+                renderCtx.fillRect(barX - 1, mpY, barW + 2, mpBarH + 1.5);
+                renderCtx.fillStyle = '#09090b';
+                renderCtx.fillRect(barX - 1, mpY - 1, barW + 2, mpBarH + 2);
+                renderCtx.fillStyle = '#0b1329';
+                renderCtx.fillRect(barX, mpY, barW, mpBarH);
+
+                // Ghost Bar de Mana Gasta
+                if (ghostMpPct > mpPct) {
+                  const gMpStartX = barX + mpPct * barW;
+                  const gMpWidth = (ghostMpPct - mpPct) * barW;
+                  renderCtx.fillStyle = '#0284c7';
+                  renderCtx.fillRect(gMpStartX, mpY, gMpWidth, mpBarH);
+                }
+
+                // Barra Principal de Mana
+                const currentMpFillW = mpPct * barW;
+                if (currentMpFillW > 0) {
+                  const mpGrad = renderCtx.createLinearGradient(0, mpY, 0, mpY + mpBarH);
+                  mpGrad.addColorStop(0, '#60a5fa');
+                  mpGrad.addColorStop(1, '#1d4ed8');
+                  renderCtx.fillStyle = mpGrad;
+                  renderCtx.fillRect(barX, mpY, currentMpFillW, mpBarH);
+
+                  // Micro Glass Highlight
+                  renderCtx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                  renderCtx.fillRect(barX, mpY, currentMpFillW, 1);
+                }
+
                 renderCtx.restore();
             },
           });

@@ -222,18 +222,7 @@ export function addCoinsToCharacter(
     basalt: Math.max(0, (currentWallet.basalt || 0) + (coins.basalt || 0)),
   };
 
-  // 100 Moedas de Prata viram 1 Moeda de Ouro!
-  if (wallet.silver >= 100) {
-    const extraGold = Math.floor(wallet.silver / 100);
-    wallet.gold += extraGold;
-    wallet.silver %= 100;
-  }
-  // 100 Moedas de Ouro viram 1 Moeda de Cristal!
-  if (wallet.gold >= 100) {
-    const extraBasalt = Math.floor(wallet.gold / 100);
-    wallet.basalt += extraBasalt;
-    wallet.gold %= 100;
-  }
+  // As moedas NÃO se transformam automaticamente; cada recurso é acumulado genuinamente.
 
   const updatedCharacters = [...account.characters];
   updatedCharacters[charIndex] = {
@@ -247,6 +236,125 @@ export function addCoinsToCharacter(
 
   saveAccount(updatedAccount);
   return { account: updatedAccount, wallet: { ...wallet } };
+}
+
+export type ExchangeOperation =
+  | 'silver_to_gold'
+  | 'gold_to_silver'
+  | 'gold_to_crystal'
+  | 'crystal_to_gold'
+  | 'optimize_all';
+
+export function exchangeCharacterCoins(
+  account: PlayerAccount,
+  charIndex: number,
+  operation: ExchangeOperation,
+  count: number = 1
+): { account: PlayerAccount; wallet: PlayerWallet; success: boolean; message: string } {
+  const char = account.characters[charIndex];
+  if (!char) return { account, wallet: getDefaultWallet(), success: false, message: 'Personagem não encontrado' };
+
+  const currentWallet = char.wallet || getDefaultWallet();
+  const wallet: PlayerWallet = {
+    gold: currentWallet.gold || 0,
+    silver: currentWallet.silver || 0,
+    basalt: currentWallet.basalt || 0,
+  };
+
+  let success = false;
+  let message = '';
+
+  switch (operation) {
+    case 'silver_to_gold': {
+      // 100 Pratas = 1 Ouro
+      const requiredSilver = count * 100;
+      if (wallet.silver >= requiredSilver) {
+        wallet.silver -= requiredSilver;
+        wallet.gold += count;
+        success = true;
+        message = `Trocou ${requiredSilver} Pratas por ${count} Ouro(s)!`;
+      } else {
+        message = `Prata insuficiente. Necessário: ${requiredSilver} Pratas.`;
+      }
+      break;
+    }
+    case 'gold_to_silver': {
+      // 1 Ouro = 100 Pratas
+      if (wallet.gold >= count) {
+        wallet.gold -= count;
+        wallet.silver += count * 100;
+        success = true;
+        message = `Trocou ${count} Ouro(s) por ${count * 100} Pratas!`;
+      } else {
+        message = `Ouro insuficiente. Necessário: ${count} Ouro(s).`;
+      }
+      break;
+    }
+    case 'gold_to_crystal': {
+      // 500 Ouros = 1 Cristal
+      const requiredGold = count * 500;
+      if (wallet.gold >= requiredGold) {
+        wallet.gold -= requiredGold;
+        wallet.basalt += count;
+        success = true;
+        message = `Trocou ${requiredGold} Ouros por ${count} Cristal(is)!`;
+      } else {
+        message = `Ouro insuficiente. Necessário: ${requiredGold} Ouros.`;
+      }
+      break;
+    }
+    case 'crystal_to_gold': {
+      // 1 Cristal = 500 Ouros
+      if (wallet.basalt >= count) {
+        wallet.basalt -= count;
+        wallet.gold += count * 500;
+        success = true;
+        message = `Trocou ${count} Cristal(is) por ${count * 500} Ouros!`;
+      } else {
+        message = `Cristal insuficiente. Necessário: ${count} Cristal(is).`;
+      }
+      break;
+    }
+    case 'optimize_all': {
+      // Converte o máximo de prata em ouro e o máximo de ouro em cristal
+      let converted = false;
+      if (wallet.silver >= 100) {
+        const extraGold = Math.floor(wallet.silver / 100);
+        wallet.silver %= 100;
+        wallet.gold += extraGold;
+        converted = true;
+      }
+      if (wallet.gold >= 500) {
+        const extraBasalt = Math.floor(wallet.gold / 500);
+        wallet.gold %= 500;
+        wallet.basalt += extraBasalt;
+        converted = true;
+      }
+      if (converted) {
+        success = true;
+        message = 'Carteira otimizada com sucesso!';
+      } else {
+        message = 'Nada para converter no momento.';
+      }
+      break;
+    }
+  }
+
+  if (success) {
+    const updatedCharacters = [...account.characters];
+    updatedCharacters[charIndex] = {
+      ...char,
+      wallet: { ...wallet },
+    };
+    const updatedAccount: PlayerAccount = {
+      ...account,
+      characters: updatedCharacters,
+    };
+    saveAccount(updatedAccount);
+    return { account: updatedAccount, wallet: { ...wallet }, success: true, message };
+  }
+
+  return { account, wallet: { ...wallet }, success: false, message };
 }
 
 export function savePlayerWallet(

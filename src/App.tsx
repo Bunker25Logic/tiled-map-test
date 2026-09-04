@@ -19,6 +19,7 @@ import CharacterSelectScreen from './components/CharacterSelectScreen';
 import PlayerHUD from './components/PlayerHUD';
 import WorldLoadingScreen from './components/WorldLoadingScreen';
 import DeathModal from './components/DeathModal';
+import CurrencyExchangeModal from './components/CurrencyExchangeModal';
 import WeaponOffsetCalibrator from './components/WeaponOffsetCalibrator';
 import type { Direction } from './game/types';
 import { ITEM_OFFSETS, type ItemOffsetConfig } from './game/itemOffsets';
@@ -41,6 +42,8 @@ import {
   clearSession,
   addXPToCharacter,
   addCoinsToCharacter,
+  exchangeCharacterCoins,
+  type ExchangeOperation,
   getLevelFromXP,
   loadSession,
   loadAccount,
@@ -104,6 +107,7 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isSpellbookOpen, setIsSpellbookOpen] = useState<boolean>(false);
   const [isInventoryOpen, setIsInventoryOpen] = useState<boolean>(false);
+  const [isExchangeOpen, setIsExchangeOpen] = useState<boolean>(false);
   const [isCalibratorOpen, setIsCalibratorOpen] = useState<boolean>(false);
   const [calibratorDirection, setCalibratorDirection] = useState<Direction | null>(null);
   const [weaponOffsets, setWeaponOffsets] = useState<ItemOffsetConfig>(() =>
@@ -125,8 +129,6 @@ export default function App() {
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [isReloading, setIsReloading] = useState(false);
   const [activeCastId, setActiveCastId] = useState<string | null>(null);
-  const [isAttackActive, setIsAttackActive] = useState(false);
-  const lastAttackTimeRef = useRef(0);
   const lastCastTimeRef = useRef(0);
 
   const accountRef = useRef<PlayerAccount | null>(account);
@@ -157,9 +159,8 @@ export default function App() {
       if (e.key === 'o' || e.key === 'O') {
         setIsCalibratorOpen((prev) => !prev);
       }
-      if (e.key === ' ' || e.key === 'j' || e.key === 'J') {
-        setIsAttackActive(true);
-        setTimeout(() => setIsAttackActive(false), 260);
+      if (e.key === 'c' || e.key === 'C') {
+        setIsExchangeOpen((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -492,6 +493,23 @@ export default function App() {
     []
   );
 
+  const handleExchangeCoins = useCallback(
+    (operation: ExchangeOperation, count: number = 1) => {
+      const acc = accountRef.current;
+      if (!acc || acc.characters.length === 0) {
+        return { success: false, message: 'Conta não encontrada' };
+      }
+      const charIdx = activeCharIndexRef.current;
+      const res = exchangeCharacterCoins(acc, charIdx, operation, count);
+      if (res.success) {
+        setAccount(res.account);
+        accountRef.current = res.account;
+      }
+      return { success: res.success, message: res.message };
+    },
+    []
+  );
+
   const handleCollectLoot = useCallback(
     (silver: number, itemId?: string) => {
       if (silver > 0) {
@@ -552,16 +570,6 @@ export default function App() {
     setActiveCastId(spell.id);
     setTimeout(() => setActiveCastId(null), 300);
     window.dispatchEvent(new CustomEvent('cast-magic-spell', { detail: { spellId: spell.id } }));
-  };
-
-  const handlePlayerAttack = () => {
-    const now = performance.now();
-    if (now - lastAttackTimeRef.current < 450) return; // Cooldown de 450ms no ataque básico
-    lastAttackTimeRef.current = now;
-
-    setIsAttackActive(true);
-    setTimeout(() => setIsAttackActive(false), 260);
-    window.dispatchEvent(new CustomEvent('player-attack'));
   };
 
   const handleEquipSpell = (slotIndex: number, spellId: string) => {
@@ -648,18 +656,6 @@ export default function App() {
       }
       return next;
     });
-  };
-
-  const handleCycleWings = () => {
-    const nextWing: WingType = equippedWings === 'angelic' ? 'none' : 'angelic';
-    setEquippedWings(nextWing);
-    const nextGear: EquippedGear = { ...equippedGearRef.current, wings: nextWing };
-    setEquippedGear(nextGear);
-    equippedGearRef.current = nextGear;
-    const acc = accountRef.current;
-    if (acc) {
-      savePlayerGear(acc, activeCharIndexRef.current, nextGear);
-    }
   };
 
   const currentZoneDef = ZONES[currentZoneId] || ZONES['map1'];
@@ -778,24 +774,12 @@ export default function App() {
               playerName={account.name}
               currentHp={playerHp}
               currentMp={playerMp}
+              onOpenExchange={() => setIsExchangeOpen(true)}
             />
           )}
         </div>
 
         <div className="header-right">
-          <button
-            className={`btn-header-action btn-wings ${equippedWings}`}
-            onClick={handleCycleWings}
-            title="Alternar Asas Angelicais"
-          >
-            <span className="header-btn-icon">
-              {equippedWings === 'angelic' ? '🪽' : '❌'}
-            </span>
-            <span className="header-btn-text">
-              {equippedWings === 'angelic' ? 'Asas Angelicais' : 'Sem Asas'}
-            </span>
-          </button>
-
           <button
             className="btn-header-action btn-spellbook"
             onClick={() => setIsSpellbookOpen(true)}
@@ -845,6 +829,7 @@ export default function App() {
           playerMaxHp={playerMaxHp}
           playerMp={playerMp}
           playerMaxMp={playerMaxMp}
+          playerLevel={xpLevel}
           onPlayerPosChange={handlePosChange}
           onZoneTransition={handleZoneTransition}
           onPlayerDamage={handlePlayerDamage}
@@ -864,24 +849,9 @@ export default function App() {
           mapId={currentZoneId}
         />
 
-        <div className="action-bar-3slots action-bar-5slots">
+        <div className="action-bar-5slots">
           <div className="action-bar-slots-row">
-            {/* Botão de Ataque Físico com Espada */}
-            <button
-              className={`btn-action-slot btn-slot-attack ${isAttackActive ? 'attacking' : ''}`}
-              onClick={handlePlayerAttack}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                handlePlayerAttack();
-              }}
-              title="Ataque Físico com Espada (Tecla Espaço / J)"
-            >
-              <span className="slot-key-hint">ESP</span>
-              <span className="slot-spell-icon">⚔️</span>
-              <span className="slot-spell-title">Atacar</span>
-            </button>
-
-            {equippedSpellIds.slice(0, 3).map((spellId, idx) => {
+            {equippedSpellIds.map((spellId, idx) => {
               const spell = ALL_SPELLS.find((s) => s.id === spellId);
               if (!spell) return null;
               const isCasting = activeCastId === spell.id;
@@ -908,14 +878,6 @@ export default function App() {
                 </button>
               );
             })}
-            <button className="btn-action-slot btn-slot-spellbook" onClick={() => setIsSpellbookOpen(true)} title="Abrir Grimório de Magias">
-              <span className="slot-spell-icon">📖</span>
-              <span className="slot-spell-title">Grimório</span>
-            </button>
-            <button className="btn-action-slot btn-slot-bag" onClick={() => setIsInventoryOpen(true)} title="Abrir Mochila & Equipamentos (Tecla B)">
-              <span className="slot-spell-icon">🎒</span>
-              <span className="slot-spell-title">Mochila</span>
-            </button>
           </div>
         </div>
       </main>
@@ -997,6 +959,13 @@ export default function App() {
         onEquipItem={handleEquipItem}
         onUnequipSlot={handleUnequipSlot}
         onUsePotion={handleUsePotion}
+        onOpenExchange={() => setIsExchangeOpen(true)}
+      />
+      <CurrencyExchangeModal
+        isOpen={isExchangeOpen}
+        onClose={() => setIsExchangeOpen(false)}
+        wallet={account?.characters[activeCharIndex]?.wallet}
+        onExchange={handleExchangeCoins}
       />
       <SettingsModal
         isOpen={isSettingsOpen}
@@ -1014,7 +983,7 @@ export default function App() {
         autoTargetNearbyEnabled={autoTargetNearbyEnabled}
         onToggleAutoTargetNearby={handleToggleAutoTargetNearby}
         equippedWings={equippedWings}
-        onSelectWings={setEquippedWings}
+        equippedGear={equippedGear}
         onReloadMap={handleReloadClick}
         isReloadingMap={isReloading}
         onReturnToLobby={handleReturnToCharacterSelect}

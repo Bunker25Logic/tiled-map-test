@@ -7,7 +7,7 @@ import {
 } from '../game/items';
 import { PLAYABLE_CHARACTERS, type CharacterId } from '../game/characters';
 import type { PlayerWallet } from '../game/playerStore';
-import { getTotalSilverValue, formatGoldNumber } from '../game/currency';
+import { formatGoldNumber } from '../game/currency';
 import CoinIcon from './CoinIcon';
 import ItemIcon from './ItemIcon';
 
@@ -27,6 +27,7 @@ interface InventoryModalProps {
   onEquipItem: (item: ItemDef) => void;
   onUnequipSlot: (slot: keyof EquippedGear) => void;
   onUsePotion: (item: ItemDef) => void;
+  onOpenExchange?: () => void;
 }
 
 export default function InventoryModal({
@@ -45,6 +46,7 @@ export default function InventoryModal({
   onEquipItem,
   onUnequipSlot,
   onUsePotion,
+  onOpenExchange,
 }: InventoryModalProps) {
   const [activeCategory, setActiveCategory] = useState<'all' | 'wings' | 'gear' | 'potion'>('all');
   const [selectedItemId, setSelectedItemId] = useState<string>(
@@ -54,7 +56,6 @@ export default function InventoryModal({
 
   if (!isOpen) return null;
 
-  const totalSilver = getTotalSilverValue(playerWallet);
   const charDef = PLAYABLE_CHARACTERS.find((c) => c.id === characterId);
 
   const showToast = (message: string, type: 'success' | 'warn' | 'info', icon: string) => {
@@ -153,31 +154,31 @@ export default function InventoryModal({
             </div>
           </div>
 
-          {/* Compact Currency Wallet Chips with Total */}
+          {/* Compact Currency Wallet Chips */}
           <div
             className="inventory-header-wallet"
-            title={`Valor Total: ${formatGoldNumber(totalSilver)} Pratas\n(100 Prata = 1 Ouro | 100 Ouro = 1 Cristal)`}
+            title={`Saldo da Carteira:\nCristal: ${formatGoldNumber(playerWallet.basalt || 0)}\nOuro: ${formatGoldNumber(playerWallet.gold || 0)}\nPrata: ${formatGoldNumber(playerWallet.silver || 0)}`}
           >
             {playerWallet.basalt > 0 && (
-              <div className="header-coin-chip" title={`Moedas de Cristal (${formatGoldNumber(playerWallet.basalt * 100)} Ouro)`}>
+              <div className="header-coin-chip" title={`Moedas de Cristal (${formatGoldNumber((playerWallet.basalt || 0) * 500)} Ouro)`}>
                 <CoinIcon type="basalt" amount={playerWallet.basalt} size={18} showAmount />
               </div>
             )}
-            <div className="header-coin-chip" title="Moedas de Ouro">
+            <div className="header-coin-chip" title={`Moedas de Ouro (${formatGoldNumber((playerWallet.gold || 0) * 100)} Prata)`}>
               <CoinIcon type="gold" amount={playerWallet.gold} size={18} showAmount />
             </div>
             <div className="header-coin-chip" title="Moedas de Prata">
               <CoinIcon type="silver" amount={playerWallet.silver} size={18} showAmount />
             </div>
-            <div className="header-coin-total" title="Saldo total">
-              <span className="total-label">Total:</span>
-              <span className="total-amount">
-                {playerWallet.gold > 0 || playerWallet.basalt > 0
-                  ? `${formatGoldNumber(playerWallet.gold + playerWallet.basalt * 100)}o ${playerWallet.silver}p`
-                  : `${playerWallet.silver}p`}
-              </span>
-              <span className="total-gold-icon">🪙</span>
-            </div>
+            {onOpenExchange && (
+              <button
+                className="btn-header-exchange"
+                onClick={onOpenExchange}
+                title="Abrir Casa de Câmbio de Moedas"
+              >
+                ⚖️ Câmbio
+              </button>
+            )}
           </div>
 
           <button className="btn-modal-close" onClick={onClose} title="Fechar Mochila">

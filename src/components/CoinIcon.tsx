@@ -1,4 +1,10 @@
-import { type CoinType, COIN_CONFIGS, getCoinFrameIndex } from '../game/currency';
+import {
+  type CoinType,
+  COIN_CONFIGS,
+  getCoinFrameIndex,
+  formatCompactCurrency,
+  formatGoldNumber,
+} from '../game/currency';
 
 interface CoinIconProps {
   type: CoinType;
@@ -27,7 +33,7 @@ export default function CoinIcon({
   return (
     <div
       className={`coin-icon-wrapper ${className}`}
-      title={`${amount}x ${config.name}`}
+      title={`${formatGoldNumber(amount)}x ${config.name}`}
       style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
     >
       <div
@@ -53,7 +59,7 @@ export default function CoinIcon({
             fontFamily: 'monospace, sans-serif',
           }}
         >
-          {amount}
+          {formatCompactCurrency(amount)}
         </span>
       )}
     </div>
