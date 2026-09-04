@@ -84,8 +84,8 @@ export function drawTileLayer(
           if (!img) continue;
 
           const { sx, sy, sw, sh } = getTileCoords(activeGid, tileset);
-          const screenX = worldX - cameraX + offsetX;
-          const screenY = worldY - cameraY + offsetY;
+          const screenX = Math.round(worldX - cameraX + offsetX);
+          const screenY = Math.round(worldY - cameraY + offsetY);
 
           ctx.drawImage(img, sx, sy, sw, sh, screenX, screenY, tw, th);
         }
@@ -124,8 +124,8 @@ export function drawTileLayer(
         if (!img) continue;
 
         const { sx, sy, sw, sh } = getTileCoords(activeGid, tileset);
-        const screenX = worldX - cameraX + offsetX;
-        const screenY = worldY - cameraY + offsetY;
+        const screenX = Math.round(worldX - cameraX + offsetX);
+        const screenY = Math.round(worldY - cameraY + offsetY);
 
         ctx.drawImage(img, sx, sy, sw, sh, screenX, screenY, tw, th);
       }
@@ -235,8 +235,8 @@ export function getLayerRenderables(
       type: 'tiled-obj',
       sortY: -999999, // Ground level: player and monsters always walk OVER flowers/plants
       draw: (ctx: CanvasRenderingContext2D) => {
-        const screenX = worldX - cameraX;
-        const screenY = worldY - cameraY;
+        const screenX = Math.round(worldX - cameraX);
+        const screenY = Math.round(worldY - cameraY);
         ctx.drawImage(img, sx, sy, sw, sh, screenX, screenY, obj.width, obj.height);
       },
     });
@@ -246,7 +246,13 @@ export function getLayerRenderables(
   for (const obj of standingObjects) {
     const worldX = obj.x + offsetX;
     const worldY = obj.y - obj.height + offsetY;
-    const sortY = obj.y + offsetY;
+    // sortY = bottom of the object's bottom tile row (obj.y in Tiled = base of the object).
+    // For tall objects like trees the character should pass IN FRONT when their feet
+    // are below the trunk base, and BEHIND when above it.
+    // We subtract the tile height so the sort point is the top of the bottom tile
+    // (i.e. where the trunk ends / trunk base begins), which is the natural occlusion line.
+    const tileH = map.tileheight || 32;
+    const sortY = obj.y + offsetY - (obj.height > tileH ? (obj.height - tileH) : 0);
 
     if (
       worldX + obj.width < viewLeft ||
@@ -269,8 +275,8 @@ export function getLayerRenderables(
       type: 'tiled-obj',
       sortY,
       draw: (ctx: CanvasRenderingContext2D) => {
-        const screenX = worldX - cameraX;
-        const screenY = worldY - cameraY;
+        const screenX = Math.round(worldX - cameraX);
+        const screenY = Math.round(worldY - cameraY);
         ctx.drawImage(img, sx, sy, sw, sh, screenX, screenY, obj.width, obj.height);
       },
     });
