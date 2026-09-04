@@ -9,14 +9,9 @@ interface InstallModalProps {
 
 export const InstallModal: React.FC<InstallModalProps> = ({ isIOS, canInstall, onInstall }) => {
   const [installing, setInstalling] = useState(false);
-  const [showIOSSteps, setShowIOSSteps] = useState(false);
 
   const handleInstall = async () => {
-    if (isIOS) {
-      setShowIOSSteps(true);
-      return;
-    }
-    if (!canInstall) return;
+    if (isIOS || !canInstall) return;
     setInstalling(true);
     const success = await onInstall();
     if (!success) setInstalling(false);
@@ -24,6 +19,9 @@ export const InstallModal: React.FC<InstallModalProps> = ({ isIOS, canInstall, o
 
   return (
     <div style={styles.overlay}>
+      {/* Bloqueio total de toque — nenhum elemento abaixo recebe eventos */}
+      <div style={styles.touchBlocker} onTouchStart={e => e.stopPropagation()} />
+
       <div style={styles.particles}>
         {Array.from({ length: 20 }).map((_, i) => (
           <div key={i} style={{ ...styles.particle, ...getParticleStyle(i) }} />
@@ -52,8 +50,8 @@ export const InstallModal: React.FC<InstallModalProps> = ({ isIOS, canInstall, o
           <div style={styles.warningIcon}>⚠</div>
           <p style={styles.warningText}>
             {isIOS
-              ? 'Para jogar no iPhone ou iPad, adicione o jogo à sua tela inicial.'
-              : 'Instale o jogo para jogar! Salve todos os dados offline e tenha acesso completo.'}
+              ? 'Para jogar no iPhone/iPad, adicione o jogo à sua Tela de Início.'
+              : 'Instale o jogo para jogar! Você precisa instalar para ter acesso ao jogo.'}
           </p>
         </div>
 
@@ -67,13 +65,13 @@ export const InstallModal: React.FC<InstallModalProps> = ({ isIOS, canInstall, o
           ))}
         </div>
 
-        {/* iOS Steps */}
-        {showIOSSteps && (
+        {/* iOS — mostra passos diretamente, sem necessidade de clique */}
+        {isIOS ? (
           <div style={styles.iosSteps}>
-            <p style={styles.iosTitle}>Como instalar no iOS:</p>
+            <p style={styles.iosTitle}>📲 Como instalar agora:</p>
             <div style={styles.iosStep}>
               <span style={styles.iosStepNum}>1</span>
-              <span>Toque no ícone <strong style={styles.iosIcon}>□↑</strong> de compartilhar</span>
+              <span>Toque no ícone <strong style={styles.iosIcon}>□↑</strong> de compartilhar (barra inferior do Safari)</span>
             </div>
             <div style={styles.iosStep}>
               <span style={styles.iosStepNum}>2</span>
@@ -85,18 +83,19 @@ export const InstallModal: React.FC<InstallModalProps> = ({ isIOS, canInstall, o
             </div>
             <div style={styles.iosStep}>
               <span style={styles.iosStepNum}>4</span>
-              <span>Abra o app da sua tela inicial 🎮</span>
+              <span>Abra <strong style={styles.iosHighlight}>Oliver b25l</strong> da sua tela inicial 🎮</span>
             </div>
+            <p style={styles.iosWait}>
+              Após instalar, abra pelo ícone na tela inicial para jogar em tela cheia!
+            </p>
           </div>
-        )}
-
-        {/* Install Button */}
-        {!showIOSSteps ? (
+        ) : (
+          /* Android/Chrome — botão de install direto */
           <button
             id="pwa-install-btn"
             style={{ ...styles.installBtn, ...(installing ? styles.installBtnLoading : {}) }}
             onClick={handleInstall}
-            disabled={installing || (!canInstall && !isIOS)}
+            disabled={installing || !canInstall}
           >
             {installing ? (
               <span style={styles.btnContent}>
@@ -105,14 +104,10 @@ export const InstallModal: React.FC<InstallModalProps> = ({ isIOS, canInstall, o
             ) : (
               <span style={styles.btnContent}>
                 <span style={styles.btnIcon}>⬇</span>
-                {isIOS ? 'Ver como instalar' : 'Instalar o Jogo'}
+                Instalar o Jogo
               </span>
             )}
           </button>
-        ) : (
-          <p style={styles.iosWait}>
-            Após instalar, abra o app da sua tela inicial para jogar!
-          </p>
         )}
 
         {/* Bottom ornament */}
@@ -153,6 +148,16 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    // Garante que nenhum toque ou click passe para o jogo abaixo
+    touchAction: 'none',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+  },
+  // Camada extra de bloqueio para iOS — cobre toda a área abaixo do modal
+  touchBlocker: {
+    position: 'absolute',
+    inset: 0,
+    zIndex: 0,
   },
   particles: {
     position: 'absolute',
@@ -179,6 +184,7 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     fontFamily: '"Segoe UI", system-ui, -apple-system, sans-serif',
     scrollbarWidth: 'none',
+    touchAction: 'pan-y', // permite scroll dentro do modal
   },
   ornamentTop: {
     display: 'flex',
@@ -266,14 +272,13 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid rgba(150,120,255,0.3)',
     borderRadius: 10,
     padding: '14px 16px',
-    marginBottom: 20,
     textAlign: 'left',
   },
   iosTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 700,
     color: '#c8a0ff',
-    margin: '0 0 12px',
+    margin: '0 0 14px',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -281,17 +286,18 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'flex-start',
     gap: 10,
-    marginBottom: 10,
+    marginBottom: 12,
     fontSize: 13,
-    color: 'rgba(220,210,255,0.85)',
+    color: 'rgba(220,210,255,0.9)',
+    lineHeight: 1.5,
   },
   iosStepNum: {
     background: 'rgba(150,120,255,0.3)',
     color: '#c8a0ff',
     borderRadius: '50%',
-    width: 20,
-    height: 20,
-    display: 'flex',
+    width: 22,
+    height: 22,
+    display: 'flex' as const,
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: 11,
@@ -300,20 +306,23 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 1,
   },
   iosIcon: {
-    background: 'rgba(0,120,255,0.3)',
+    background: 'rgba(0,120,255,0.25)',
     borderRadius: 4,
-    padding: '0 4px',
-    color: '#60a0ff',
+    padding: '1px 5px',
+    color: '#60b0ff',
+    fontWeight: 800,
   },
   iosHighlight: {
     color: '#ffd700',
     fontWeight: 700,
   },
   iosWait: {
-    fontSize: 13,
-    color: 'rgba(200,210,255,0.7)',
+    fontSize: 12,
+    color: 'rgba(200,210,255,0.6)',
+    margin: '14px 0 0',
     lineHeight: 1.6,
-    margin: '0 0 10px',
+    borderTop: '1px solid rgba(150,120,255,0.2)',
+    paddingTop: 12,
   },
   installBtn: {
     width: '100%',
@@ -328,8 +337,6 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: 0.5,
     transition: 'all 0.2s ease',
     boxShadow: '0 4px 20px rgba(200,160,0,0.4), 0 1px 0 rgba(255,255,255,0.2) inset',
-    position: 'relative',
-    overflow: 'hidden',
   },
   installBtnLoading: {
     opacity: 0.7,

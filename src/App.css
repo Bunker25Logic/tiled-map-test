@@ -15,6 +15,32 @@
   from { transform: translateY(30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+@keyframes spinOrientation {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes fadeOutOrientation {
+  from { opacity: 1; }
+  to   { opacity: 0; pointer-events: none; }
+}
+
+/* ─── Forced Landscape (iOS / PWA) ────────────────────────────────────────── */
+/*
+ * iOS Safari ignores manifest orientation and screen.orientation.lock().
+ * When OrientationLockModal detects portrait on mobile, it adds .force-landscape
+ * to <html>. This CSS then rotates #root so the content appears in landscape
+ * regardless of how the device is held — no manual rotation needed.
+ */
+html.force-landscape #root {
+  transform: rotate(90deg);
+  transform-origin: left top;
+  width: 100dvh;      /* swap axes: new "width" = device height */
+  height: 100dvw;     /* new "height" = device width */
+  position: fixed;
+  top: 100%;
+  left: 0;
+  overflow: hidden;
+}
 
 /* ─── Global Reset & Layout ────────────────────────────────────────────────── */
 * {

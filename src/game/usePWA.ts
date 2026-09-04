@@ -13,26 +13,34 @@ declare global {
   }
 }
 
-// Valores derivados do ambiente — calculados uma única vez, fora do ciclo React,
-// pois navigator.userAgent e window.matchMedia não mudam durante a sessão.
+// Valores derivados do ambiente — calculados uma única vez, fora do ciclo React.
+// Usa APENAS o user-agent para mobile/iOS — não usa innerWidth porque no iOS em
+// landscape o innerWidth pode ser > 768px e a detecção falharia.
 function detectEnv() {
   const ua = navigator.userAgent;
+
+  // Mobile = qualquer device com UA de celular/tablet, independente da orientação
   const isMobile =
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) ||
-    window.innerWidth <= 768;
+    // fallback para dispositivos sem UA padrão (ex: tablets genéricos)
+    window.matchMedia('(pointer: coarse)').matches;
+
+  // iOS = iPhone, iPad (incluindo iPad que reporta como "Macintosh" no iOS 13+)
   const isIOS =
-    /iPad|iPhone|iPod/.test(ua) &&
-    !(window as unknown as { MSStream: unknown }).MSStream;
+    /iPad|iPhone|iPod/.test(ua) ||
+    // iPad iOS 13+ se passa por Mac mas tem touch
+    (ua.includes('Mac') && navigator.maxTouchPoints > 1);
+
+  // Instalado = rodando como PWA standalone/fullscreen
   const isInstalled =
     window.matchMedia('(display-mode: fullscreen)').matches ||
     window.matchMedia('(display-mode: standalone)').matches ||
     (navigator as unknown as { standalone?: boolean }).standalone === true;
+
   return { isMobile, isIOS, isInstalled };
 }
 
 export function usePWA() {
-  // Inicialização lazy: detectEnv() roda apenas na primeira renderização,
-  // sem useEffect — elimina o setState síncrono dentro de effect.
   const [isMobile] = useState(() => detectEnv().isMobile);
   const [isIOS] = useState(() => detectEnv().isIOS);
   const [isInstalled, setIsInstalled] = useState(() => detectEnv().isInstalled);
@@ -96,7 +104,7 @@ export function usePWA() {
     updateServiceWorker(true);
   };
 
-  // Mostra modal de instalação quando: mobile E não instalado
+  // Mostra modal de instalação quando: é mobile E não está instalado como PWA
   const showInstallModal = isMobile && !isInstalled;
 
   return {
