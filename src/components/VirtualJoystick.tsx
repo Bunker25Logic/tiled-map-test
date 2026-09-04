@@ -6,6 +6,8 @@ interface VirtualJoystickProps {
   onAttack: () => void;
   onEnterPortal?: () => void;
   hasPortalNearby?: boolean;
+  onInteractNPC?: () => void;
+  hasNPCNearby?: boolean;
   onOpenInventory?: () => void;
 }
 
@@ -15,6 +17,8 @@ export default function VirtualJoystick({
   onAttack,
   onEnterPortal,
   hasPortalNearby,
+  onInteractNPC,
+  hasNPCNearby,
   onOpenInventory,
 }: VirtualJoystickProps) {
   const [joystickActive, setJoystickActive] = useState(false);
@@ -138,6 +142,21 @@ export default function VirtualJoystick({
 
       {/* Floating Action Buttons for Right Thumb on Mobile */}
       <div className="mobile-actions-right">
+        {hasNPCNearby && onInteractNPC && (
+          <button
+            className="btn-mobile-action btn-mobile-npc"
+            onTouchStart={(e) => {
+              e.stopPropagation();
+              onInteractNPC();
+            }}
+            onClick={onInteractNPC}
+            title="Conversar com NPC"
+          >
+            <span className="mobile-action-icon">💬</span>
+            <span className="mobile-action-text">Falar</span>
+          </button>
+        )}
+
         {hasPortalNearby && onEnterPortal && (
           <button
             className="btn-mobile-action btn-mobile-portal"

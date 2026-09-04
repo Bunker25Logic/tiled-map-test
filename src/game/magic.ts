@@ -77,12 +77,14 @@ export interface SpellDef {
   damage?: number;
   damageRadius?: number;
   isHoming?: boolean;
+  requiredLevel?: number;
 }
 
 export const ALL_SPELLS: SpellDef[] = [
   // ─── Elemental Spells ──────────────────────────────────────────────────────
   {
     id: 'firelion',
+    requiredLevel: 1,
     allowedClasses: ["luxio","magician"],
     damage: 70,
     manaCost: 30,
@@ -120,6 +122,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'lightningclaw',
+    requiredLevel: 1,
     allowedClasses: ["luxio","paladin"],
     damage: 65,
     manaCost: 25,
@@ -147,6 +150,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'iceshield',
+    requiredLevel: 6,
     allowedClasses: ["paladin","magician"],
     damage: 30,
     manaCost: 20,
@@ -175,6 +179,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'tornado',
+    requiredLevel: 10,
     allowedClasses: ["luxio","archer","magician"],
     damage: 70,
     manaCost: 30,
@@ -203,6 +208,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'torrentacle',
+    requiredLevel: 12,
     allowedClasses: ["paladin","magician"],
     damage: 75,
     manaCost: 32,
@@ -230,6 +236,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'spikes',
+    requiredLevel: 14,
     allowedClasses: ["necromancer","luxio","paladin"],
     damage: 65,
     manaCost: 24,
@@ -257,6 +264,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'turtleshell',
+    requiredLevel: 8,
     allowedClasses: ["paladin","luxio"],
     damage: 25,
     manaCost: 18,
@@ -287,6 +295,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'snakebite',
+    requiredLevel: 1,
     allowedClasses: ["archer","necromancer"],
     damage: 50,
     manaCost: 22,
@@ -326,6 +335,7 @@ export const ALL_SPELLS: SpellDef[] = [
   // ─── Fireball (Mage & Elemental) ─────────────────────────────────────────
   {
     id: 'fireball',
+    requiredLevel: 1,
     allowedClasses: ['magician', 'necromancer'],
     damage: 65,
     manaCost: 20,
@@ -358,6 +368,7 @@ export const ALL_SPELLS: SpellDef[] = [
   // ─── Fireball & Particle Blasts ───────────────────────────────────────────
   {
     id: 'sparkling_fireball',
+    requiredLevel: 4,
     allowedClasses: ["luxio","magician","paladin"],
     damage: 55,
     manaCost: 20,
@@ -387,6 +398,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'wind_fireball',
+    requiredLevel: 4,
     allowedClasses: ["archer","magician"],
     damage: 60,
     manaCost: 22,
@@ -418,6 +430,7 @@ export const ALL_SPELLS: SpellDef[] = [
   // ─── Magias Exclusivas do Necromante ────────────────────────────────────────
   {
     id: 'necro_orb',
+    requiredLevel: 1,
     allowedClasses: ["necromancer"],
     name: 'Miasma Sombrio',
     category: 'arcane',
@@ -448,6 +461,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'necro_reaper',
+    requiredLevel: 6,
     allowedClasses: ["necromancer"],
     name: 'Ceifador Espectral',
     category: 'arcane',
@@ -478,6 +492,7 @@ export const ALL_SPELLS: SpellDef[] = [
   // ─── Arcane Magic ────────────────────────────────────────────────────────
   {
     id: 'arcane_nova',
+    requiredLevel: 4,
     allowedClasses: ["magician","luxio"],
     damage: 85,
     manaCost: 38,
@@ -502,6 +517,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'arcane_astral',
+    requiredLevel: 8,
     allowedClasses: ["magician","necromancer"],
     damage: 90,
     manaCost: 40,
@@ -526,6 +542,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'arcane_sanctuary',
+    requiredLevel: 4,
     allowedClasses: ["paladin"],
     damage: 40,
     manaCost: 25,
@@ -551,6 +568,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'arcane_vortex',
+    requiredLevel: 20,
     allowedClasses: ["magician"],
     damage: 95,
     manaCost: 42,
@@ -577,6 +595,7 @@ export const ALL_SPELLS: SpellDef[] = [
   // ─── Nature Magic ────────────────────────────────────────────────────────
   {
     id: 'nature_roots',
+    requiredLevel: 1,
     allowedClasses: ["archer"],
     damage: 55,
     manaCost: 22,
@@ -600,6 +619,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'nature_vines',
+    requiredLevel: 8,
     allowedClasses: ["archer"],
     damage: 65,
     manaCost: 26,
@@ -624,6 +644,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'leaf_tempest',
+    requiredLevel: 6,
     allowedClasses: ["archer"],
     damage: 70,
     manaCost: 28,
@@ -648,6 +669,7 @@ export const ALL_SPELLS: SpellDef[] = [
   },
   {
     id: 'nature_spores',
+    requiredLevel: 12,
     allowedClasses: ["necromancer","archer"],
     damage: 80,
     manaCost: 32,

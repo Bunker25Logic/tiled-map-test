@@ -27,6 +27,13 @@ export default function PlayerHUD({
         <span className="hud-level-number">{currentLevel}</span>
       </div>
 
+      {/* Bênção do Templo Ativa */}
+      {character.hasBlessing && (
+        <div className="hud-blessing-badge" title="✨ Bênção do Templo Ativa! Perda de XP na morte reduzida para apenas 2%">
+          <span className="hud-blessing-icon">🛡️</span>
+        </div>
+      )}
+
 
       {/* XP Bar */}
       <div className="hud-bar-row hud-xp-row" title={`XP: ${character.xp.toLocaleString()} • Próximo nível em ${xpNeeded.toLocaleString()} XP`}>

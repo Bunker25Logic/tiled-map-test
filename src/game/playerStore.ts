@@ -13,7 +13,9 @@ import {
   DEFAULT_INVENTORY_ITEMS,
   type EquippedGear,
   type ItemDef,
+  ALL_ITEMS,
 } from './items';
+import { getTotalSilverValue } from './currency';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -39,6 +41,7 @@ export interface PlayerCharacter {
   lastPos: { x: number; y: number } | null;
   equippedGear?: EquippedGear;
   inventory?: ItemDef[];
+  hasBlessing?: boolean;
   createdAt: number;
 }
 
@@ -192,6 +195,7 @@ export function createCharacter(
     lastPos: null,
     equippedGear: { ...DEFAULT_EQUIPPED_GEAR },
     inventory: DEFAULT_INVENTORY_ITEMS.map((it) => ({ ...it })),
+    hasBlessing: false,
     createdAt: Date.now(),
   };
   account.characters.push(newChar);
@@ -442,6 +446,7 @@ export interface DeathPenaltyResult {
   lostXp: number;
   oldLevel: number;
   newLevel: number;
+  protectedByBlessing: boolean;
 }
 
 export function applyDeathPenalty(
@@ -450,13 +455,18 @@ export function applyDeathPenalty(
 ): DeathPenaltyResult {
   const char = account.characters[charIndex];
   if (!char) {
-    return { account, lostXp: 0, oldLevel: 1, newLevel: 1 };
+    return { account, lostXp: 0, oldLevel: 1, newLevel: 1, protectedByBlessing: false };
   }
   const oldLevel = getLevelFromXP(char.xp);
 
-  // Tibia standard death penalty: lose 10% of total XP
-  const lostXp = Math.floor(char.xp * 0.10);
+  // Tibia death penalty: 10% normally, or 2% if protected by Temple Blessing
+  const hadBlessing = Boolean(char.hasBlessing);
+  const penaltyRate = hadBlessing ? 0.02 : 0.10;
+  const lostXp = Math.floor(char.xp * penaltyRate);
   char.xp = Math.max(0, char.xp - lostXp);
+
+  // Blessing is consumed on death
+  char.hasBlessing = false;
 
   const newLevel = getLevelFromXP(char.xp);
 
@@ -473,7 +483,155 @@ export function applyDeathPenalty(
   char.lastPos = { x: 0, y: 0 };
 
   saveAccount(account);
-  return { account, lostXp, oldLevel, newLevel };
+  return { account, lostXp, oldLevel, newLevel, protectedByBlessing: hadBlessing };
+}
+
+/**
+ * Deducts silver value from player wallet, converting higher denomination coins as needed.
+ */
+export function deductWalletSilver(wallet: PlayerWallet, costInSilver: number): boolean {
+  const total = getTotalSilverValue(wallet);
+  if (total < costInSilver) return false;
+
+  let remaining = total - costInSilver;
+  const basalt = Math.floor(remaining / 50000);
+  remaining %= 50000;
+  const gold = Math.floor(remaining / 100);
+  const silver = remaining % 100;
+
+  wallet.basalt = basalt;
+  wallet.gold = gold;
+  wallet.silver = silver;
+  return true;
+}
+
+/**
+ * Buys a Temple Blessing for 10 Gold (1000 Silver), protecting player from losing 10% XP on next death.
+ */
+export function buyTempleBlessing(
+  account: PlayerAccount,
+  charIndex: number,
+  costInGold = 10
+): { account: PlayerAccount; success: boolean; message: string } {
+  const char = account.characters[charIndex];
+  if (!char) return { account, success: false, message: 'Personagem não encontrado' };
+
+  if (char.hasBlessing) {
+    return { account, success: false, message: 'Você já possui a Bênção do Templo ativa!' };
+  }
+
+  const wallet = char.wallet || getDefaultWallet();
+  const costSilver = costInGold * 100;
+
+  if (!deductWalletSilver(wallet, costSilver)) {
+    return { account, success: false, message: `Moedas insuficientes! Necessário: ${costInGold} Moedas de Ouro.` };
+  }
+
+  char.wallet = wallet;
+  char.hasBlessing = true;
+  saveAccount(account);
+
+  return {
+    account,
+    success: true,
+    message: '✨ Você recebeu a Bênção Sagrada do Templo! Sua perda de XP na próxima morte será de apenas 2%.',
+  };
+}
+
+/**
+ * Buys an item from an NPC shop.
+ */
+export function buyItemFromShop(
+  account: PlayerAccount,
+  charIndex: number,
+  itemId: string,
+  count = 1
+): { account: PlayerAccount; success: boolean; message: string } {
+  const char = account.characters[charIndex];
+  if (!char) return { account, success: false, message: 'Personagem não encontrado' };
+
+  const itemDef = ALL_ITEMS[itemId];
+  if (!itemDef) return { account, success: false, message: 'Item não encontrado' };
+
+  const unitPrice = itemDef.buyPriceSilver ?? 100;
+  const totalPrice = unitPrice * count;
+
+  const wallet = char.wallet || getDefaultWallet();
+  if (!deductWalletSilver(wallet, totalPrice)) {
+    return { account, success: false, message: `Moedas insuficientes! Preço: ${totalPrice} Pratas.` };
+  }
+
+  char.wallet = wallet;
+  const inventory = char.inventory || [];
+
+  // If potion or stackable, increase quantity
+  const existing = inventory.find((i) => i.id === itemDef.id);
+  if (existing && itemDef.slotType === 'potion') {
+    existing.quantity = (existing.quantity || 1) + (itemDef.quantity ? itemDef.quantity * count : count);
+  } else {
+    // Add new item entry
+    inventory.push({
+      ...itemDef,
+      quantity: itemDef.slotType === 'potion' ? (itemDef.quantity ? itemDef.quantity * count : count) : 1,
+    });
+  }
+
+  char.inventory = inventory;
+  saveAccount(account);
+
+  return {
+    account,
+    success: true,
+    message: `Comprou ${count}x ${itemDef.name}!`,
+  };
+}
+
+/**
+ * Sells an item from player's inventory to an NPC.
+ */
+export function sellItemToShop(
+  account: PlayerAccount,
+  charIndex: number,
+  itemIndex: number,
+  count = 1
+): { account: PlayerAccount; success: boolean; message: string; earnedSilver: number } {
+  const char = account.characters[charIndex];
+  if (!char) return { account, success: false, message: 'Personagem não encontrado', earnedSilver: 0 };
+
+  const inventory = char.inventory || [];
+  const item = inventory[itemIndex];
+  if (!item) return { account, success: false, message: 'Item não está na mochila', earnedSilver: 0 };
+
+  const unitSell = item.sellPriceSilver ?? Math.max(10, Math.floor((item.buyPriceSilver || 100) * 0.35));
+  const earnedSilver = unitSell * count;
+
+  // Reduce quantity or remove item
+  if (item.quantity && item.quantity > count) {
+    item.quantity -= count;
+  } else {
+    inventory.splice(itemIndex, 1);
+  }
+
+  char.inventory = inventory;
+  const wallet = char.wallet || getDefaultWallet();
+  wallet.silver = (wallet.silver || 0) + earnedSilver;
+
+  // Auto-pack silver to gold if exceeds 100
+  if (wallet.silver >= 100) {
+    const extraGold = Math.floor(wallet.silver / 100);
+    wallet.silver %= 100;
+    wallet.gold = (wallet.gold || 0) + extraGold;
+  }
+
+  char.wallet = wallet;
+  saveAccount(account);
+
+  return {
+    account,
+    success: true,
+    message: `Vendeu ${count}x ${item.name} por ${earnedSilver} Pratas!`,
+    earnedSilver,
+  };
 }
 
 export function saveSession(name: string): void {

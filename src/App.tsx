@@ -20,8 +20,10 @@ import PlayerHUD from './components/PlayerHUD';
 import WorldLoadingScreen from './components/WorldLoadingScreen';
 import DeathModal from './components/DeathModal';
 import CurrencyExchangeModal from './components/CurrencyExchangeModal';
+import NPCModal from './components/NPCModal';
 import WeaponOffsetCalibrator from './components/WeaponOffsetCalibrator';
 import type { Direction } from './game/types';
+import type { NPCDef } from './game/npc';
 import { ITEM_OFFSETS, type ItemOffsetConfig } from './game/itemOffsets';
 import {
   type ItemDef,
@@ -45,6 +47,9 @@ import {
   addCoinsToCharacter,
   exchangeCharacterCoins,
   type ExchangeOperation,
+  buyItemFromShop,
+  sellItemToShop,
+  buyTempleBlessing,
   getLevelFromXP,
   loadSession,
   loadAccount,
@@ -128,7 +133,8 @@ export default function App() {
   const [playerMp, setPlayerMp] = useState(80);
   const [playerMaxMp, setPlayerMaxMp] = useState(80);
   const [levelUpMsg, setLevelUpMsg] = useState<string | null>(null);
-  const [deathResult, setDeathResult] = useState<{ lostXp: number; oldLevel: number; newLevel: number } | null>(null);
+  const [deathResult, setDeathResult] = useState<{ lostXp: number; oldLevel: number; newLevel: number; protectedByBlessing?: boolean } | null>(null);
+  const [activeNPC, setActiveNPC] = useState<NPCDef | null>(null);
 
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [isReloading, setIsReloading] = useState(false);
@@ -395,7 +401,7 @@ export default function App() {
     const acc = accountRef.current;
     if (!acc) return;
     const charIdx = activeCharIndexRef.current;
-    const { account: updatedAccount, lostXp, oldLevel, newLevel } = applyDeathPenalty(acc, charIdx);
+    const { account: updatedAccount, lostXp, oldLevel, newLevel, protectedByBlessing } = applyDeathPenalty(acc, charIdx);
     const cloned = { ...updatedAccount, characters: [...updatedAccount.characters] };
     setAccount(cloned);
     accountRef.current = cloned;
@@ -406,7 +412,7 @@ export default function App() {
       setPlayerMp(char.maxMp);
       setPlayerMaxMp(char.maxMp);
     }
-    setDeathResult({ lostXp, oldLevel, newLevel });
+    setDeathResult({ lostXp, oldLevel, newLevel, protectedByBlessing });
   }, []);
 
   const handleRespawnAtTemple = useCallback(() => {
@@ -511,6 +517,50 @@ export default function App() {
     },
     []
   );
+
+  const handleBuyItemFromNPC = useCallback((itemId: string, count = 1) => {
+    const acc = accountRef.current;
+    if (!acc || acc.characters.length === 0) return { success: false, message: 'Conta não encontrada' };
+    const res = buyItemFromShop(acc, activeCharIndexRef.current, itemId, count);
+    if (res.success) {
+      const cloned = { ...res.account, characters: [...res.account.characters] };
+      setAccount(cloned);
+      accountRef.current = cloned;
+      const char = cloned.characters[activeCharIndexRef.current];
+      if (char?.inventory) {
+        setInventoryItems([...char.inventory]);
+      }
+    }
+    return { success: res.success, message: res.message };
+  }, []);
+
+  const handleSellItemToNPC = useCallback((itemIndex: number, count = 1) => {
+    const acc = accountRef.current;
+    if (!acc || acc.characters.length === 0) return { success: false, message: 'Conta não encontrada' };
+    const res = sellItemToShop(acc, activeCharIndexRef.current, itemIndex, count);
+    if (res.success) {
+      const cloned = { ...res.account, characters: [...res.account.characters] };
+      setAccount(cloned);
+      accountRef.current = cloned;
+      const char = cloned.characters[activeCharIndexRef.current];
+      if (char?.inventory) {
+        setInventoryItems([...char.inventory]);
+      }
+    }
+    return { success: res.success, message: res.message };
+  }, []);
+
+  const handleBuyBlessingFromNPC = useCallback(() => {
+    const acc = accountRef.current;
+    if (!acc || acc.characters.length === 0) return { success: false, message: 'Conta não encontrada' };
+    const res = buyTempleBlessing(acc, activeCharIndexRef.current, 10);
+    if (res.success) {
+      const cloned = { ...res.account, characters: [...res.account.characters] };
+      setAccount(cloned);
+      accountRef.current = cloned;
+    }
+    return { success: res.success, message: res.message };
+  }, []);
 
   const handleCollectLoot = useCallback(
     (silver: number, itemId?: string) => {
@@ -858,6 +908,7 @@ export default function App() {
           onOpenInventory={() => setIsInventoryOpen(true)}
           onCollectLoot={handleCollectLoot}
           onCollectCoins={handleCollectCoins}
+          onInteractNPC={(npc) => setActiveNPC(npc)}
         />
 
         <Minimap
@@ -961,6 +1012,7 @@ export default function App() {
         onUnequipSpell={handleUnequipSpell}
         onCastPreview={handleCastSpell}
         characterId={selectedCharacterId}
+        playerLevel={xpLevel}
       />
       <InventoryModal
         isOpen={isInventoryOpen}
@@ -1013,9 +1065,26 @@ export default function App() {
           lostXp={deathResult.lostXp}
           oldLevel={deathResult.oldLevel}
           newLevel={deathResult.newLevel}
+          protectedByBlessing={deathResult.protectedByBlessing}
           onRespawn={handleRespawnAtTemple}
         />
       )}
+
+      {/* NPC Interaction & Shop Modal */}
+      <NPCModal
+        npc={activeNPC}
+        isOpen={Boolean(activeNPC)}
+        onClose={() => setActiveNPC(null)}
+        playerLevel={xpLevel}
+        playerCharacterId={selectedCharacterId}
+        playerWallet={account?.characters[activeCharIndex]?.wallet}
+        playerInventory={inventoryItems}
+        hasBlessing={Boolean(account?.characters[activeCharIndex]?.hasBlessing)}
+        onBuyItem={handleBuyItemFromNPC}
+        onSellItem={handleSellItemToNPC}
+        onBuyBlessing={handleBuyBlessingFromNPC}
+      />
+
       <OrientationLockModal />
 
       {/* ── PWA System ── */}

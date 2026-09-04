@@ -10,6 +10,7 @@ interface SpellbookModalProps {
   onUnequipSpell?: (slotIndex: number) => void;
   onCastPreview?: (spell: SpellDef) => void;
   characterId?: CharacterId;
+  playerLevel?: number;
 }
 
 interface FeedbackToast {
@@ -26,6 +27,7 @@ export default function SpellbookModal({
   onUnequipSpell,
   onCastPreview,
   characterId,
+  playerLevel = 1,
 }: SpellbookModalProps) {
   const [selectedSlot, setSelectedSlot] = useState<number>(0);
   const [activeCategory, setActiveCategory] = useState<'all' | 'elemental' | 'arcane' | 'nature'>('all');
@@ -87,6 +89,10 @@ export default function SpellbookModal({
 
   const handleEquip = (slotIdx: number, spell: SpellDef, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    if (spell.requiredLevel && playerLevel < spell.requiredLevel) {
+      showToast(`Nível insuficiente! Requer Nível ${spell.requiredLevel}.`, 'warn', '🔒');
+      return;
+    }
     onEquipSpell(slotIdx, spell.id);
     triggerPulse(slotIdx);
     showToast(`${spell.name} equipado no Slot ${slotIdx + 1}!`, 'success', spell.icon);
@@ -280,6 +286,10 @@ export default function SpellbookModal({
                 const isClassRestricted = Boolean(
                   spell.classRestriction && characterId && spell.classRestriction !== characterId
                 );
+                const isLevelLocked = Boolean(
+                  spell.requiredLevel && playerLevel < spell.requiredLevel
+                );
+                const isBlocked = isClassRestricted || isLevelLocked;
 
                 const spellTypeLabel = spell.isHoming
                   ? '🎯 Teleguiado'
@@ -294,10 +304,12 @@ export default function SpellbookModal({
                     key={spell.id}
                     className={`spell-catalog-card spell-slider-card ${
                       isEquippedInActiveSlot ? 'equipped-here' : ''
-                    } ${isClassRestricted ? 'class-locked' : ''}`}
+                    } ${isClassRestricted ? 'class-locked' : ''} ${isLevelLocked ? 'level-locked' : ''}`}
                     onClick={(e) => {
-                      if (!isClassRestricted) {
+                      if (!isBlocked) {
                         handleEquip(selectedSlot, spell, e);
+                      } else if (isLevelLocked) {
+                        showToast(`Requer Nível ${spell.requiredLevel} para desbloquear!`, 'warn', '🔒');
                       }
                     }}
                   >
@@ -321,6 +333,15 @@ export default function SpellbookModal({
                           >
                             {spell.category.toUpperCase()}
                           </span>
+                          {spell.requiredLevel && (
+                            <span
+                              className={`spell-level-badge ${
+                                isLevelLocked ? 'locked' : 'unlocked'
+                              }`}
+                            >
+                              {isLevelLocked ? `🔒 Nv. ${spell.requiredLevel}` : `✓ Nv. ${spell.requiredLevel}`}
+                            </span>
+                          )}
                           {spell.classRestriction && (
                             <span
                               className={`spell-exclusive-badge ${
@@ -363,17 +384,25 @@ export default function SpellbookModal({
                       <button
                         className={`btn-equip-action ${
                           isEquippedInActiveSlot ? 'already-equipped' : ''
-                        } ${isClassRestricted ? 'disabled' : ''}`}
-                        disabled={isClassRestricted}
+                        } ${isBlocked ? 'disabled' : ''}`}
+                        disabled={isBlocked}
                         onClick={(e) => {
-                          if (!isClassRestricted) {
+                          if (!isBlocked) {
                             handleEquip(selectedSlot, spell, e);
                           }
                         }}
-                        title={isClassRestricted ? 'Exclusivo para outra classe' : undefined}
+                        title={
+                          isClassRestricted
+                            ? 'Exclusivo para outra classe'
+                            : isLevelLocked
+                            ? `Requer Nível ${spell.requiredLevel}`
+                            : undefined
+                        }
                       >
                         {isClassRestricted
                           ? '🔒 Bloqueado'
+                          : isLevelLocked
+                          ? `🔒 Nv. ${spell.requiredLevel}`
                           : isEquippedInActiveSlot
                           ? `✓ No Slot ${selectedSlot + 1}`
                           : isEquippedAnywhere

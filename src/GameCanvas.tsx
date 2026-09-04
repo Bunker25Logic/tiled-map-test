@@ -47,6 +47,14 @@ import {
 } from './game/graphics';
 import VirtualJoystick from './components/VirtualJoystick';
 import { createPoundElement } from './game/poundAnimation';
+import {
+  NPCS_CONFIG,
+  type NPCDef,
+  loadNPCSprites,
+  type NPCImages,
+  getNPCDirectionTowards,
+  npcDirToNum,
+} from './game/npc';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -167,6 +175,8 @@ interface GameCanvasProps {
   onCollectLoot?: (gold: number, itemId?: string) => void;
   /** Called when coins are collected */
   onCollectCoins?: (coins: { gold?: number; silver?: number; basalt?: number }) => void;
+  /** Called when player interacts with an NPC */
+  onInteractNPC?: (npc: NPCDef) => void;
 }
 
 export default function GameCanvas({
@@ -200,11 +210,15 @@ export default function GameCanvas({
   onOpenInventory,
   onCollectLoot,
   onCollectCoins,
+  onInteractNPC,
 }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [, setAssetsLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [activeNearbyPortal, setActiveNearbyPortal] = useState<PortalDef | null>(null);
+  const [activeNearbyNPC, setActiveNearbyNPC] = useState<NPCDef | null>(null);
+  const activeNearbyNPCRef = useRef<NPCDef | null>(null);
+  const npcImagesRef = useRef<NPCImages>({});
 
   // Persistent player position
   const playerRef = useRef({
@@ -284,6 +298,7 @@ export default function GameCanvas({
     onOpenInventory,
     onCollectLoot,
     onCollectCoins,
+    onInteractNPC,
   });
 
   useEffect(() => {
@@ -313,7 +328,8 @@ export default function GameCanvas({
     propsRef.current.onOpenInventory = onOpenInventory;
     propsRef.current.onCollectLoot = onCollectLoot;
     propsRef.current.onCollectCoins = onCollectCoins;
-  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedWeapon, equippedGear, autoAttackEnabled, autoTargetNearbyEnabled, weaponOffsets, overrideDirection, equippedSpellIds, playerLevel, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot, onCollectCoins]);
+    propsRef.current.onInteractNPC = onInteractNPC;
+  }, [mapId, selectedCharacterId, graphicStyle, enableParticles, debugColliders, showGrid, equippedWings, equippedWeapon, equippedGear, autoAttackEnabled, autoTargetNearbyEnabled, weaponOffsets, overrideDirection, equippedSpellIds, playerLevel, playerHp, playerMaxHp, playerMp, playerMaxMp, onConsumeMana, onPlayerPosChange, onZoneTransition, onPlayerDeath, onOpenInventory, onCollectLoot, onCollectCoins, onInteractNPC]);
 
   // Update particles on map change
   useEffect(() => {
@@ -334,8 +350,12 @@ export default function GameCanvas({
 
     async function init() {
       try {
-        // 1. Fetch preloaded game assets (instant in-memory cache)
-        const cached = await preloadAllGameAssets();
+        // 1. Fetch preloaded game assets (instant in-memory cache) + NPC sprites
+        const [cached, npcImgs] = await Promise.all([
+          preloadAllGameAssets(),
+          loadNPCSprites(),
+        ]);
+        npcImagesRef.current = npcImgs;
 
         if (isCancelled) return;
 
@@ -777,11 +797,21 @@ export default function GameCanvas({
           // Clear touch tap target when keyboard is pressed
           tapTargetRef.current = null;
 
-          // Interaction key (E or Enter) to enter/exit hole if nearby
+          // Interaction key (E or Enter) to interact with NPC or enter/exit hole if nearby
           if (key === 'e' || key === 'enter') {
-            const portals = getMapPortals(mapId, mapData);
             const px = playerRef.current.x + HITBOX_W / 2;
             const py = playerRef.current.y + HITBOX_H / 2;
+
+            // Check NPC proximity first
+            const npcs = Object.values(NPCS_CONFIG).filter((n) => n.mapId === mapId);
+            const nearbyNPC = npcs.find((n) => Math.hypot(px - n.x, py - n.y) <= 65);
+            if (nearbyNPC) {
+              e.preventDefault();
+              propsRef.current.onInteractNPC?.(nearbyNPC);
+              return;
+            }
+
+            const portals = getMapPortals(mapId, mapData);
             const nearby = portals.find((p) => Math.hypot(px - p.worldX, py - p.worldY) < 65);
             if (nearby) {
               e.preventDefault();
@@ -1156,6 +1186,21 @@ export default function GameCanvas({
             }
           }
           setActiveNearbyPortal(nearbyPortal);
+
+          // ── Proximity Detection for Interactive NPCs ────────────────────
+          const npcsInZone = Object.values(NPCS_CONFIG).filter((n) => n.mapId === mapId);
+          let nearbyNPC: NPCDef | null = null;
+          for (const npc of npcsInZone) {
+            const dist = Math.hypot(pxFootCenterX - npc.x, pyFootCenterY - npc.y);
+            if (dist <= 65) {
+              nearbyNPC = npc;
+              break;
+            }
+          }
+          if (activeNearbyNPCRef.current !== nearbyNPC) {
+            activeNearbyNPCRef.current = nearbyNPC;
+            setActiveNearbyNPC(nearbyNPC);
+          }
 
           // ── Update Monsters (AI with combat) ─────────────────────────────
           const playerHitbox: Rect = {
@@ -1762,6 +1807,86 @@ export default function GameCanvas({
                   renderCtx.lineWidth = 0.8;
                   renderCtx.strokeRect(barX - 1, barY - 1, barW + 2, barH + 2);
                 }
+                renderCtx.restore();
+              },
+            });
+          }
+
+          // Add NPCs to depth sorting
+          const currentZoneNPCs = Object.values(NPCS_CONFIG).filter((n) => n.mapId === mapId);
+          for (const npc of currentZoneNPCs) {
+            const npcBaseY = npc.y + npc.hitboxH;
+            if (
+              npc.x + npc.width < camX ||
+              npc.x - npc.width > camX + worldViewW ||
+              npc.y + npc.height < camY ||
+              npc.y - npc.height > camY + worldViewH
+            ) {
+              continue;
+            }
+
+            depthObjects.push({
+              type: 'tiled-obj',
+              sortY: npcBaseY,
+              draw: (renderCtx) => {
+                const npcFootCenterX = npc.x + npc.hitboxW / 2 - camX;
+                const npcFootBottomY = npc.y + npc.hitboxH - camY;
+
+                // NPC drop shadow
+                renderCtx.save();
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                renderCtx.beginPath();
+                renderCtx.ellipse(
+                  npcFootCenterX,
+                  npcFootBottomY - 1,
+                  npc.shadowRadiusX,
+                  npc.shadowRadiusY,
+                  0, 0, Math.PI * 2
+                );
+                renderCtx.fill();
+                renderCtx.restore();
+
+                // Facing direction towards player if within range
+                const facingDir = getNPCDirectionTowards(
+                  npc.x,
+                  npc.y,
+                  playerRef.current.x,
+                  playerRef.current.y,
+                  npc.defaultDir
+                );
+                const dirNum = npcDirToNum(facingDir);
+                const frameNum = (Math.floor(now / 550) % 3) + 1;
+                const spriteKey = `${npc.id}_${frameNum}_${dirNum}`;
+                const spr = npcImagesRef.current[spriteKey] || npcImagesRef.current[`${npc.id}_1_${dirNum}`];
+
+                const drawW = npc.width;
+                const drawH = npc.height;
+                const drawX = npcFootCenterX - drawW / 2;
+                const drawY = npcFootBottomY - drawH + 4;
+
+                if (spr) {
+                  renderCtx.drawImage(spr, drawX, drawY, drawW, drawH);
+                }
+
+                // Name Tag & Title
+                renderCtx.save();
+                const textY = drawY - 4;
+                renderCtx.font = 'bold 9px Tahoma, Verdana, sans-serif';
+                renderCtx.textAlign = 'center';
+
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                renderCtx.fillText(`${npc.name} • ${npc.title.split(' ')[0]}`, npcFootCenterX + 1, textY + 1);
+                renderCtx.fillStyle = '#67e8f9';
+                renderCtx.fillText(`${npc.name} • ${npc.title.split(' ')[0]}`, npcFootCenterX, textY);
+
+                // Overhead speech balloon when player is nearby
+                const distToPlayer = Math.hypot(playerRef.current.x - npc.x, playerRef.current.y - npc.y);
+                if (distToPlayer <= 70) {
+                  const bubbleY = textY - 14 + Math.sin(now * 0.005) * 2;
+                  renderCtx.font = '12px sans-serif';
+                  renderCtx.fillText('💬', npcFootCenterX, bubbleY);
+                }
+
                 renderCtx.restore();
               },
             });
@@ -2821,6 +2946,17 @@ export default function GameCanvas({
     const mapPortals = getMapPortals(mapId, mapData);
     let enteredPortal = false;
 
+    // Check if clicked near an NPC
+    const npcs = Object.values(NPCS_CONFIG).filter((n) => n.mapId === mapId);
+    for (const npc of npcs) {
+      const distClick = Math.hypot(clickWorldX - npc.x, clickWorldY - npc.y);
+      const distPlayer = Math.hypot(playerRef.current.x - npc.x, playerRef.current.y - npc.y);
+      if (distClick < Math.max(npc.width, 32) && distPlayer < 85) {
+        propsRef.current.onInteractNPC?.(npc);
+        return;
+      }
+    }
+
     for (const portal of mapPortals) {
       const distClick = Math.hypot(clickWorldX - portal.worldX, clickWorldY - portal.worldY);
       const distPlayer = Math.hypot(playerRef.current.x - portal.worldX, playerRef.current.y - portal.worldY);
@@ -2879,6 +3015,20 @@ export default function GameCanvas({
         </div>
       )}
 
+      {/* Interactive NPC Action Button (Click or E to Talk) */}
+      {activeNearbyNPC && !activeNearbyPortal && (
+        <div className="portal-action-container npc-action-container">
+          <button
+            className="btn-portal-action btn-npc-action"
+            onClick={() => activeNearbyNPC && propsRef.current.onInteractNPC?.(activeNearbyNPC)}
+          >
+            <span className="portal-btn-icon">💬</span>
+            <span className="portal-btn-title">Falar com {activeNearbyNPC.name}</span>
+            <span className="portal-btn-hint">[ Pressione E ou Toque ]</span>
+          </button>
+        </div>
+      )}
+
       <canvas
         ref={canvasRef}
         className={`game-canvas ${graphicStyle === 'pixel-sharp' ? 'pixel-sharp' : ''}`}
@@ -2904,6 +3054,8 @@ export default function GameCanvas({
         }}
         onEnterPortal={handlePortalButtonClick}
         hasPortalNearby={Boolean(activeNearbyPortal)}
+        onInteractNPC={() => activeNearbyNPC && propsRef.current.onInteractNPC?.(activeNearbyNPC)}
+        hasNPCNearby={Boolean(activeNearbyNPC)}
         onOpenInventory={onOpenInventory}
       />
     </div>

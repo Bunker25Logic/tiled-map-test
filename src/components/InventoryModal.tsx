@@ -112,6 +112,16 @@ export default function InventoryModal({
   });
 
   const handleEquipClick = (item: ItemDef) => {
+    // Check level requirement
+    if (item.requiredLevel && playerLevel < item.requiredLevel) {
+      showToast(`Nível insuficiente! Requer Nível ${item.requiredLevel}.`, 'warn', '🔒');
+      return;
+    }
+    // Check vocation requirement
+    if (characterId && item.allowedVocations && !item.allowedVocations.includes(characterId)) {
+      showToast(`Sua classe não pode usar este equipamento!`, 'warn', '⚠️');
+      return;
+    }
     onEquipItem(item);
     showToast(`${item.name} equipado!`, 'success', item.icon);
   };
@@ -551,6 +561,22 @@ export default function InventoryModal({
                     <span className="stat-chip-pill mp">🔷 Restaura +{selectedItem.effect.healMp} MP</span>
                   )}
                 </div>
+
+                {/* Level & Vocation Requirements */}
+                {(selectedItem.requiredLevel || selectedItem.allowedVocations) && (
+                  <div className="inspector-reqs-row">
+                    {selectedItem.requiredLevel && (
+                      <span className={`req-chip ${playerLevel >= selectedItem.requiredLevel ? 'req-ok' : 'req-fail'}`}>
+                        {playerLevel >= selectedItem.requiredLevel ? '✓' : '🔒'} Requer Nível {selectedItem.requiredLevel}
+                      </span>
+                    )}
+                    {selectedItem.allowedVocations && (
+                      <span className={`req-chip ${!characterId || selectedItem.allowedVocations.includes(characterId) ? 'req-ok' : 'req-fail'}`}>
+                        {!characterId || selectedItem.allowedVocations.includes(characterId) ? '✓' : '⚠️'} Vocação Permitida
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="inspector-actions-row">

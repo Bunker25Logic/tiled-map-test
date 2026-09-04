@@ -6344,6 +6344,732 @@ html {
   box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   NPC & SHOP SYSTEM STYLES (Tibia Authentic & Modern Web Aesthetics)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Modal Container */
+.npc-modal-container {
+  background: linear-gradient(165deg, #111827 0%, #0b0f19 50%, #030712 100%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(56, 189, 248, 0.15);
+  border-radius: 16px;
+  width: 95%;
+  max-width: 780px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #e2e8f0;
+  font-family: inherit;
+  z-index: 10000;
+}
+
+/* Header */
+.npc-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.8));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 16px;
+}
+
+.npc-header-profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.npc-avatar-frame {
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(15, 23, 42, 0.9) 70%);
+  border: 2px solid rgba(56, 189, 248, 0.5);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+}
+
+.npc-avatar-img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transform: scale(1.6);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.npc-avatar-img.npc-nano {
+  transform: scale(2.2);
+}
+
+.npc-identity {
+  display: flex;
+  flex-direction: column;
+}
+
+.npc-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
+}
+
+.npc-title {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.npc-header-wallet {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.npc-wallet-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.npc-wallet-pill .wallet-amount {
+  color: #f8fafc;
+  margin-right: 4px;
+}
+
+/* Nav Tabs */
+.npc-nav-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 10px 18px 0;
+  background: rgba(15, 23, 42, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+}
+
+.npc-tab-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.npc-tab-btn:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px 6px 0 0;
+}
+
+.npc-tab-btn.active {
+  color: #38bdf8;
+  border-bottom-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  border-radius: 6px 6px 0 0;
+}
+
+/* Toast */
+.npc-toast {
+  margin: 10px 20px 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  animation: slideDown 0.2s ease-out;
+}
+
+.npc-toast.toast-success {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #86efac;
+}
+
+.npc-toast.toast-error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+/* Tab Body */
+.npc-tab-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: 60vh;
+}
+
+/* Shop Grid */
+.npc-shop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.npc-shop-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  transition: all 0.15s ease;
+  gap: 14px;
+}
+
+.npc-shop-card:hover {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(56, 189, 248, 0.3);
+  transform: translateY(-1px);
+}
+
+.shop-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.shop-item-icon-box {
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1.5px solid;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.item-qty-tag {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #facc15;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.shop-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.shop-item-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.shop-item-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+.shop-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.badge-stat {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.badge-stat.atk { color: #f87171; background: rgba(239, 68, 68, 0.12); }
+.badge-stat.def { color: #60a5fa; background: rgba(59, 130, 246, 0.12); }
+.badge-stat.hp { color: #4ade80; background: rgba(34, 197, 94, 0.12); }
+.badge-stat.mp { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
+.badge-stat.spd { color: #fbbf24; background: rgba(245, 158, 11, 0.12); }
+.badge-stat.heal-hp { color: #34d399; background: rgba(16, 185, 129, 0.12); }
+.badge-stat.heal-mp { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
+
+.shop-reqs-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.badge-req {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.badge-req.req-met {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-req.req-unmet {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.shop-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.shop-price-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.sell-label {
+  font-size: 10px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.price-part {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 700;
+}
+
+.price-part.gold { color: #facc15; }
+.price-part.silver { color: #cbd5e1; }
+
+.btn-buy-item, .btn-sell-item {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+}
+
+.btn-buy-item {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+}
+
+.btn-buy-item:hover:not(.disabled) {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-buy-item.disabled {
+  background: rgba(51, 65, 85, 0.5);
+  color: #64748b;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-sell-item {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: #ffffff;
+}
+
+.btn-sell-item:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  transform: translateY(-1px);
+}
+
+.empty-inventory-note {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+}
+
+.empty-inventory-note span {
+  font-size: 16px;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.empty-inventory-note p {
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* Blessing Tab */
+.npc-blessing-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.blessing-banner {
+  text-align: center;
+  padding: 16px;
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  border-radius: 12px;
+}
+
+.blessing-icon-large {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 10px #facc15);
+}
+
+.blessing-banner h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #fef08a;
+  font-weight: 800;
+}
+
+.blessing-banner p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #cbd5e1;
+}
+
+.blessing-perks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.blessing-perk-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.perk-check {
+  font-size: 18px;
+}
+
+.blessing-perk-item strong {
+  font-size: 13px;
+  color: #f8fafc;
+  display: block;
+}
+
+.blessing-perk-item p {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.blessing-status-box {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.status-active {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.status-active strong {
+  color: #86efac;
+  font-size: 13px;
+}
+
+.status-active p {
+  margin: 0;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.status-inactive strong {
+  color: #f87171;
+  font-size: 13px;
+}
+
+.status-inactive p {
+  margin: 0;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.blessing-action-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 10px;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  gap: 16px;
+}
+
+.blessing-cost {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.cost-val {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #facc15;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.btn-receive-blessing {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+  border: none;
+  border-radius: 8px;
+  color: #1a1a00;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35);
+  transition: all 0.15s ease;
+}
+
+.btn-receive-blessing:hover:not(.already-blessed) {
+  background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+  transform: translateY(-1px);
+}
+
+.btn-receive-blessing.already-blessed {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  box-shadow: none;
+  cursor: default;
+}
+
+/* Dialogue / Lore */
+.npc-dialogue-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.npc-speech-bubble {
+  padding: 18px 20px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.npc-greeting {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.speech-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.3), transparent);
+  margin: 12px 0;
+}
+
+.npc-lore-body {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.npc-lore-tips {
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.npc-lore-tips h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #fbbf24;
+}
+
+.npc-lore-tips ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 11px;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* On-Screen Action Button for NPCs */
+.btn-npc-action {
+  background: linear-gradient(135deg, rgba(14, 116, 144, 0.95), rgba(15, 23, 42, 0.95)) !important;
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 6px 24px rgba(56, 189, 248, 0.3) !important;
+}
+
+.btn-npc-action:hover {
+  border-color: #38bdf8 !important;
+  transform: scale(1.03) !important;
+}
+
+/* Mobile Virtual Joystick NPC Button */
+.btn-mobile-npc {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+  border-color: #38bdf8 !important;
+}
+
+/* HUD Blessing Badge */
+.hud-blessing-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.3) 0%, rgba(15, 23, 42, 0.8) 70%);
+  border: 1.5px solid #facc15;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+  animation: pulseGlow 2.5s infinite alternate;
+  cursor: pointer;
+}
+
+.hud-blessing-icon {
+  font-size: 14px;
+}
+
+/* Death Modal Blessing Banner */
+.death-blessing-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(250, 204, 21, 0.4);
+  border-radius: 10px;
+  text-align: left;
+}
+
+.death-blessing-banner .blessing-shield-icon {
+  font-size: 22px;
+}
+
+.death-blessing-banner strong {
+  font-size: 13px;
+  color: #fef08a;
+  display: block;
+}
+
+.death-blessing-banner p {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.death-xp-loss.blessed-loss {
+  color: #fde047 !important;
+}
+
+/* Spellbook Level Lock */
+.spell-catalog-card.level-locked {
+  opacity: 0.65;
+  filter: grayscale(0.4);
+}
+
+.spell-level-badge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+.spell-level-badge.unlocked {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.spell-level-badge.locked {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* Inventory Inspector Requirements */
+.inspector-reqs-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.req-chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+.req-chip.req-ok {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.req-chip.req-fail {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+
 
 
 

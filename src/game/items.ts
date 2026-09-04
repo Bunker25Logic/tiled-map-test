@@ -1,4 +1,5 @@
 import type { WingType } from './types';
+import type { CharacterId } from './characters';
 
 export type ItemRarity = 'common' | 'rare' | 'epic' | 'legendary';
 export type ItemSlotType = 'wings' | 'weapon' | 'armor' | 'shield' | 'amulet' | 'ring' | 'boots' | 'potion';
@@ -31,6 +32,11 @@ export interface ItemDef {
   effect?: ItemEffect;
   quantity?: number;
   description: string;
+  // ── Economia e Progressão ──
+  buyPriceSilver?: number;
+  sellPriceSilver?: number;
+  requiredLevel?: number;
+  allowedVocations?: CharacterId[];
 }
 
 export interface EquippedGear {
@@ -55,6 +61,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     wingType: 'angelic',
     stats: { speed: 15, maxMp: 30 },
     description: 'Asas celestiais tecidas com plumas de luz pura. Concedem velocidade graciosa e bônus de mana.',
+    requiredLevel: 30,
+    buyPriceSilver: 25000, // 250 Ouros
+    sellPriceSilver: 8000,
   },
 
   // ── Weapons (Armas) ────────────────────────────────────────────────────────
@@ -67,6 +76,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     image: '/assets/itens/swords/wood_sword.webp',
     stats: { attack: 18, speed: 6 },
     description: 'Espada de treino esculpida em madeira maciça com empunhadura reforçada por cordas.',
+    requiredLevel: 1,
+    buyPriceSilver: 100, // 1 Ouro
+    sellPriceSilver: 35,
   },
   wood_sword: {
     id: 'wood_sword',
@@ -77,6 +89,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     image: '/assets/itens/swords/wood_sword.webp',
     stats: { attack: 18, speed: 6 },
     description: 'Espada de treino esculpida em madeira maciça com empunhadura reforçada por cordas.',
+    requiredLevel: 1,
+    buyPriceSilver: 100, // 1 Ouro
+    sellPriceSilver: 35,
   },
   sword_gold: {
     id: 'sword_gold',
@@ -87,6 +102,10 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     image: '/assets/itens/swords/gold_sword.webp',
     stats: { attack: 45, speed: 12 },
     description: 'Lâmina lendária forjada em puro ouro resplandecente. Desfere golpes velozes de poder avassalador.',
+    requiredLevel: 28,
+    allowedVocations: ['luxio', 'paladin'],
+    buyPriceSilver: 35000, // 350 Ouros
+    sellPriceSilver: 12000,
   },
   gold_sword: {
     id: 'gold_sword',
@@ -97,6 +116,10 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     image: '/assets/itens/swords/gold_sword.webp',
     stats: { attack: 45, speed: 12 },
     description: 'Lâmina lendária forjada em puro ouro resplandecente. Desfere golpes velozes de poder avassalador.',
+    requiredLevel: 28,
+    allowedVocations: ['luxio', 'paladin'],
+    buyPriceSilver: 35000, // 350 Ouros
+    sellPriceSilver: 12000,
   },
   sword_light: {
     id: 'sword_light',
@@ -107,6 +130,10 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     image: '/assets/itens/swords/radiant_sword.webp',
     stats: { attack: 28, speed: 8 },
     description: 'Lâmina nobre encantada com energia luminosa. Emite um pulsar neon branco celestial constante.',
+    requiredLevel: 12,
+    allowedVocations: ['luxio', 'paladin'],
+    buyPriceSilver: 4500, // 45 Ouros
+    sellPriceSilver: 1600,
   },
   radiant_sword: {
     id: 'radiant_sword',
@@ -117,6 +144,10 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     image: '/assets/itens/swords/radiant_sword.webp',
     stats: { attack: 28, speed: 8 },
     description: 'Lâmina nobre encantada com energia luminosa. Emite um pulsar neon branco celestial constante.',
+    requiredLevel: 12,
+    allowedVocations: ['luxio', 'paladin'],
+    buyPriceSilver: 4500, // 45 Ouros
+    sellPriceSilver: 1600,
   },
   staff_shadow: {
     id: 'staff_shadow',
@@ -126,6 +157,10 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     icon: '🔮',
     stats: { attack: 35, maxMp: 40 },
     description: 'Cajado antigo canalizador de energias abissais, potencializando o poder mágico.',
+    requiredLevel: 15,
+    allowedVocations: ['magician', 'necromancer'],
+    buyPriceSilver: 5000, // 50 Ouros
+    sellPriceSilver: 1800,
   },
   bow_elven: {
     id: 'bow_elven',
@@ -135,6 +170,10 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     icon: '🏹',
     stats: { attack: 22, speed: 10 },
     description: 'Arco leve de madeira élfica sagrada que acelera a velocidade e mira do atirador.',
+    requiredLevel: 8,
+    allowedVocations: ['archer'],
+    buyPriceSilver: 2500, // 25 Ouros
+    sellPriceSilver: 900,
   },
 
   // ── Armor & Shields (Armaduras e Escudos) ───────────────────────────────────
@@ -146,6 +185,10 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     icon: '🦺',
     stats: { maxHp: 60, defense: 18 },
     description: 'Armadura pesada reforçada com liga de titânio para absorver impactos devastadores.',
+    requiredLevel: 20,
+    allowedVocations: ['paladin', 'luxio'],
+    buyPriceSilver: 8000, // 80 Ouros
+    sellPriceSilver: 2800,
   },
   robe_mystic: {
     id: 'robe_mystic',
@@ -155,6 +198,10 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     icon: '👘',
     stats: { maxMp: 50, defense: 8 },
     description: 'Tecido com fios de mana pura, amplificando a reserva mágica do usuário.',
+    requiredLevel: 12,
+    allowedVocations: ['magician', 'necromancer'],
+    buyPriceSilver: 4000, // 40 Ouros
+    sellPriceSilver: 1400,
   },
   shield_aegis: {
     id: 'shield_aegis',
@@ -164,6 +211,10 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     icon: '🛡️',
     stats: { defense: 15, maxHp: 30 },
     description: 'Escudo ornamentado com runas protetoras ancestrais que repelem investidas inimigas.',
+    requiredLevel: 10,
+    allowedVocations: ['paladin', 'luxio'],
+    buyPriceSilver: 3000, // 30 Ouros
+    sellPriceSilver: 1100,
   },
 
   // ── Accessories (Acessórios) ───────────────────────────────────────────────
@@ -175,6 +226,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     icon: '📿',
     stats: { maxHp: 40, hpRegen: 2 },
     description: 'Rubi pulsante com essência vital que acelera a recuperação contínua de vida.',
+    requiredLevel: 8,
+    buyPriceSilver: 2200,
+    sellPriceSilver: 750,
   },
   // ── Anéis de Poder Animados (Tibia Classic Rings) ────────────────────────
   ring_energy: {
@@ -187,6 +241,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { maxMp: 120, mpRegen: 4, defense: 6 },
     description: 'Anel reluzente de safira mágica azul. Canaliza energia arcana pura, expandindo sua reserva de Mana.',
+    requiredLevel: 8,
+    buyPriceSilver: 2000,
+    sellPriceSilver: 700,
   },
   ring_amethyst: {
     id: 'ring_amethyst',
@@ -198,6 +255,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { defense: 10, maxMp: 80, mpRegen: 3 },
     description: 'Lendário anel celestial de ametista sagrada. Concede proteção mística superior e bênção espiritual.',
+    requiredLevel: 18,
+    buyPriceSilver: 4500,
+    sellPriceSilver: 1600,
   },
   ring_life: {
     id: 'ring_life',
@@ -209,6 +269,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { hpRegen: 6, mpRegen: 8, maxHp: 50, maxMp: 60 },
     description: 'Anel encantado com gema verde-água vital. Concede regeneração contínua de Vida e Mana a cada instante.',
+    requiredLevel: 10,
+    buyPriceSilver: 2500,
+    sellPriceSilver: 850,
   },
   ring_healing: {
     id: 'ring_healing',
@@ -220,6 +283,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { hpRegen: 15, mpRegen: 20, maxHp: 100, maxMp: 120 },
     description: 'O mais potente anel de restauração do Tibia. Sua esmeralda radiante regenera Vida e Mana com velocidade avassaladora.',
+    requiredLevel: 25,
+    buyPriceSilver: 10000,
+    sellPriceSilver: 3500,
   },
   ring_stealth: {
     id: 'ring_stealth',
@@ -231,6 +297,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { defense: 10, speed: 20, attack: 8 },
     description: 'Anel forjado com ônix das sombras. Envolve o usuário com manto etéreo de furtividade e agilidade.',
+    requiredLevel: 12,
+    buyPriceSilver: 3200,
+    sellPriceSilver: 1100,
   },
   ring_time: {
     id: 'ring_time',
@@ -242,6 +311,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { speed: 35, defense: 4 },
     description: 'Poderoso anel de topázio cintilante. Acelera o fluxo temporal ao redor do portador, concedendo +35 de Velocidade extrema.',
+    requiredLevel: 15,
+    buyPriceSilver: 4000,
+    sellPriceSilver: 1400,
   },
   ring_dwarven: {
     id: 'ring_dwarven',
@@ -253,6 +325,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { defense: 16, maxHp: 80 },
     description: 'Forjado nas fornalhas de Kazordoon pelos mestres anões. Concede solidez inquebrável e defesa física.',
+    requiredLevel: 14,
+    buyPriceSilver: 3500,
+    sellPriceSilver: 1200,
   },
   ring_power: {
     id: 'ring_power',
@@ -264,6 +339,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { attack: 22, maxHp: 60 },
     description: 'Anel místico de rubi magenta. Canaliza força destrutiva nos golpes corporais, amplificando o Ataque.',
+    requiredLevel: 20,
+    buyPriceSilver: 6000,
+    sellPriceSilver: 2100,
   },
   ring_crystal: {
     id: 'ring_crystal',
@@ -275,6 +353,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { maxMp: 180, mpRegen: 6, defense: 8 },
     description: 'Anel esculpido em diamante cristalino puro. Expande imensamente a reserva de Mana e a pureza defensiva.',
+    requiredLevel: 25,
+    buyPriceSilver: 9000,
+    sellPriceSilver: 3200,
   },
   ring_might: {
     id: 'ring_might',
@@ -286,6 +367,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     frameCount: 4,
     stats: { defense: 25, attack: 14, maxHp: 120 },
     description: 'O anel mais cobiçado pelos guerreiros de Tibia. Reduz todo dano recebido em 20% e concede força heróica.',
+    requiredLevel: 35,
+    buyPriceSilver: 20000, // 200 Ouros
+    sellPriceSilver: 7000,
   },
   boots_hermes: {
     id: 'boots_hermes',
@@ -295,6 +379,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     icon: '👢',
     stats: { speed: 25 },
     description: 'Botas encantadas que diminuem o atrito com o solo, concedendo grande mobilidade.',
+    requiredLevel: 10,
+    buyPriceSilver: 2000,
+    sellPriceSilver: 700,
   },
 
   // ── Consumables (Poções) ───────────────────────────────────────────────────
@@ -307,6 +394,8 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     quantity: 5,
     effect: { healHp: 80 },
     description: 'Frasco destilado com ervas curativas. Restaura +80 pontos de Vida instantaneamente.',
+    buyPriceSilver: 40,
+    sellPriceSilver: 15,
   },
   potion_mp_large: {
     id: 'potion_mp_large',
@@ -317,6 +406,8 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     quantity: 5,
     effect: { healMp: 80 },
     description: 'Elixir cintilante de mana condensada. Restaura +80 pontos de Mana instantaneamente.',
+    buyPriceSilver: 50,
+    sellPriceSilver: 20,
   },
   elixir_fury: {
     id: 'elixir_fury',
@@ -327,6 +418,9 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
     quantity: 2,
     effect: { healHp: 50, healMp: 50 },
     description: 'Bebida revigorante dos guerreiros ancestrais. Recupera +50 HP e +50 MP com vigor imediato.',
+    requiredLevel: 5,
+    buyPriceSilver: 300, // 3 Ouros
+    sellPriceSilver: 100,
   },
 };
 
