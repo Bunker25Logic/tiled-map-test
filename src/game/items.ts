@@ -330,35 +330,45 @@ export const ALL_ITEMS: Record<string, ItemDef> = {
   },
 };
 
-// Default starter inventory items for every player
-export const DEFAULT_INVENTORY_ITEMS: ItemDef[] = [
-  { ...ALL_ITEMS.wing_angelic },
-  { ...ALL_ITEMS.sword_gold },
-  { ...ALL_ITEMS.sword_wood },
-  { ...ALL_ITEMS.sword_light },
-  { ...ALL_ITEMS.armor_paladin },
-  { ...ALL_ITEMS.shield_aegis },
-  { ...ALL_ITEMS.amulet_heart },
-  { ...ALL_ITEMS.ring_might },
-  { ...ALL_ITEMS.ring_healing },
-  { ...ALL_ITEMS.ring_time },
-  { ...ALL_ITEMS.ring_life },
-  { ...ALL_ITEMS.ring_power },
-  { ...ALL_ITEMS.boots_hermes },
-  { ...ALL_ITEMS.potion_hp_large, quantity: 8 },
-  { ...ALL_ITEMS.potion_mp_large, quantity: 8 },
-  { ...ALL_ITEMS.elixir_fury, quantity: 3 },
-];
+// Default starter inventory items for every player (inicia vazio — itens obtidos ao derrotar chefes)
+export const DEFAULT_INVENTORY_ITEMS: ItemDef[] = [];
 
 export const DEFAULT_EQUIPPED_GEAR: EquippedGear = {
-  wings: 'angelic',
-  weapon: 'sword_gold',
-  armor: 'armor_paladin',
-  shield: 'shield_aegis',
-  amulet: 'amulet_heart',
-  ring: 'ring_might',
-  boots: 'boots_hermes',
+  wings: 'none',
+  weapon: null,
+  armor: null,
+  shield: null,
+  amulet: null,
+  ring: null,
+  boots: null,
 };
+
+export function getGearStatBonuses(gear: EquippedGear | null | undefined): {
+  attack: number;
+  defense: number;
+  maxHp: number;
+  maxMp: number;
+  speed: number;
+  hpRegen: number;
+  mpRegen: number;
+} {
+  const bonuses = { attack: 0, defense: 0, maxHp: 0, maxMp: 0, speed: 0, hpRegen: 0, mpRegen: 0 };
+  if (!gear) return bonuses;
+  for (const slot of Object.keys(gear) as (keyof EquippedGear)[]) {
+    const itemId = gear[slot];
+    if (itemId && ALL_ITEMS[itemId]?.stats) {
+      const st = ALL_ITEMS[itemId].stats!;
+      if (st.attack) bonuses.attack += st.attack;
+      if (st.defense) bonuses.defense += st.defense;
+      if (st.maxHp) bonuses.maxHp += st.maxHp;
+      if (st.maxMp) bonuses.maxMp += st.maxMp;
+      if (st.speed) bonuses.speed += st.speed;
+      if (st.hpRegen) bonuses.hpRegen += st.hpRegen;
+      if (st.mpRegen) bonuses.mpRegen += st.mpRegen;
+    }
+  }
+  return bonuses;
+}
 
 export function getRarityColor(rarity: ItemRarity): string {
   switch (rarity) {

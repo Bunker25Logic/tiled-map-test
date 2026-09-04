@@ -389,9 +389,9 @@ export default function GameCanvas({
             const coins = generateMonsterCoinDrops(mob.id, deathX, deathY, xpReward);
             coinDropsRef.current.push(...coins);
 
-            // 2. Extra equipment or potion loot box if rare item rolled
-            const loot = generateLootBox(mob.id, deathX, deathY - 8, xpReward);
-            if (loot.itemId || loot.rarity !== 'common') {
+            // 2. Extra equipment or potion loot box (Chefes derrubam baú lendário garantido com equipamentos)
+            const loot = generateLootBox(mob.id, deathX, deathY - 8, xpReward, mob.isBoss, mob.type);
+            if (loot.itemId || loot.rarity !== 'common' || mob.isBoss) {
               lootBoxesRef.current.push(loot);
             }
 
@@ -1359,7 +1359,16 @@ export default function GameCanvas({
 
             // Check collision with monsters
             const hitRadius = spell.def.damageRadius || 42;
-            const spellDmg = spell.def.damage || (40 + Math.floor(Math.random() * 25));
+            let spellDmg = spell.def.damage || (40 + Math.floor(Math.random() * 25));
+            const gear = propsRef.current.equippedGear;
+            if (gear) {
+              for (const slot of Object.keys(gear) as (keyof EquippedGear)[]) {
+                const itemId = gear[slot];
+                if (itemId && ALL_ITEMS[itemId]?.stats?.attack) {
+                  spellDmg += Math.round(ALL_ITEMS[itemId].stats!.attack! * 0.75);
+                }
+              }
+            }
 
             for (const mob of monstersRef.current) {
               if (mob.isDead) continue;
@@ -1453,9 +1462,9 @@ export default function GameCanvas({
           // ── Rendering ──────────────────────────────────────────────────
           ctx.save();
 
-          // Intelligent antialiasing based on active graphic style
+          // Intelligent antialiasing based on active graphic style (sem serrilhado no modern-hd e bloom-glow)
           const currentStyle = propsRef.current.graphicStyle || 'modern-hd';
-          if (currentStyle === 'modern-hd') {
+          if (currentStyle === 'modern-hd' || currentStyle === 'bloom-glow') {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
           } else {
@@ -1660,12 +1669,31 @@ export default function GameCanvas({
               type: 'tiled-obj',
               sortY: mobBaseY,
               draw: (renderCtx) => {
+                const rScale = mob.renderScale || 1.0;
                 const mobFootCenterX = mob.x + mob.config.hitboxW / 2 - camX;
                 const mobFootBottomY = mob.y + mob.config.hitboxH - camY;
 
+                // Pulsating Boss Aura Ring on ground
+                if (mob.isBoss) {
+                  renderCtx.save();
+                  const auraPulse = 0.55 + Math.sin(now * 0.005) * 0.35;
+                  renderCtx.strokeStyle = `rgba(234, 179, 8, ${auraPulse})`;
+                  renderCtx.lineWidth = 2;
+                  renderCtx.beginPath();
+                  renderCtx.ellipse(
+                    mobFootCenterX,
+                    mobFootBottomY - 1,
+                    mob.config.shadowRadiusX * 1.35,
+                    mob.config.shadowRadiusY * 1.35,
+                    0, 0, Math.PI * 2
+                  );
+                  renderCtx.stroke();
+                  renderCtx.restore();
+                }
+
                 // Monster drop shadow
                 renderCtx.save();
-                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                renderCtx.fillStyle = mob.isBoss ? 'rgba(0, 0, 0, 0.55)' : 'rgba(0, 0, 0, 0.35)';
                 renderCtx.beginPath();
                 renderCtx.ellipse(
                   mobFootCenterX,
@@ -1677,47 +1705,63 @@ export default function GameCanvas({
                 renderCtx.fill();
                 renderCtx.restore();
 
-                // Monster sprite
+                // Monster sprite with scale
                 const spriteKey = `${mob.type}_${mob.frame}_${mob.dir}`;
-                const spr = cached.monsters[spriteKey];
+                const fallbackKey = mob.type.endsWith('_mini')
+                  ? `${mob.type.replace('_mini', '_chefe')}_${mob.frame}_${mob.dir}`
+                  : `${mob.type}_chefe_${mob.frame}_${mob.dir}`;
+                const spr = cached.monsters[spriteKey] || cached.monsters[fallbackKey];
 
-                const drawX = mob.x + mob.config.hitboxW / 2 - mob.config.visCenterX - camX;
-                const drawY = mob.y + mob.config.hitboxH - mob.config.feetY - camY;
+                const drawW = mob.config.width * rScale;
+                const drawH = mob.config.height * rScale;
+                const drawX = mobFootCenterX - (mob.config.visCenterX * rScale);
+                const drawY = mobFootBottomY - (mob.config.feetY * rScale);
 
                 if (spr) {
-                  renderCtx.drawImage(spr, drawX, drawY, mob.config.width, mob.config.height);
+                  renderCtx.drawImage(spr, drawX, drawY, drawW, drawH);
                 }
 
                 // Name Tag & HP Bar
                 renderCtx.save();
-                const visualTopY = drawY + (mob.config.height - mob.config.visH);
+                const visualTopY = drawY + ((mob.config.height - mob.config.visH) * rScale);
                 const textY = visualTopY - 4;
-                renderCtx.font = 'bold 9px Tahoma, Verdana, sans-serif';
+
+                const displayName = mob.isBoss ? `👑 ${mob.config.name} [CHEFE]` : mob.config.name;
+                const nameFont = mob.isBoss ? 'bold 10px Tahoma, Verdana, sans-serif' : 'bold 9px Tahoma, Verdana, sans-serif';
+                renderCtx.font = nameFont;
                 renderCtx.textAlign = 'center';
 
-                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-                renderCtx.fillText(mob.config.name, mobFootCenterX + 1, textY + 1);
+                renderCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+                renderCtx.fillText(displayName, mobFootCenterX + 1, textY + 1);
                 // Name color by behavior
-                const nameColor = mob.combat.behavior === 'aggressive' ? '#f87171'
+                const nameColor = mob.isBoss ? '#facc15'
+                  : mob.combat.behavior === 'aggressive' ? '#f87171'
                   : mob.combat.behavior === 'animal' ? '#86efac'
                   : '#fcd34d';
                 renderCtx.fillStyle = nameColor;
-                renderCtx.fillText(mob.config.name, mobFootCenterX, textY);
+                renderCtx.fillText(displayName, mobFootCenterX, textY);
 
-                const barW = Math.max(22, mob.config.visW * 0.7);
-                const barH = 3;
+                const barW = mob.isBoss ? Math.max(48, mob.config.visW * rScale * 0.8) : Math.max(22, mob.config.visW * rScale * 0.7);
+                const barH = mob.isBoss ? 4.5 : 3;
                 const barX = mobFootCenterX - barW / 2;
-                const barY = textY - 9;
+                const barY = textY - (mob.isBoss ? 10 : 9);
 
                 const hpPct = mob.maxHp > 0 ? mob.hp / mob.maxHp : 0;
-                const hpColor = hpPct > 0.6 ? '#22c55e' : hpPct > 0.3 ? '#f59e0b' : '#ef4444';
+                const hpColor = mob.isBoss
+                  ? (hpPct > 0.5 ? '#eab308' : hpPct > 0.25 ? '#f97316' : '#dc2626')
+                  : (hpPct > 0.6 ? '#22c55e' : hpPct > 0.3 ? '#f59e0b' : '#ef4444');
 
-                renderCtx.fillStyle = '#000000';
+                renderCtx.fillStyle = mob.isBoss ? '#78350f' : '#000000';
                 renderCtx.fillRect(barX - 1, barY - 1, barW + 2, barH + 2);
-                renderCtx.fillStyle = '#333';
+                renderCtx.fillStyle = '#222';
                 renderCtx.fillRect(barX, barY, barW, barH);
                 renderCtx.fillStyle = hpColor;
                 renderCtx.fillRect(barX, barY, barW * hpPct, barH);
+                if (mob.isBoss) {
+                  renderCtx.strokeStyle = 'rgba(254, 240, 138, 0.6)';
+                  renderCtx.lineWidth = 0.8;
+                  renderCtx.strokeRect(barX - 1, barY - 1, barW + 2, barH + 2);
+                }
                 renderCtx.restore();
               },
             });
@@ -2837,7 +2881,7 @@ export default function GameCanvas({
 
       <canvas
         ref={canvasRef}
-        className="game-canvas"
+        className={`game-canvas ${graphicStyle === 'pixel-sharp' ? 'pixel-sharp' : ''}`}
         onClick={handleCanvasClick}
       />
 

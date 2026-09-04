@@ -136,9 +136,9 @@ export const ZONE_SPAWNS_TEMPLATES: Record<string, SpawnPointTemplate[]> = {
       habitatName: 'Câmara dos Ossos',
     },
     {
-      id: 'c3_draertis_1', zone: 'caverna3', monsterType: 'draertis',
+      id: 'c3_draertis_1', zone: 'caverna3', monsterType: 'draertis_mini',
       homeX: 380, homeY: 150, roamRadius: 55, maxChaseDistance: 280, respawnSeconds: 65,
-      habitatName: 'Ninho de Draertis (Elite)',
+      habitatName: 'Ninho das Crias de Draertis',
     },
     {
       id: 'c3_fantasn_1', zone: 'caverna3', monsterType: 'fantasn',
@@ -259,6 +259,22 @@ export const ZONE_SPAWNS_TEMPLATES: Record<string, SpawnPointTemplate[]> = {
       homeX: 1210, homeY: 310, roamRadius: 50, maxChaseDistance: 260, respawnSeconds: 65,
       habitatName: 'Cratera Ardente (Ilha 2)',
     },
+    // Chefe do Deserto & Crias
+    {
+      id: 's_i2_boss_golen', zone: 'map1', monsterType: 'golen_chefe',
+      homeX: 1350, homeY: 280, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 90,
+      habitatName: 'Altar do Colosso Golen (Chefe do Deserto)',
+    },
+    {
+      id: 's_i2_mini_golen_1', zone: 'map1', monsterType: 'golen_mini',
+      homeX: 1310, homeY: 310, roamRadius: 45, maxChaseDistance: 240, respawnSeconds: 35,
+      habitatName: 'Guarda do Altar (Mini Golen)',
+    },
+    {
+      id: 's_i2_mini_golen_2', zone: 'map1', monsterType: 'golen_mini',
+      homeX: 1390, homeY: 250, roamRadius: 45, maxChaseDistance: 240, respawnSeconds: 35,
+      habitatName: 'Guarda do Altar (Mini Golen)',
+    },
 
     // ── ILHA 3 (Montanhas Rochosas) ──
     {
@@ -313,8 +329,24 @@ export const ZONE_SPAWNS_TEMPLATES: Record<string, SpawnPointTemplate[]> = {
     },
     {
       id: 's_i3_drago_1', zone: 'map1', monsterType: 'drago',
-      homeX: -360, homeY: -2010, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 100,
+      homeX: -560, homeY: -2010, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 100,
       habitatName: 'Ninho do Dragão Vermelho (Ilha 3)',
+    },
+    // Chefe das Montanhas & Crias
+    {
+      id: 's_i3_boss_triar', zone: 'map1', monsterType: 'triardinguer_chefe',
+      homeX: -360, homeY: -2010, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 100,
+      habitatName: 'Pico do Titã Triardinguer (Chefe das Montanhas)',
+    },
+    {
+      id: 's_i3_mini_triar_1', zone: 'map1', monsterType: 'triardinguer_mini',
+      homeX: -320, homeY: -1980, roamRadius: 45, maxChaseDistance: 250, respawnSeconds: 40,
+      habitatName: 'Escolta do Pico (Mini Triardinguer)',
+    },
+    {
+      id: 's_i3_mini_triar_2', zone: 'map1', monsterType: 'triardinguer_mini',
+      homeX: -400, homeY: -2040, roamRadius: 45, maxChaseDistance: 250, respawnSeconds: 40,
+      habitatName: 'Escolta do Pico (Mini Triardinguer)',
     },
 
     // ── ILHA 4 (Santuário Místico) ──
@@ -338,10 +370,21 @@ export const ZONE_SPAWNS_TEMPLATES: Record<string, SpawnPointTemplate[]> = {
       homeX: 1010, homeY: -1810, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 75,
       habitatName: 'Covil da Medusa (Ilha 4)',
     },
+    // Chefe do Santuário Místico & Crias
     {
-      id: 's_i4_draertis_1', zone: 'map1', monsterType: 'draertis',
-      homeX: 1160, homeY: -1710, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 75,
-      habitatName: 'Torre de Draertis (Ilha 4)',
+      id: 's_i4_boss_draertis', zone: 'map1', monsterType: 'draertis_chefe',
+      homeX: 1160, homeY: -1710, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 110,
+      habitatName: 'Torre do Arquimago Draertis (Chefe do Santuário)',
+    },
+    {
+      id: 's_i4_mini_draertis_1', zone: 'map1', monsterType: 'draertis_mini',
+      homeX: 1120, homeY: -1680, roamRadius: 45, maxChaseDistance: 260, respawnSeconds: 45,
+      habitatName: 'Sentinela do Altar (Mini Draertis)',
+    },
+    {
+      id: 's_i4_mini_draertis_2', zone: 'map1', monsterType: 'draertis_mini',
+      homeX: 1200, homeY: -1740, roamRadius: 45, maxChaseDistance: 260, respawnSeconds: 45,
+      habitatName: 'Sentinela do Altar (Mini Draertis)',
     },
     {
       id: 's_i4_dragis_1', zone: 'map1', monsterType: 'dragis',
@@ -370,15 +413,26 @@ export const ZONE_SPAWNS_TEMPLATES: Record<string, SpawnPointTemplate[]> = {
     },
 
     // ── ILHA 5 (Terras Dracônicas - Endgame) ──
+    // Chefe Supremo dos Dragões & Crias
     {
-      id: 's_i5_draertis_1', zone: 'map1', monsterType: 'draertis',
-      homeX: 1810, homeY: -1810, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 60,
-      habitatName: 'Desolação Dracônica (Ilha 5)',
+      id: 's_i5_boss_dragis', zone: 'map1', monsterType: 'dragis_chefe',
+      homeX: 2010, homeY: -1910, roamRadius: 70, maxChaseDistance: 340, respawnSeconds: 120,
+      habitatName: 'Trono do Imperador Dragis (Chefe Supremo)',
     },
     {
-      id: 's_i5_dragis_1', zone: 'map1', monsterType: 'dragis',
-      homeX: 2010, homeY: -1910, roamRadius: 60, maxChaseDistance: 290, respawnSeconds: 65,
-      habitatName: 'Ninho dos Dragões Anciões (Ilha 5)',
+      id: 's_i5_mini_dragis_1', zone: 'map1', monsterType: 'dragis_mini',
+      homeX: 1960, homeY: -1880, roamRadius: 50, maxChaseDistance: 280, respawnSeconds: 50,
+      habitatName: 'Cria Dracônica (Mini Dragis)',
+    },
+    {
+      id: 's_i5_mini_dragis_2', zone: 'map1', monsterType: 'dragis_mini',
+      homeX: 2060, homeY: -1940, roamRadius: 50, maxChaseDistance: 280, respawnSeconds: 50,
+      habitatName: 'Cria Dracônica (Mini Dragis)',
+    },
+    {
+      id: 's_i5_mini_dragis_3', zone: 'map1', monsterType: 'dragis_mini',
+      homeX: 2020, homeY: -1850, roamRadius: 50, maxChaseDistance: 280, respawnSeconds: 50,
+      habitatName: 'Cria Dracônica (Mini Dragis)',
     },
     {
       id: 's_i5_bat_rei_1', zone: 'map1', monsterType: 'bat rei',

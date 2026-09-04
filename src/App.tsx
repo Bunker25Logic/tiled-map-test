@@ -29,6 +29,7 @@ import {
   DEFAULT_INVENTORY_ITEMS,
   DEFAULT_EQUIPPED_GEAR,
   ALL_ITEMS,
+  getGearStatBonuses,
 } from './game/items';
 import {
   type PlayerAccount,
@@ -72,7 +73,7 @@ export default function App() {
   const [mapData, setMapData] = useState<TiledMap | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [graphicStyle, setGraphicStyle] = useState<GraphicStyle>('pixel-sharp');
+  const [graphicStyle, setGraphicStyle] = useState<GraphicStyle>('modern-hd');
   const [enableParticles, setEnableParticles] = useState<boolean>(false);
   const [debugColliders, setDebugColliders] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(false);
@@ -211,26 +212,18 @@ export default function App() {
   useEffect(() => {
     if (screen !== 'game') return;
     const regenInterval = setInterval(() => {
-      // Calcula bônus de regeneração concedidos por anéis (ex: Ring of Healing, Life Ring)
-      let bonusHpRegen = 0;
-      let bonusMpRegen = 0;
+      // Calcula bônus de regeneração concedidos por anéis e equipamentos
       const gear = equippedGearRef.current;
-      if (gear) {
-        for (const slot of Object.keys(gear) as (keyof EquippedGear)[]) {
-          const itemId = gear[slot];
-          if (itemId && ALL_ITEMS[itemId]?.stats) {
-            bonusHpRegen += ALL_ITEMS[itemId].stats!.hpRegen || 0;
-            bonusMpRegen += ALL_ITEMS[itemId].stats!.mpRegen || 0;
-          }
-        }
-      }
+      const bonuses = getGearStatBonuses(gear);
+      const bonusHpRegen = bonuses.hpRegen;
+      const bonusMpRegen = bonuses.mpRegen;
 
       setPlayerMp((curMp) => {
         const acc = accountRef.current;
         if (!acc) return curMp;
         const char = acc.characters[activeCharIndexRef.current];
         if (!char) return curMp;
-        const maxMp = char.maxMp || 80;
+        const maxMp = (char.maxMp || 80) + bonuses.maxMp;
         if (curMp >= maxMp) return curMp;
         const nextMp = Math.min(maxMp, curMp + 2 + bonusMpRegen);
         char.mp = nextMp;
@@ -243,7 +236,7 @@ export default function App() {
         if (!acc) return curHp;
         const char = acc.characters[activeCharIndexRef.current];
         if (!char) return curHp;
-        const maxHp = char.maxHp || 100;
+        const maxHp = (char.maxHp || 100) + bonuses.maxHp;
         if (curHp <= 0 || curHp >= maxHp) return curHp;
         const nextHp = Math.min(maxHp, curHp + 1 + bonusHpRegen);
         char.hp = nextHp;
@@ -303,11 +296,6 @@ export default function App() {
     activeCharIndexRef.current = charIndex;
     setSelectedCharacterId(char.characterId);
     setEquippedSpellIds(DEFAULT_CLASS_SPELLS[char.characterId] || DEFAULT_CLASS_SPELLS['luxio']);
-    setPlayerHp(char.hp);
-    setPlayerMaxHp(char.maxHp);
-    setPlayerMp(char.mp);
-    setPlayerMaxMp(char.maxMp);
-
     // 1. Restore or initialize equipped gear
     const savedGear: EquippedGear = char.equippedGear
       ? { ...char.equippedGear }
@@ -325,8 +313,16 @@ export default function App() {
       savePlayerGear(resolvedAcc, charIndex, savedGear);
     }
 
-    // 2. Restore or initialize inventory
-    const savedInventory: ItemDef[] = char.inventory && char.inventory.length > 0
+    const gearBonuses = getGearStatBonuses(savedGear);
+    const effMaxHp = (char.maxHp || 100) + gearBonuses.maxHp;
+    const effMaxMp = (char.maxMp || 80) + gearBonuses.maxMp;
+    setPlayerHp(Math.min(effMaxHp, char.hp || effMaxHp));
+    setPlayerMaxHp(effMaxHp);
+    setPlayerMp(Math.min(effMaxMp, char.mp || effMaxMp));
+    setPlayerMaxMp(effMaxMp);
+
+    // 2. Restore or initialize inventory (respeita inventário vazio)
+    const savedInventory: ItemDef[] = char.inventory
       ? char.inventory.map((item) => ({ ...item }))
       : DEFAULT_INVENTORY_ITEMS.map((item) => ({ ...item }));
     setInventoryItems(savedInventory);
@@ -468,10 +464,13 @@ export default function App() {
     accountRef.current = cloned;
     const char = cloned.characters[charIdx];
     if (char) {
+      const bonuses = getGearStatBonuses(equippedGearRef.current);
+      const effMaxHp = char.maxHp + bonuses.maxHp;
+      const effMaxMp = char.maxMp + bonuses.maxMp;
       setPlayerHp(char.hp);
-      setPlayerMaxHp(char.maxHp);
+      setPlayerMaxHp(effMaxHp);
       setPlayerMp(char.mp);
-      setPlayerMaxMp(char.maxMp);
+      setPlayerMaxMp(effMaxMp);
     }
     if (didLevelUp) {
       setLevelUpMsg(`🎉 LEVEL UP! Você atingiu o nível ${newLevel}!`);
@@ -614,6 +613,16 @@ export default function App() {
     const acc = accountRef.current;
     if (acc) {
       savePlayerGear(acc, activeCharIndexRef.current, nextGear);
+      const char = acc.characters[activeCharIndexRef.current];
+      if (char) {
+        const bonuses = getGearStatBonuses(nextGear);
+        const newMaxHp = (char.maxHp || 100) + bonuses.maxHp;
+        const newMaxMp = (char.maxMp || 80) + bonuses.maxMp;
+        setPlayerMaxHp(newMaxHp);
+        setPlayerMaxMp(newMaxMp);
+        setPlayerHp((cur) => Math.min(newMaxHp, cur));
+        setPlayerMp((cur) => Math.min(newMaxMp, cur));
+      }
     }
   };
 
@@ -630,6 +639,16 @@ export default function App() {
     const acc = accountRef.current;
     if (acc) {
       savePlayerGear(acc, activeCharIndexRef.current, nextGear);
+      const char = acc.characters[activeCharIndexRef.current];
+      if (char) {
+        const bonuses = getGearStatBonuses(nextGear);
+        const newMaxHp = (char.maxHp || 100) + bonuses.maxHp;
+        const newMaxMp = (char.maxMp || 80) + bonuses.maxMp;
+        setPlayerMaxHp(newMaxHp);
+        setPlayerMaxMp(newMaxMp);
+        setPlayerHp((cur) => Math.min(newMaxHp, cur));
+        setPlayerMp((cur) => Math.min(newMaxMp, cur));
+      }
     }
   };
 
@@ -756,7 +775,6 @@ export default function App() {
             </div>
             <div className="hero-mini-info">
               <strong>{curCharDef.name}</strong>
-              <span>{curCharDef.className}</span>
             </div>
           </button>
 
@@ -772,8 +790,6 @@ export default function App() {
             <PlayerHUD
               character={activeChar}
               playerName={account.name}
-              currentHp={playerHp}
-              currentMp={playerMp}
               onOpenExchange={() => setIsExchangeOpen(true)}
             />
           )}

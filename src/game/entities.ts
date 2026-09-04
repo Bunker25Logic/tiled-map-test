@@ -26,6 +26,16 @@ export const MONSTER_CONFIGS: Record<string, MonsterConfig> = rawConfigs;
 
 export type MonsterImages = Record<string, HTMLImageElement>;
 
+export function getMonsterAssetFolder(type: string): string {
+  if (type.endsWith('_mini')) {
+    return type.replace('_mini', '_chefe');
+  }
+  if (type === 'draertis' || type === 'dragis' || type === 'golen' || type === 'triardinguer') {
+    return `${type}_chefe`;
+  }
+  return type;
+}
+
 export async function loadMonsterSprites(types: string[]): Promise<MonsterImages> {
   const images: MonsterImages = {};
   const promises: Promise<void>[] = [];
@@ -33,16 +43,19 @@ export async function loadMonsterSprites(types: string[]): Promise<MonsterImages
   for (const type of types) {
     const config = MONSTER_CONFIGS[type];
     const maxFrames = config?.frameCount || 3;
+    const folder = getMonsterAssetFolder(type);
 
     for (let frame = 1; frame <= maxFrames; frame++) {
       for (let dirNum = 1; dirNum <= 4; dirNum++) {
         const key = `${type}_${frame}_${dirNum}`;
-        const filePath = `/assets/entities/${type}/${frame}_1_1_${dirNum}.png`;
+        const assetKey = `${folder}_${frame}_${dirNum}`;
+        const filePath = `/assets/entities/${folder}/${frame}_1_1_${dirNum}.png`;
 
         promises.push(
           loadChromaKeyImage(filePath)
             .then((img) => {
               images[key] = img;
+              images[assetKey] = img;
             })
             .catch((err) => {
               console.warn(`Failed to load monster sprite: ${filePath}`, err);
@@ -145,6 +158,16 @@ const MONSTER_COMBAT: Record<string, Partial<MonsterCombatDef>> = {
   token:        { behavior: 'aggressive', maxHp: 220, attack: 40, aggroRadius: 195, xpReward: 310, chaseSpeed: 1.0 },
   'cavern creature': { behavior: 'aggressive', maxHp: 180, attack: 32, aggroRadius: 170, xpReward: 200, chaseSpeed: 1.1 },
   golen2:       { behavior: 'aggressive', maxHp: 230, attack: 42, aggroRadius: 165, xpReward: 250, chaseSpeed: 0.9 },
+
+  // ── Chefes Majestosos & Lacaios (Minis) ──
+  golen_chefe:        { behavior: 'aggressive', maxHp: 1800, attack: 65,  aggroRadius: 260, xpReward: 1500, chaseSpeed: 1.05 },
+  golen_mini:         { behavior: 'aggressive', maxHp: 160,  attack: 24,  aggroRadius: 160, xpReward: 110,  chaseSpeed: 1.25 },
+  triardinguer_chefe: { behavior: 'aggressive', maxHp: 2600, attack: 85,  aggroRadius: 280, xpReward: 2400, chaseSpeed: 1.1 },
+  triardinguer_mini:  { behavior: 'aggressive', maxHp: 210,  attack: 32,  aggroRadius: 170, xpReward: 160,  chaseSpeed: 1.3 },
+  draertis_chefe:     { behavior: 'aggressive', maxHp: 3600, attack: 110, aggroRadius: 300, xpReward: 3800, chaseSpeed: 1.15 },
+  draertis_mini:      { behavior: 'aggressive', maxHp: 260,  attack: 40,  aggroRadius: 180, xpReward: 260,  chaseSpeed: 1.35 },
+  dragis_chefe:       { behavior: 'aggressive', maxHp: 5200, attack: 145, aggroRadius: 340, xpReward: 6500, chaseSpeed: 1.2 },
+  dragis_mini:        { behavior: 'aggressive', maxHp: 340,  attack: 48,  aggroRadius: 200, xpReward: 350,  chaseSpeed: 1.4 },
 };
 
 const DEFAULT_COMBAT: MonsterCombatDef = {
@@ -220,6 +243,10 @@ export class Monster {
   /** Called when this monster successfully hits the player */
   public onAttackPlayer?: (damage: number) => void;
 
+  public isBoss = false;
+  public isMini = false;
+  public renderScale = 1.0;
+
   constructor(
     id: string,
     type: string,
@@ -244,6 +271,9 @@ export class Monster {
     this.homeY = spawnOpts?.homeY ?? y;
     this.roamRadius = spawnOpts?.roamRadius ?? 50;
     this.maxChaseDistance = spawnOpts?.maxChaseDistance ?? 260;
+    this.isBoss = this.type.includes('_chefe');
+    this.isMini = this.type.includes('_mini');
+    this.renderScale = this.isBoss ? 1.85 : (this.isMini ? 0.9 : 1.0);
     this.config = MONSTER_CONFIGS[type] || {
       name: type,
       width: 32, height: 32,
@@ -253,6 +283,15 @@ export class Monster {
       hitboxW: 16, hitboxH: 12,
       speed: 38, walkFps: 5, frameCount: 3,
     };
+    if (this.isBoss) {
+      this.config = {
+        ...this.config,
+        hitboxW: Math.round(this.config.hitboxW * 1.35),
+        hitboxH: Math.round(this.config.hitboxH * 1.35),
+        shadowRadiusX: Math.round(this.config.shadowRadiusX * 1.5),
+        shadowRadiusY: Math.round(this.config.shadowRadiusY * 1.5),
+      };
+    }
     this.combat = getCombat(type);
     this.hp = this.combat.maxHp;
     this.maxHp = this.combat.maxHp;
@@ -599,34 +638,6 @@ export interface LootBox {
   collectAnim: number;
 }
 
-/** Loot table entries per rarity */
-const LOOT_TABLE: { rarity: LootRarity; weight: number; goldRange: [number, number]; itemPool: string[] }[] = [
-  {
-    rarity: 'common',
-    weight: 55,
-    goldRange: [5, 20],
-    itemPool: [],
-  },
-  {
-    rarity: 'rare',
-    weight: 30,
-    goldRange: [15, 45],
-    itemPool: ['potion_hp_large', 'potion_mp_large', 'ring_life', 'ring_time', 'ring_dwarven', 'ring_stealth', 'ring_energy'],
-  },
-  {
-    rarity: 'epic',
-    weight: 12,
-    goldRange: [35, 90],
-    itemPool: ['elixir_fury', 'sword_light', 'ring_healing', 'ring_amethyst', 'ring_power', 'ring_crystal'],
-  },
-  {
-    rarity: 'legendary',
-    weight: 3,
-    goldRange: [100, 250],
-    itemPool: ['staff_shadow', 'armor_paladin', 'ring_might', 'sword_gold'],
-  },
-];
-
 const RARITY_COLORS: Record<LootRarity, { main: string; glow: string; accent: string }> = {
   common:    { main: '#94a3b8', glow: 'rgba(148, 163, 184, 0.4)', accent: '#cbd5e1' },
   rare:      { main: '#38bdf8', glow: 'rgba(56, 189, 248, 0.5)',  accent: '#7dd3fc' },
@@ -634,46 +645,53 @@ const RARITY_COLORS: Record<LootRarity, { main: string; glow: string; accent: st
   legendary: { main: '#f59e0b', glow: 'rgba(245, 158, 11, 0.6)',  accent: '#fde68a' },
 };
 
-/** Generate a loot box drop from a killed monster */
-export function generateLootBox(monsterId: string, x: number, y: number, xpReward: number): LootBox {
-  // XP bonus shifts rarity weights towards better loot
-  const xpBonus = Math.min(45, xpReward / 10);
+const BOSS_EQUIPMENT_DROPS: Record<string, string[]> = {
+  golen_chefe: ['shield_aegis', 'armor_paladin', 'ring_dwarven', 'ring_healing', 'sword_light'],
+  triardinguer_chefe: ['sword_light', 'radiant_sword', 'ring_power', 'boots_hermes', 'ring_time'],
+  draertis_chefe: ['staff_shadow', 'robe_mystic', 'ring_amethyst', 'ring_healing', 'ring_time', 'ring_crystal'],
+  dragis_chefe: ['sword_gold', 'armor_paladin', 'ring_might', 'wing_angelic', 'elixir_fury'],
+};
 
-  // Roll rarity
-  const adjustedWeights = LOOT_TABLE.map((entry) => {
-    let w = entry.weight;
-    if (entry.rarity === 'common') w = Math.max(8, w - xpBonus * 1.2);
-    else if (entry.rarity === 'rare') w += xpBonus * 0.45;
-    else if (entry.rarity === 'epic') w += xpBonus * 0.45;
-    else if (entry.rarity === 'legendary') w += xpBonus * 0.30;
-    return w;
-  });
-  const totalWeight = adjustedWeights.reduce((a, b) => a + b, 0);
-  let roll = Math.random() * totalWeight;
-  let selectedEntry = LOOT_TABLE[0];
-  for (let i = 0; i < LOOT_TABLE.length; i++) {
-    roll -= adjustedWeights[i];
-    if (roll <= 0) {
-      selectedEntry = LOOT_TABLE[i];
-      break;
-    }
+/** Generate a loot box drop from a killed monster (Chefes derrubam equipamentos garantidos) */
+export function generateLootBox(
+  monsterId: string,
+  x: number,
+  y: number,
+  xpReward: number,
+  isBoss = false,
+  monsterType = ''
+): LootBox {
+  if (isBoss) {
+    const bossPool = BOSS_EQUIPMENT_DROPS[monsterType] || [
+      'sword_gold', 'armor_paladin', 'ring_might', 'wing_angelic', 'shield_aegis', 'boots_hermes'
+    ];
+    const itemId = bossPool[Math.floor(Math.random() * bossPool.length)];
+    const gold = 150 + Math.floor(Math.random() * 200) + Math.floor(xpReward * 0.1);
+    return {
+      id: `loot_boss_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      x,
+      y,
+      rarity: 'legendary',
+      gold,
+      itemId,
+      animTimer: Math.random() * Math.PI * 2,
+      collected: false,
+      collectAnim: 0,
+    };
   }
 
-  const minGold = selectedEntry.goldRange[0];
-  const maxGold = selectedEntry.goldRange[1];
-  const gold = minGold + Math.floor(Math.random() * (maxGold - minGold + 1));
-  const hasItem = selectedEntry.itemPool.length > 0 && (selectedEntry.rarity !== 'common' ? Math.random() < 0.75 : Math.random() < 0.25);
-  const itemId = hasItem && selectedEntry.itemPool.length > 0
-    ? selectedEntry.itemPool[Math.floor(Math.random() * selectedEntry.itemPool.length)]
-    : undefined;
+  // Monstros normais não derrubam itens de equipamento (apenas chefes dropam equipamentos)
+  const rollPotion = Math.random() < 0.08;
+  const potionId = rollPotion ? (Math.random() < 0.5 ? 'potion_hp_large' : 'potion_mp_large') : undefined;
+  const gold = Math.max(3, Math.floor(xpReward * 0.15)) + Math.floor(Math.random() * 10);
 
   return {
     id: `loot_${monsterId}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     x,
     y,
-    rarity: selectedEntry.rarity,
+    rarity: rollPotion ? 'rare' : 'common',
     gold,
-    itemId,
+    itemId: potionId,
     animTimer: Math.random() * Math.PI * 2,
     collected: false,
     collectAnim: 0,

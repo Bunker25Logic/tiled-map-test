@@ -127,24 +127,24 @@ export default function SettingsModal({
             <span className="settings-section-title">Estilo Gráfico do Mundo</span>
             <div className="settings-options-grid">
               <button
-                className={`btn-setting-card ${graphicStyle === 'pixel-sharp' ? 'active' : ''}`}
-                onClick={() => onSelectGraphicStyle('pixel-sharp')}
-              >
-                <span className="setting-card-icon">🎨</span>
-                <div className="setting-card-text">
-                  <strong>Pixel Sharp (Padrão)</strong>
-                  <small>Pixel-art nítido e perfeito sem distorções</small>
-                </div>
-              </button>
-
-              <button
                 className={`btn-setting-card ${graphicStyle === 'modern-hd' ? 'active' : ''}`}
                 onClick={() => onSelectGraphicStyle('modern-hd')}
               >
                 <span className="setting-card-icon">✨</span>
                 <div className="setting-card-text">
-                  <strong>Moderno HD</strong>
-                  <small>Interpolação bilinear suave e bordas polidas</small>
+                  <strong>Moderno HD (Padrão)</strong>
+                  <small>Interpolação bilinear suave e sem serrilhado</small>
+                </div>
+              </button>
+
+              <button
+                className={`btn-setting-card ${graphicStyle === 'pixel-sharp' ? 'active' : ''}`}
+                onClick={() => onSelectGraphicStyle('pixel-sharp')}
+              >
+                <span className="setting-card-icon">🎨</span>
+                <div className="setting-card-text">
+                  <strong>Pixel Sharp</strong>
+                  <small>Pixel-art clássico com arestas quadradas</small>
                 </div>
               </button>
 

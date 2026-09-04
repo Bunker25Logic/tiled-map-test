@@ -6,35 +6,18 @@ import CoinIcon from './CoinIcon';
 interface PlayerHUDProps {
   character: PlayerCharacter;
   playerName: string;
-  currentHp?: number;
-  currentMp?: number;
   onXPGainDebug?: () => void;
   onOpenExchange?: () => void;
 }
 
 export default function PlayerHUD({
   character,
-  currentHp,
-  currentMp,
   onOpenExchange,
 }: PlayerHUDProps) {
-  const hp = currentHp !== undefined ? currentHp : character.hp;
-  const mp = currentMp !== undefined ? currentMp : character.mp;
-  const maxHp = character.maxHp > 0 ? character.maxHp : 100;
-  const maxMp = character.maxMp > 0 ? character.maxMp : 100;
-
   const currentLevel = getLevelFromXP(character.xp);
   const xpProgress = getLevelProgress(character.xp);
   const xpNeeded = getXPToNextLevel(character.xp);
   const wallet = character.wallet || { gold: 0, silver: 0, basalt: 0 };
-
-  const hpPercent = maxHp > 0 ? hp / maxHp : 1;
-  const mpPercent = maxMp > 0 ? mp / maxMp : 1;
-
-  const hpColor =
-    hpPercent > 0.6 ? '#22c55e' :
-    hpPercent > 0.3 ? '#f59e0b' :
-    '#ef4444';
 
   return (
     <div className="player-hud">
@@ -44,29 +27,6 @@ export default function PlayerHUD({
         <span className="hud-level-number">{currentLevel}</span>
       </div>
 
-      {/* HP Bar */}
-      <div className="hud-bar-row hud-hp-row" title={`Vida: ${hp} / ${maxHp} (${Math.round(hpPercent * 100)}%)`}>
-        <span className="hud-bar-label">❤️</span>
-        <div className="hud-bar-track">
-          <div
-            className="hud-bar-fill hud-hp-fill"
-            style={{ width: `${Math.max(0, Math.min(1, hpPercent)) * 100}%`, backgroundColor: hpColor }}
-          />
-        </div>
-        <span className="hud-bar-value">{hp}<span className="hud-bar-max">/{maxHp}</span></span>
-      </div>
-
-      {/* MP Bar */}
-      <div className="hud-bar-row hud-mp-row" title={`Mana: ${mp} / ${maxMp} (${Math.round(mpPercent * 100)}%)`}>
-        <span className="hud-bar-label">🔷</span>
-        <div className="hud-bar-track">
-          <div
-            className="hud-bar-fill hud-mp-fill"
-            style={{ width: `${Math.max(0, Math.min(1, mpPercent)) * 100}%` }}
-          />
-        </div>
-        <span className="hud-bar-value">{mp}<span className="hud-bar-max">/{maxMp}</span></span>
-      </div>
 
       {/* XP Bar */}
       <div className="hud-bar-row hud-xp-row" title={`XP: ${character.xp.toLocaleString()} • Próximo nível em ${xpNeeded.toLocaleString()} XP`}>
