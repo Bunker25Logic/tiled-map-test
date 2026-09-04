@@ -49,6 +49,9 @@ import {
   loadSession,
   loadAccount,
 } from './game/playerStore';
+import { usePWA } from './game/usePWA';
+import { InstallModal } from './components/InstallModal';
+import { AssetDownloadModal } from './components/AssetDownloadModal';
 import './App.css';
 
 // Default starting 3-slot loadouts per character
@@ -1014,6 +1017,99 @@ export default function App() {
         />
       )}
       <OrientationLockModal />
+
+      {/* ── PWA System ── */}
+      <PWASystem />
     </div>
   );
 }
+
+// ── PWA System Component ──────────────────────────────────────────────────────
+function PWASystem() {
+  const { showInstallModal, isIOS, canInstall, needRefresh, promptInstall, applyUpdate } = usePWA();
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadDone, setDownloadDone] = useState(() =>
+    localStorage.getItem('pwa_assets_downloaded') === 'true'
+  );
+
+  // Após instalar, perguntar se quer baixar assets
+  useEffect(() => {
+    if (!showInstallModal && !downloadDone) {
+      const timer = setTimeout(() => setShowDownloadModal(true), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [showInstallModal, downloadDone]);
+
+  const handleDownloadComplete = () => {
+    localStorage.setItem('pwa_assets_downloaded', 'true');
+    setDownloadDone(true);
+    setShowDownloadModal(false);
+  };
+
+  const handleSkipDownload = () => {
+    setShowDownloadModal(false);
+  };
+
+  return (
+    <>
+      {/* Modal de instalação obrigatório no mobile */}
+      {showInstallModal && (
+        <InstallModal
+          isIOS={isIOS}
+          canInstall={canInstall}
+          onInstall={promptInstall}
+        />
+      )}
+
+      {/* Modal de download de assets */}
+      {!showInstallModal && showDownloadModal && (
+        <AssetDownloadModal
+          onComplete={handleDownloadComplete}
+          onSkip={handleSkipDownload}
+        />
+      )}
+
+      {/* Banner de atualização disponível */}
+      {needRefresh && (
+        <div style={updateBannerStyle}>
+          <span style={{ fontSize: 13, color: '#e0e8ff' }}>🔄 Nova versão disponível!</span>
+          <button
+            id="pwa-update-btn"
+            onClick={applyUpdate}
+            style={updateBtnStyle}
+          >
+            Atualizar
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+const updateBannerStyle: React.CSSProperties = {
+  position: 'fixed',
+  bottom: 16,
+  left: '50%',
+  transform: 'translateX(-50%)',
+  zIndex: 99997,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 16,
+  background: 'linear-gradient(135deg, #1a1a3a, #0e0e22)',
+  border: '1px solid rgba(100,150,255,0.4)',
+  borderRadius: 12,
+  padding: '12px 20px',
+  boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
+  whiteSpace: 'nowrap',
+};
+
+const updateBtnStyle: React.CSSProperties = {
+  padding: '6px 16px',
+  background: 'linear-gradient(135deg, #1565c0, #1976d2)',
+  border: 'none',
+  borderRadius: 8,
+  color: '#fff',
+  fontSize: 13,
+  fontWeight: 700,
+  cursor: 'pointer',
+};

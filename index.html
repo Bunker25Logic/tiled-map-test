@@ -2,16 +2,40 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/pwa-512x512.png" />
+    <!-- Viewport & Mobile -->
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
+    <!-- PWA & Mobile Web App -->
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Oliver b25l" />
+    <meta name="application-name" content="Oliver b25l" />
+    <!-- Orientation -->
     <meta name="screen-orientation" content="landscape" />
-    <title>Tibia Tiled Explorer</title>
+    <!-- Theme -->
+    <meta name="theme-color" content="#1a1a2e" />
+    <meta name="msapplication-navbutton-color" content="#1a1a2e" />
+    <meta name="msapplication-TileColor" content="#0a0a0f" />
+    <meta name="msapplication-TileImage" content="/pwa-192x192.png" />
+    <!-- SEO -->
+    <meta name="description" content="Oliver b25l - RPG de aventura épica com batalhas, masmorras e criaturas fantásticas. Jogue offline no seu celular!" />
+    <meta name="keywords" content="RPG, aventura, jogo, online, offline, batalha, masmorra" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="Oliver b25l" />
+    <meta property="og:description" content="RPG de aventura épica. Instale e jogue offline!" />
+    <meta property="og:image" content="/pwa-512x512.png" />
+    <meta property="og:type" content="website" />
+    <title>Oliver b25l</title>
   </head>
   <body>
     <div id="root"></div>
