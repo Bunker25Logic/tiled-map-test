@@ -39,9 +39,9 @@ export const NPCS_CONFIG: Record<NPCId, NPCDef> = {
     greeting: 'Pelas forjas de Kazordoon! O que um valente guerreiro procura hoje?',
     dialogue:
       'Forjo lâminas e armaduras afiadas com o mais nobre aço do continente. Se você trouxe espadas, escudos ou troféus encontrados nas masmorras, pago um preço justo em moedas de prata e ouro!',
-    mapId: 'map1',
-    x: 23 - 96,   // à esquerda do spawn
-    y: -32,
+    mapId: 'mundo_sobrevivencia',
+    x: 960,       // Em frente à Ferraria
+    y: 576,
     width: 32,
     height: 32,
     hitboxW: 16,
@@ -67,9 +67,9 @@ export const NPCS_CONFIG: Record<NPCId, NPCDef> = {
     greeting: 'Aproxime-se do caldeirão arcano... Sinto a fragrância de mana pura no ar.',
     dialogue:
       'Aventureiro prudente jamais desce às profundezas sem poções revigorantes! Meus elixires fecham as piores feridas e saciam a sede mágica instantaneamente.',
-    mapId: 'map1',
-    x: 23 + 96,   // à direita do spawn
-    y: -32,
+    mapId: 'mundo_sobrevivencia',
+    x: 480,       // À direita da Cabana do Jogador
+    y: 560,
     width: 64,
     height: 64,
     hitboxW: 18,
@@ -91,9 +91,9 @@ export const NPCS_CONFIG: Record<NPCId, NPCDef> = {
     greeting: 'Que a luz dos Deuses de Tibia proteja seus passos nesta terra perigosa.',
     dialogue:
       'A morte neste mundo drena a alma e arranca 10% de toda a sua experiência acumulada. Como Sacerdote do Templo, posso conceder a Bênção Sagrada por 10 Moedas de Ouro. Com ela, a perda de XP ao cair em combate cai de 10% para meros 2%!',
-    mapId: 'map1',
-    x: 23,         // acima do spawn
-    y: -32 - 80,
+    mapId: 'mundo_sobrevivencia',
+    x: 352,       // Na praça da vila perto da fonte
+    y: 560,
     width: 64,
     height: 64,
     hitboxW: 20,

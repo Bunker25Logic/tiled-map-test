@@ -18,12 +18,13 @@ export function getTilesetForGid(
     .sort((a, b) => a.firstgid - b.firstgid);
 
   let target: TiledTileset | null = null;
-  for (const ts of valid) {
+  for (let i = valid.length - 1; i >= 0; i--) {
+    const ts = valid[i];
     if (cleaned >= ts.firstgid) {
-      if (ts.tilecount && cleaned >= ts.firstgid + ts.tilecount) {
-        continue;
+      if (!ts.tilecount || cleaned < ts.firstgid + ts.tilecount) {
+        target = ts;
+        break;
       }
-      target = ts;
     }
   }
   return target;
@@ -163,6 +164,22 @@ export function buildCollisionRects(map: TiledMap): Rect[] {
     for (const obj of layer.objects) {
       // Ignore tile objects (items with images like ladders, wall tiles, flowers)
       if (obj.gid !== undefined) continue;
+
+      // Ignore triggers and portals (player must be able to walk into cave entrances/stairs)
+      const objType = (obj.type || '').toLowerCase();
+      const objName = (obj.name || '').toLowerCase();
+      if (
+        objType.includes('trigger') ||
+        objType.includes('portal') ||
+        objType.includes('warp') ||
+        objType.includes('teleport') ||
+        objType.includes('entrance') ||
+        objType.includes('exit') ||
+        objName.includes('gatilho') ||
+        objName.includes('trigger')
+      ) {
+        continue;
+      }
 
       // Handle user-drawn shapes: Rectangle, Ellipse/Round, Capsule
       const width = obj.width || 0;

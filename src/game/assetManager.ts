@@ -6,21 +6,19 @@ import type { TilesetImages } from './renderer';
 import { ITEM_OFFSETS } from './itemOffsets';
 
 export const TILESET_ASSETS: Record<string, string> = {
-  otsp_tiles_01: '/assets/tiles/otsp_tiles_01.png',
-  otsp_nature_01: '/assets/tiles/otsp_nature_01.png',
-  otsp_walls_01: '/assets/tiles/otsp_walls_01.png',
-  otsp_walls_02: '/assets/tiles/otsp_walls_02.png',
+  chao: '/assets/tiles/chao.png',
+  nature: '/assets/tiles/nature.png',
+  agua: '/assets/tiles/agua.png',
+  walls: '/assets/tiles/walls.png',
+  walls2: '/assets/tiles/walls2.png',
+  town: '/assets/tiles/town.png',
   otsp_doors_01: '/assets/tiles/otsp_doors_01.png',
-  otsp_town_01: '/assets/tiles/otsp_town_01.png',
-  otsp_misc_01: '/assets/tiles/otsp_misc_01.png',
-  Daniel: '/assets/tiles/Daniel.png',
-  Leshrot: '/assets/tiles/Leshrot.png',
-  ElderDark: '/assets/tiles/ElderDark.png',
-  Madarada: '/assets/tiles/Madarada.png',
-  Nordberg: '/assets/tiles/Nordberg.png',
-  Somni: '/assets/tiles/Somni.png',
-  Way20: '/assets/tiles/Way20.png',
-  wesleyt10: '/assets/tiles/wesleyt10.png',
+  // Retrocompatibilidade caso algum mapa ainda use nomes legados
+  otsp_tiles_01: '/assets/tiles/chao.png',
+  otsp_nature_01: '/assets/tiles/nature.png',
+  otsp_walls_01: '/assets/tiles/walls.png',
+  otsp_walls_02: '/assets/tiles/walls2.png',
+  otsp_town_01: '/assets/tiles/town.png',
 };
 
 export interface GameAssetCache {

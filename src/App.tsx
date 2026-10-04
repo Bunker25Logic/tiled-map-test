@@ -75,7 +75,7 @@ export default function App() {
   const [account, setAccount] = useState<PlayerAccount | null>(null);
   const [activeCharIndex, setActiveCharIndex] = useState(0);
 
-  const [currentZoneId, setCurrentZoneId] = useState<string>('map1');
+  const [currentZoneId, setCurrentZoneId] = useState<string>('mundo_sobrevivencia');
   const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId>('luxio');
   const [initialSpawnCoords, setInitialSpawnCoords] = useState<{ x: number; y: number } | null>(null);
   const [mapData, setMapData] = useState<TiledMap | null>(null);
@@ -340,16 +340,23 @@ export default function App() {
     }
 
     // 3. Restore last location & zone
-    const zone = char.lastZone || 'map1';
-    const zoneDef = ZONES[zone] || ZONES['map1'];
+    let rawZone = char.lastZone || 'mundo_sobrevivencia';
+    if (rawZone === 'map1') rawZone = 'mundo_sobrevivencia';
+    if (rawZone === 'caverna-zona-1') rawZone = 'caverna_minerios';
+    if (rawZone === 'caverna2') rawZone = 'caverna_fungica';
+    if (rawZone === 'caverna3') rawZone = 'catacumbas_deserto';
 
-    // Validate saved position against known zone bounds.
-    // If out of bounds (e.g. bug from old coordinates), reset to defaultSpawn.
+    const zone = rawZone;
+    const zoneDef = ZONES[zone] || ZONES['mundo_sobrevivencia'];
+
+    // Limites dos novos mapas para validar a posição salva
     const ZONE_BOUNDS: Record<string, { minX: number; maxX: number; minY: number; maxY: number }> = {
-      'map1':          { minX: -1200, maxX: 4000,  minY: -3200, maxY: 1200  },
-      'caverna-zona-1':{ minX: -200,  maxX: 1000,  minY: -200,  maxY: 1000  },
-      'caverna2':      { minX: -200,  maxX: 1000,  minY: -200,  maxY: 1000  },
-      'caverna3':      { minX: -200,  maxX: 1000,  minY: -200,  maxY: 1000  },
+      'mundo_sobrevivencia': { minX: 0, maxX: 2560, minY: 0, maxY: 2560 },
+      'caverna_minerios':    { minX: 0, maxX: 1280, minY: 0, maxY: 1280 },
+      'caverna_fungica':     { minX: 0, maxX: 1280, minY: 0, maxY: 1280 },
+      'catacumbas_deserto':  { minX: 0, maxX: 1280, minY: 0, maxY: 1280 },
+      'floresta_grande':     { minX: 0, maxX: 1920, minY: 0, maxY: 1920 },
+      'map1':                { minX: 0, maxX: 2560, minY: 0, maxY: 2560 },
     };
     const bounds = ZONE_BOUNDS[zone];
     let pos = char.lastPos || zoneDef.defaultSpawn;
@@ -439,8 +446,8 @@ export default function App() {
 
   const handleRespawnAtTemple = useCallback(() => {
     setDeathResult(null);
-    setCurrentZoneId('map1');
-    setInitialSpawnCoords({ x: 0, y: 0 });
+    setCurrentZoneId('mundo_sobrevivencia');
+    setInitialSpawnCoords(ZONES['mundo_sobrevivencia'].defaultSpawn);
     const acc = accountRef.current;
     if (acc) {
       const char = acc.characters[activeCharIndexRef.current];
@@ -854,7 +861,7 @@ export default function App() {
           </button>
 
           <div className="zone-indicator-badge">
-            <span className="zone-icon">{currentZoneId === 'map1' ? '🌲' : '🕳️'}</span>
+            <span className="zone-icon">{currentZoneId.startsWith('caverna') || currentZoneId.startsWith('catacumbas') ? '🕳️' : '🌲'}</span>
             <span className="zone-name">{currentZoneDef.name}</span>
           </div>
         </div>

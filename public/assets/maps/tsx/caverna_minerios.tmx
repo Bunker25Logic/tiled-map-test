@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="326">
+ <tileset firstgid="1" source="chao.tsx"/>
+ <tileset firstgid="1009" source="nature.tsx"/>
+ <tileset firstgid="1777" source="agua.tsx"/>
+ <tileset firstgid="2049" source="walls.tsx"/>
+ <tileset firstgid="3073" source="walls2.tsx"/>
+ <tileset firstgid="4049" source="town.tsx"/>
+ <tileset firstgid="4977" source="otsp_doors_01.tsx"/>
+ <layer id="1" name="Chao" width="40" height="40">
+  <data encoding="csv">
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,309,309,197,197,197,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,309,309,309,309,197,197,197,197,197,
+197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,309,309,309,309,309,309,197,197,197,197,
+197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,197,197,309,309,309,309,309,309,309,309,309,309,197,197,197,309,309,309,309,309,309,309,197,197,197,
+197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,197,197,309,309,309,197,197,197,
+197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,
+197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,309,309,309,309,309,309,309,197,197,197,309,309,309,309,309,309,197,197,197,197,
+197,197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,197,197,197,197,309,309,309,309,309,309,197,197,197,197,197,309,309,309,309,309,197,197,197,197,
+197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,309,309,309,309,309,197,197,197,197,197,
+197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,309,309,309,309,309,309,309,197,197,197,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,
+197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,
+197,197,197,197,197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,309,309,309,197,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,309,309,309,309,309,309,1777,1777,1777,1777,1777,309,309,309,309,309,309,309,197,197,197,197,309,309,309,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,309,309,309,1777,1777,1777,1777,1777,309,309,309,309,309,309,309,197,197,197,197,309,309,309,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,309,309,309,309,1777,1777,1777,1777,1777,309,309,309,309,309,309,309,309,197,197,197,197,197,197,197,197,197,
+197,197,197,197,309,309,309,197,197,197,197,197,197,197,197,309,309,309,1777,1777,1777,1777,1777,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,197,197,
+197,197,197,197,309,309,309,309,197,197,197,197,197,197,309,309,309,309,1777,1777,1777,1777,1777,309,309,309,197,309,309,309,309,309,309,309,309,197,197,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,197,309,309,309,309,309,309,309,309,309,197,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,
+197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,
+197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,
+197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,
+197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,197,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,
+197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,197,197,309,309,309,309,309,309,309,309,309,197,197,197,197,197,
+197,197,197,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,197,197,197,197,197,197,197,309,309,309,309,309,309,309,309,197,197,197,197,197,197,
+197,197,197,197,309,309,309,309,309,309,309,197,197,309,309,309,309,309,309,309,309,309,197,197,197,197,309,309,309,309,309,309,309,309,197,197,197,197,197,197,
+197,197,197,197,197,309,309,197,197,197,197,197,197,197,309,309,309,309,309,309,309,309,309,197,197,197,309,309,309,309,309,309,309,197,197,197,197,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,309,309,197,197,197,197,197,309,309,309,309,197,197,197,197,197,197,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,
+197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197,197
+  </data>
+ </layer>
+ <objectgroup id="2" name="Estruturas_e_Casas">
+  <object id="26" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1024" y="96" width="32" height="32"/>
+  <object id="28" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1056" y="96" width="32" height="32"/>
+  <object id="30" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="128" y="128" width="32" height="32"/>
+  <object id="32" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="160" y="128" width="32" height="32"/>
+  <object id="34" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="192" y="128" width="32" height="32"/>
+  <object id="36" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="224" y="128" width="32" height="32"/>
+  <object id="38" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="256" y="128" width="32" height="32"/>
+  <object id="40" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="288" y="128" width="32" height="32"/>
+  <object id="42" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="320" y="128" width="32" height="32"/>
+  <object id="44" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="352" y="128" width="32" height="32"/>
+  <object id="46" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="384" y="128" width="32" height="32"/>
+  <object id="48" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="416" y="128" width="32" height="32"/>
+  <object id="50" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="448" y="128" width="32" height="32"/>
+  <object id="52" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="480" y="128" width="32" height="32"/>
+  <object id="54" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="512" y="128" width="32" height="32"/>
+  <object id="56" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="544" y="128" width="32" height="32"/>
+  <object id="58" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="576" y="128" width="32" height="32"/>
+  <object id="60" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="608" y="128" width="32" height="32"/>
+  <object id="62" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="640" y="128" width="32" height="32"/>
+  <object id="64" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="672" y="128" width="32" height="32"/>
+  <object id="66" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="704" y="128" width="32" height="32"/>
+  <object id="68" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="736" y="128" width="32" height="32"/>
+  <object id="70" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="768" y="128" width="32" height="32"/>
+  <object id="72" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="992" y="128" width="32" height="32"/>
+  <object id="74" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1088" y="128" width="32" height="32"/>
+  <object id="76" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="96" y="160" width="32" height="32"/>
+  <object id="78" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="800" y="160" width="32" height="32"/>
+  <object id="80" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="960" y="160" width="32" height="32"/>
+  <object id="82" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1120" y="160" width="32" height="32"/>
+  <object id="85" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="832" y="192" width="32" height="32"/>
+  <object id="88" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1152" y="192" width="32" height="32"/>
+  <object id="93" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="864" y="224" width="32" height="32"/>
+  <object id="95" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="896" y="224" width="32" height="32"/>
+  <object id="97" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="928" y="224" width="32" height="32"/>
+  <object id="103" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1024" y="256" width="32" height="32"/>
+  <object id="105" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1056" y="256" width="32" height="32"/>
+  <object id="113" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="480" y="320" width="32" height="32"/>
+  <object id="123" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="160" y="384" width="32" height="32"/>
+  <object id="125" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="512" y="384" width="32" height="32"/>
+  <object id="127" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="544" y="384" width="32" height="32"/>
+  <object id="129" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="576" y="384" width="32" height="32"/>
+  <object id="131" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="608" y="384" width="32" height="32"/>
+  <object id="134" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="960" y="384" width="32" height="32"/>
+  <object id="139" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="864" y="416" width="32" height="32"/>
+  <object id="141" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="896" y="416" width="32" height="32"/>
+  <object id="143" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="928" y="416" width="32" height="32"/>
+  <object id="146" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="128" y="448" width="32" height="32"/>
+  <object id="148" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="768" y="448" width="32" height="32"/>
+  <object id="150" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="800" y="448" width="32" height="32"/>
+  <object id="152" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="832" y="448" width="32" height="32"/>
+  <object id="155" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="96" y="480" width="32" height="32"/>
+  <object id="159" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1088" y="512" width="32" height="32"/>
+  <object id="162" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1120" y="544" width="32" height="32"/>
+  <object id="167" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1152" y="576" width="32" height="32"/>
+  <object id="173" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="448" y="640" width="32" height="32"/>
+  <object id="175" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="960" y="640" width="32" height="32"/>
+  <object id="179" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="128" y="672" width="32" height="32"/>
+  <object id="181" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="160" y="672" width="32" height="32"/>
+  <object id="183" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="192" y="672" width="32" height="32"/>
+  <object id="186" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="992" y="672" width="32" height="32"/>
+  <object id="189" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="224" y="704" width="32" height="32"/>
+  <object id="191" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="448" y="704" width="32" height="32"/>
+  <object id="193" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1024" y="704" width="32" height="32"/>
+  <object id="195" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1056" y="704" width="32" height="32"/>
+  <object id="197" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1088" y="704" width="32" height="32"/>
+  <object id="200" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="256" y="736" width="32" height="32"/>
+  <object id="202" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="288" y="736" width="32" height="32"/>
+  <object id="204" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="320" y="736" width="32" height="32"/>
+  <object id="206" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="416" y="736" width="32" height="32"/>
+  <object id="209" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1120" y="736" width="32" height="32"/>
+  <object id="212" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="352" y="768" width="32" height="32"/>
+  <object id="214" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="384" y="768" width="32" height="32"/>
+  <object id="216" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="832" y="768" width="32" height="32"/>
+  <object id="219" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="96" y="800" width="32" height="32"/>
+  <object id="230" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="768" y="896" width="32" height="32"/>
+  <object id="232" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="1152" y="896" width="32" height="32"/>
+  <object id="238" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="128" y="960" width="32" height="32"/>
+  <object id="247" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="96" y="1024" width="32" height="32"/>
+  <object id="253" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="576" y="1056" width="32" height="32"/>
+  <object id="258" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="608" y="1088" width="32" height="32"/>
+  <object id="260" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="640" y="1088" width="32" height="32"/>
+  <object id="262" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="672" y="1088" width="32" height="32"/>
+  <object id="269" name="Parede_Rocha_Sul" type="RockWall" gid="3649" x="704" y="1120" width="32" height="32"/>
+  <object id="283" name="Escada_Saida" type="ExitLadder" gid="5589" x="320" y="288" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="3" name="Natureza_e_Vegetacao">
+  <object id="291" name="Veio_Minério" type="Ore" gid="4163" x="480" y="512" width="32" height="32"/>
+  <object id="293" name="Veio_Minério" type="Ore" gid="4164" x="512" y="480" width="32" height="32"/>
+  <object id="295" name="Veio_Minério" type="Ore" gid="4163" x="800" y="608" width="32" height="32"/>
+  <object id="297" name="Veio_Minério" type="Ore" gid="4164" x="832" y="736" width="32" height="32"/>
+  <object id="299" name="Veio_Minério" type="Ore" gid="4163" x="1024" y="832" width="32" height="32"/>
+  <object id="301" name="Veio_Minério" type="Ore" gid="4164" x="1088" y="864" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="4" name="Moveis_e_Decoracoes">
+  <object id="285" name="Bau_Madeira_Esq" type="Chest" gid="4117" x="256" y="352" width="32" height="32"/>
+  <object id="286" name="Bau_Madeira_Dir" type="Chest" gid="4118" x="288" y="352" width="32" height="32"/>
+  <object id="288" name="Fogueira" type="Campfire" gid="4161" x="352" y="352" width="32" height="32"/>
+  <object id="289" name="Caixa_Minerador" type="Crate" gid="4073" x="384" y="352" width="32" height="32"/>
+  <object id="290" name="Barris" type="Barrel" gid="4074" x="384" y="384" width="32" height="32"/>
+  <object id="303" name="Forja_TL" type="Forge" gid="4279" x="896" y="896" width="32" height="32"/>
+  <object id="304" name="Forja_TR" type="Forge" gid="4280" x="928" y="896" width="32" height="32"/>
+  <object id="305" name="Forja_BL" type="Forge" gid="4295" x="896" y="928" width="32" height="32"/>
+  <object id="306" name="Forja_BR" type="Forge" gid="4296" x="928" y="928" width="32" height="32"/>
+  <object id="308" name="Pilar_TL" type="Pillar" gid="4213" x="832" y="864" width="32" height="32"/>
+  <object id="309" name="Pilar_TR" type="Pillar" gid="4214" x="864" y="864" width="32" height="32"/>
+  <object id="310" name="Pilar_BL" type="Pillar" gid="4229" x="832" y="896" width="32" height="32"/>
+  <object id="311" name="Pilar_BR" type="Pillar" gid="4230" x="864" y="896" width="32" height="32"/>
+  <object id="313" name="Pilar_TL" type="Pillar" gid="4213" x="1056" y="864" width="32" height="32"/>
+  <object id="314" name="Pilar_TR" type="Pillar" gid="4214" x="1088" y="864" width="32" height="32"/>
+  <object id="315" name="Pilar_BL" type="Pillar" gid="4229" x="1056" y="896" width="32" height="32"/>
+  <object id="316" name="Pilar_BR" type="Pillar" gid="4230" x="1088" y="896" width="32" height="32"/>
+  <object id="318" name="Bau_Ouro_Esq" type="Chest" gid="4113" x="960" y="864" width="32" height="32"/>
+  <object id="319" name="Bau_Ouro_Dir" type="Chest" gid="4114" x="992" y="864" width="32" height="32"/>
+  <object id="321" name="Monolito_TL" type="Monolith" gid="4277" x="960" y="992" width="32" height="32"/>
+  <object id="322" name="Monolito_TR" type="Monolith" gid="4278" x="992" y="992" width="32" height="32"/>
+  <object id="323" name="Monolito_BL" type="Monolith" gid="4293" x="960" y="1024" width="32" height="32"/>
+  <object id="324" name="Monolito_BR" type="Monolith" gid="4294" x="992" y="1024" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="5" name="Colisoes_e_Gatilhos">
+  <object id="1" name="Colisao_Water" type="Water" x="576" y="576" width="32" height="32">
+  </object>
+  <object id="2" name="Colisao_Water" type="Water" x="608" y="576" width="32" height="32">
+  </object>
+  <object id="3" name="Colisao_Water" type="Water" x="640" y="576" width="32" height="32">
+  </object>
+  <object id="4" name="Colisao_Water" type="Water" x="672" y="576" width="32" height="32">
+  </object>
+  <object id="5" name="Colisao_Water" type="Water" x="704" y="576" width="32" height="32">
+  </object>
+  <object id="6" name="Colisao_Water" type="Water" x="576" y="608" width="32" height="32">
+  </object>
+  <object id="7" name="Colisao_Water" type="Water" x="608" y="608" width="32" height="32">
+  </object>
+  <object id="8" name="Colisao_Water" type="Water" x="640" y="608" width="32" height="32">
+  </object>
+  <object id="9" name="Colisao_Water" type="Water" x="672" y="608" width="32" height="32">
+  </object>
+  <object id="10" name="Colisao_Water" type="Water" x="704" y="608" width="32" height="32">
+  </object>
+  <object id="11" name="Colisao_Water" type="Water" x="576" y="640" width="32" height="32">
+  </object>
+  <object id="12" name="Colisao_Water" type="Water" x="608" y="640" width="32" height="32">
+  </object>
+  <object id="13" name="Colisao_Water" type="Water" x="640" y="640" width="32" height="32">
+  </object>
+  <object id="14" name="Colisao_Water" type="Water" x="672" y="640" width="32" height="32">
+  </object>
+  <object id="15" name="Colisao_Water" type="Water" x="704" y="640" width="32" height="32">
+  </object>
+  <object id="16" name="Colisao_Water" type="Water" x="576" y="672" width="32" height="32">
+  </object>
+  <object id="17" name="Colisao_Water" type="Water" x="608" y="672" width="32" height="32">
+  </object>
+  <object id="18" name="Colisao_Water" type="Water" x="640" y="672" width="32" height="32">
+  </object>
+  <object id="19" name="Colisao_Water" type="Water" x="672" y="672" width="32" height="32">
+  </object>
+  <object id="20" name="Colisao_Water" type="Water" x="704" y="672" width="32" height="32">
+  </object>
+  <object id="21" name="Colisao_Water" type="Water" x="576" y="704" width="32" height="32">
+  </object>
+  <object id="22" name="Colisao_Water" type="Water" x="608" y="704" width="32" height="32">
+  </object>
+  <object id="23" name="Colisao_Water" type="Water" x="640" y="704" width="32" height="32">
+  </object>
+  <object id="24" name="Colisao_Water" type="Water" x="672" y="704" width="32" height="32">
+  </object>
+  <object id="25" name="Colisao_Water" type="Water" x="704" y="704" width="32" height="32">
+  </object>
+  <object id="27" name="Colisao_SolidWall" type="SolidWall" x="1024" y="64" width="32" height="32">
+  </object>
+  <object id="29" name="Colisao_SolidWall" type="SolidWall" x="1056" y="64" width="32" height="32">
+  </object>
+  <object id="31" name="Colisao_SolidWall" type="SolidWall" x="128" y="96" width="32" height="32">
+  </object>
+  <object id="33" name="Colisao_SolidWall" type="SolidWall" x="160" y="96" width="32" height="32">
+  </object>
+  <object id="35" name="Colisao_SolidWall" type="SolidWall" x="192" y="96" width="32" height="32">
+  </object>
+  <object id="37" name="Colisao_SolidWall" type="SolidWall" x="224" y="96" width="32" height="32">
+  </object>
+  <object id="39" name="Colisao_SolidWall" type="SolidWall" x="256" y="96" width="32" height="32">
+  </object>
+  <object id="41" name="Colisao_SolidWall" type="SolidWall" x="288" y="96" width="32" height="32">
+  </object>
+  <object id="43" name="Colisao_SolidWall" type="SolidWall" x="320" y="96" width="32" height="32">
+  </object>
+  <object id="45" name="Colisao_SolidWall" type="SolidWall" x="352" y="96" width="32" height="32">
+  </object>
+  <object id="47" name="Colisao_SolidWall" type="SolidWall" x="384" y="96" width="32" height="32">
+  </object>
+  <object id="49" name="Colisao_SolidWall" type="SolidWall" x="416" y="96" width="32" height="32">
+  </object>
+  <object id="51" name="Colisao_SolidWall" type="SolidWall" x="448" y="96" width="32" height="32">
+  </object>
+  <object id="53" name="Colisao_SolidWall" type="SolidWall" x="480" y="96" width="32" height="32">
+  </object>
+  <object id="55" name="Colisao_SolidWall" type="SolidWall" x="512" y="96" width="32" height="32">
+  </object>
+  <object id="57" name="Colisao_SolidWall" type="SolidWall" x="544" y="96" width="32" height="32">
+  </object>
+  <object id="59" name="Colisao_SolidWall" type="SolidWall" x="576" y="96" width="32" height="32">
+  </object>
+  <object id="61" name="Colisao_SolidWall" type="SolidWall" x="608" y="96" width="32" height="32">
+  </object>
+  <object id="63" name="Colisao_SolidWall" type="SolidWall" x="640" y="96" width="32" height="32">
+  </object>
+  <object id="65" name="Colisao_SolidWall" type="SolidWall" x="672" y="96" width="32" height="32">
+  </object>
+  <object id="67" name="Colisao_SolidWall" type="SolidWall" x="704" y="96" width="32" height="32">
+  </object>
+  <object id="69" name="Colisao_SolidWall" type="SolidWall" x="736" y="96" width="32" height="32">
+  </object>
+  <object id="71" name="Colisao_SolidWall" type="SolidWall" x="768" y="96" width="32" height="32">
+  </object>
+  <object id="73" name="Colisao_SolidWall" type="SolidWall" x="992" y="96" width="32" height="32">
+  </object>
+  <object id="75" name="Colisao_SolidWall" type="SolidWall" x="1088" y="96" width="32" height="32">
+  </object>
+  <object id="77" name="Colisao_SolidWall" type="SolidWall" x="96" y="128" width="32" height="32">
+  </object>
+  <object id="79" name="Colisao_SolidWall" type="SolidWall" x="800" y="128" width="32" height="32">
+  </object>
+  <object id="81" name="Colisao_SolidWall" type="SolidWall" x="960" y="128" width="32" height="32">
+  </object>
+  <object id="83" name="Colisao_SolidWall" type="SolidWall" x="1120" y="128" width="32" height="32">
+  </object>
+  <object id="84" name="Colisao_SolidWall" type="SolidWall" x="64" y="160" width="32" height="32">
+  </object>
+  <object id="86" name="Colisao_SolidWall" type="SolidWall" x="832" y="160" width="32" height="32">
+  </object>
+  <object id="87" name="Colisao_SolidWall" type="SolidWall" x="928" y="160" width="32" height="32">
+  </object>
+  <object id="89" name="Colisao_SolidWall" type="SolidWall" x="1152" y="160" width="32" height="32">
+  </object>
+  <object id="90" name="Colisao_SolidWall" type="SolidWall" x="64" y="192" width="32" height="32">
+  </object>
+  <object id="91" name="Colisao_SolidWall" type="SolidWall" x="480" y="192" width="32" height="32">
+  </object>
+  <object id="92" name="Colisao_SolidWall" type="SolidWall" x="512" y="192" width="32" height="32">
+  </object>
+  <object id="94" name="Colisao_SolidWall" type="SolidWall" x="864" y="192" width="32" height="32">
+  </object>
+  <object id="96" name="Colisao_SolidWall" type="SolidWall" x="896" y="192" width="32" height="32">
+  </object>
+  <object id="98" name="Colisao_SolidWall" type="SolidWall" x="928" y="192" width="32" height="32">
+  </object>
+  <object id="99" name="Colisao_SolidWall" type="SolidWall" x="1184" y="192" width="32" height="32">
+  </object>
+  <object id="100" name="Colisao_SolidWall" type="SolidWall" x="64" y="224" width="32" height="32">
+  </object>
+  <object id="101" name="Colisao_SolidWall" type="SolidWall" x="480" y="224" width="32" height="32">
+  </object>
+  <object id="102" name="Colisao_SolidWall" type="SolidWall" x="608" y="224" width="32" height="32">
+  </object>
+  <object id="104" name="Colisao_SolidWall" type="SolidWall" x="1024" y="224" width="32" height="32">
+  </object>
+  <object id="106" name="Colisao_SolidWall" type="SolidWall" x="1056" y="224" width="32" height="32">
+  </object>
+  <object id="107" name="Colisao_SolidWall" type="SolidWall" x="1184" y="224" width="32" height="32">
+  </object>
+  <object id="108" name="Colisao_SolidWall" type="SolidWall" x="64" y="256" width="32" height="32">
+  </object>
+  <object id="109" name="Colisao_SolidWall" type="SolidWall" x="480" y="256" width="32" height="32">
+  </object>
+  <object id="110" name="Colisao_SolidWall" type="SolidWall" x="608" y="256" width="32" height="32">
+  </object>
+  <object id="111" name="Colisao_SolidWall" type="SolidWall" x="1184" y="256" width="32" height="32">
+  </object>
+  <object id="112" name="Colisao_SolidWall" type="SolidWall" x="96" y="288" width="32" height="32">
+  </object>
+  <object id="114" name="Colisao_SolidWall" type="SolidWall" x="480" y="288" width="32" height="32">
+  </object>
+  <object id="115" name="Colisao_SolidWall" type="SolidWall" x="608" y="288" width="32" height="32">
+  </object>
+  <object id="116" name="Colisao_SolidWall" type="SolidWall" x="1152" y="288" width="32" height="32">
+  </object>
+  <object id="117" name="Colisao_SolidWall" type="SolidWall" x="128" y="320" width="32" height="32">
+  </object>
+  <object id="118" name="Colisao_SolidWall" type="SolidWall" x="512" y="320" width="32" height="32">
+  </object>
+  <object id="119" name="Colisao_SolidWall" type="SolidWall" x="608" y="320" width="32" height="32">
+  </object>
+  <object id="120" name="Colisao_SolidWall" type="SolidWall" x="864" y="320" width="32" height="32">
+  </object>
+  <object id="121" name="Colisao_SolidWall" type="SolidWall" x="928" y="320" width="32" height="32">
+  </object>
+  <object id="122" name="Colisao_SolidWall" type="SolidWall" x="1152" y="320" width="32" height="32">
+  </object>
+  <object id="124" name="Colisao_SolidWall" type="SolidWall" x="160" y="352" width="32" height="32">
+  </object>
+  <object id="126" name="Colisao_SolidWall" type="SolidWall" x="512" y="352" width="32" height="32">
+  </object>
+  <object id="128" name="Colisao_SolidWall" type="SolidWall" x="544" y="352" width="32" height="32">
+  </object>
+  <object id="130" name="Colisao_SolidWall" type="SolidWall" x="576" y="352" width="32" height="32">
+  </object>
+  <object id="132" name="Colisao_SolidWall" type="SolidWall" x="608" y="352" width="32" height="32">
+  </object>
+  <object id="133" name="Colisao_SolidWall" type="SolidWall" x="832" y="352" width="32" height="32">
+  </object>
+  <object id="135" name="Colisao_SolidWall" type="SolidWall" x="960" y="352" width="32" height="32">
+  </object>
+  <object id="136" name="Colisao_SolidWall" type="SolidWall" x="1152" y="352" width="32" height="32">
+  </object>
+  <object id="137" name="Colisao_SolidWall" type="SolidWall" x="128" y="384" width="32" height="32">
+  </object>
+  <object id="138" name="Colisao_SolidWall" type="SolidWall" x="768" y="384" width="32" height="32">
+  </object>
+  <object id="140" name="Colisao_SolidWall" type="SolidWall" x="864" y="384" width="32" height="32">
+  </object>
+  <object id="142" name="Colisao_SolidWall" type="SolidWall" x="896" y="384" width="32" height="32">
+  </object>
+  <object id="144" name="Colisao_SolidWall" type="SolidWall" x="928" y="384" width="32" height="32">
+  </object>
+  <object id="145" name="Colisao_SolidWall" type="SolidWall" x="1120" y="384" width="32" height="32">
+  </object>
+  <object id="147" name="Colisao_SolidWall" type="SolidWall" x="128" y="416" width="32" height="32">
+  </object>
+  <object id="149" name="Colisao_SolidWall" type="SolidWall" x="768" y="416" width="32" height="32">
+  </object>
+  <object id="151" name="Colisao_SolidWall" type="SolidWall" x="800" y="416" width="32" height="32">
+  </object>
+  <object id="153" name="Colisao_SolidWall" type="SolidWall" x="832" y="416" width="32" height="32">
+  </object>
+  <object id="154" name="Colisao_SolidWall" type="SolidWall" x="1088" y="416" width="32" height="32">
+  </object>
+  <object id="156" name="Colisao_SolidWall" type="SolidWall" x="96" y="448" width="32" height="32">
+  </object>
+  <object id="157" name="Colisao_SolidWall" type="SolidWall" x="1088" y="448" width="32" height="32">
+  </object>
+  <object id="158" name="Colisao_SolidWall" type="SolidWall" x="64" y="480" width="32" height="32">
+  </object>
+  <object id="160" name="Colisao_SolidWall" type="SolidWall" x="1088" y="480" width="32" height="32">
+  </object>
+  <object id="161" name="Colisao_SolidWall" type="SolidWall" x="96" y="512" width="32" height="32">
+  </object>
+  <object id="163" name="Colisao_SolidWall" type="SolidWall" x="1120" y="512" width="32" height="32">
+  </object>
+  <object id="164" name="Colisao_SolidWall" type="SolidWall" x="256" y="544" width="32" height="32">
+  </object>
+  <object id="165" name="Colisao_SolidWall" type="SolidWall" x="992" y="544" width="32" height="32">
+  </object>
+  <object id="166" name="Colisao_SolidWall" type="SolidWall" x="1024" y="544" width="32" height="32">
+  </object>
+  <object id="168" name="Colisao_SolidWall" type="SolidWall" x="1152" y="544" width="32" height="32">
+  </object>
+  <object id="169" name="Colisao_SolidWall" type="SolidWall" x="352" y="576" width="32" height="32">
+  </object>
+  <object id="170" name="Colisao_SolidWall" type="SolidWall" x="960" y="576" width="32" height="32">
+  </object>
+  <object id="171" name="Colisao_SolidWall" type="SolidWall" x="1056" y="576" width="32" height="32">
+  </object>
+  <object id="172" name="Colisao_SolidWall" type="SolidWall" x="1184" y="576" width="32" height="32">
+  </object>
+  <object id="174" name="Colisao_SolidWall" type="SolidWall" x="448" y="608" width="32" height="32">
+  </object>
+  <object id="176" name="Colisao_SolidWall" type="SolidWall" x="960" y="608" width="32" height="32">
+  </object>
+  <object id="177" name="Colisao_SolidWall" type="SolidWall" x="1056" y="608" width="32" height="32">
+  </object>
+  <object id="178" name="Colisao_SolidWall" type="SolidWall" x="1184" y="608" width="32" height="32">
+  </object>
+  <object id="180" name="Colisao_SolidWall" type="SolidWall" x="128" y="640" width="32" height="32">
+  </object>
+  <object id="182" name="Colisao_SolidWall" type="SolidWall" x="160" y="640" width="32" height="32">
+  </object>
+  <object id="184" name="Colisao_SolidWall" type="SolidWall" x="192" y="640" width="32" height="32">
+  </object>
+  <object id="185" name="Colisao_SolidWall" type="SolidWall" x="416" y="640" width="32" height="32">
+  </object>
+  <object id="187" name="Colisao_SolidWall" type="SolidWall" x="992" y="640" width="32" height="32">
+  </object>
+  <object id="188" name="Colisao_SolidWall" type="SolidWall" x="96" y="672" width="32" height="32">
+  </object>
+  <object id="190" name="Colisao_SolidWall" type="SolidWall" x="224" y="672" width="32" height="32">
+  </object>
+  <object id="192" name="Colisao_SolidWall" type="SolidWall" x="448" y="672" width="32" height="32">
+  </object>
+  <object id="194" name="Colisao_SolidWall" type="SolidWall" x="1024" y="672" width="32" height="32">
+  </object>
+  <object id="196" name="Colisao_SolidWall" type="SolidWall" x="1056" y="672" width="32" height="32">
+  </object>
+  <object id="198" name="Colisao_SolidWall" type="SolidWall" x="1088" y="672" width="32" height="32">
+  </object>
+  <object id="199" name="Colisao_SolidWall" type="SolidWall" x="96" y="704" width="32" height="32">
+  </object>
+  <object id="201" name="Colisao_SolidWall" type="SolidWall" x="256" y="704" width="32" height="32">
+  </object>
+  <object id="203" name="Colisao_SolidWall" type="SolidWall" x="288" y="704" width="32" height="32">
+  </object>
+  <object id="205" name="Colisao_SolidWall" type="SolidWall" x="320" y="704" width="32" height="32">
+  </object>
+  <object id="207" name="Colisao_SolidWall" type="SolidWall" x="416" y="704" width="32" height="32">
+  </object>
+  <object id="208" name="Colisao_SolidWall" type="SolidWall" x="832" y="704" width="32" height="32">
+  </object>
+  <object id="210" name="Colisao_SolidWall" type="SolidWall" x="1120" y="704" width="32" height="32">
+  </object>
+  <object id="211" name="Colisao_SolidWall" type="SolidWall" x="96" y="736" width="32" height="32">
+  </object>
+  <object id="213" name="Colisao_SolidWall" type="SolidWall" x="352" y="736" width="32" height="32">
+  </object>
+  <object id="215" name="Colisao_SolidWall" type="SolidWall" x="384" y="736" width="32" height="32">
+  </object>
+  <object id="217" name="Colisao_SolidWall" type="SolidWall" x="832" y="736" width="32" height="32">
+  </object>
+  <object id="218" name="Colisao_SolidWall" type="SolidWall" x="1152" y="736" width="32" height="32">
+  </object>
+  <object id="220" name="Colisao_SolidWall" type="SolidWall" x="96" y="768" width="32" height="32">
+  </object>
+  <object id="221" name="Colisao_SolidWall" type="SolidWall" x="1152" y="768" width="32" height="32">
+  </object>
+  <object id="222" name="Colisao_SolidWall" type="SolidWall" x="64" y="800" width="32" height="32">
+  </object>
+  <object id="223" name="Colisao_SolidWall" type="SolidWall" x="1152" y="800" width="32" height="32">
+  </object>
+  <object id="224" name="Colisao_SolidWall" type="SolidWall" x="64" y="832" width="32" height="32">
+  </object>
+  <object id="225" name="Colisao_SolidWall" type="SolidWall" x="704" y="832" width="32" height="32">
+  </object>
+  <object id="226" name="Colisao_SolidWall" type="SolidWall" x="736" y="832" width="32" height="32">
+  </object>
+  <object id="227" name="Colisao_SolidWall" type="SolidWall" x="1152" y="832" width="32" height="32">
+  </object>
+  <object id="228" name="Colisao_SolidWall" type="SolidWall" x="96" y="864" width="32" height="32">
+  </object>
+  <object id="229" name="Colisao_SolidWall" type="SolidWall" x="704" y="864" width="32" height="32">
+  </object>
+  <object id="231" name="Colisao_SolidWall" type="SolidWall" x="768" y="864" width="32" height="32">
+  </object>
+  <object id="233" name="Colisao_SolidWall" type="SolidWall" x="1152" y="864" width="32" height="32">
+  </object>
+  <object id="234" name="Colisao_SolidWall" type="SolidWall" x="128" y="896" width="32" height="32">
+  </object>
+  <object id="235" name="Colisao_SolidWall" type="SolidWall" x="672" y="896" width="32" height="32">
+  </object>
+  <object id="236" name="Colisao_SolidWall" type="SolidWall" x="736" y="896" width="32" height="32">
+  </object>
+  <object id="237" name="Colisao_SolidWall" type="SolidWall" x="1184" y="896" width="32" height="32">
+  </object>
+  <object id="239" name="Colisao_SolidWall" type="SolidWall" x="128" y="928" width="32" height="32">
+  </object>
+  <object id="240" name="Colisao_SolidWall" type="SolidWall" x="576" y="928" width="32" height="32">
+  </object>
+  <object id="241" name="Colisao_SolidWall" type="SolidWall" x="768" y="928" width="32" height="32">
+  </object>
+  <object id="242" name="Colisao_SolidWall" type="SolidWall" x="1152" y="928" width="32" height="32">
+  </object>
+  <object id="243" name="Colisao_SolidWall" type="SolidWall" x="96" y="960" width="32" height="32">
+  </object>
+  <object id="244" name="Colisao_SolidWall" type="SolidWall" x="576" y="960" width="32" height="32">
+  </object>
+  <object id="245" name="Colisao_SolidWall" type="SolidWall" x="768" y="960" width="32" height="32">
+  </object>
+  <object id="246" name="Colisao_SolidWall" type="SolidWall" x="1152" y="960" width="32" height="32">
+  </object>
+  <object id="248" name="Colisao_SolidWall" type="SolidWall" x="96" y="992" width="32" height="32">
+  </object>
+  <object id="249" name="Colisao_SolidWall" type="SolidWall" x="576" y="992" width="32" height="32">
+  </object>
+  <object id="250" name="Colisao_SolidWall" type="SolidWall" x="768" y="992" width="32" height="32">
+  </object>
+  <object id="251" name="Colisao_SolidWall" type="SolidWall" x="1152" y="992" width="32" height="32">
+  </object>
+  <object id="252" name="Colisao_SolidWall" type="SolidWall" x="64" y="1024" width="32" height="32">
+  </object>
+  <object id="254" name="Colisao_SolidWall" type="SolidWall" x="576" y="1024" width="32" height="32">
+  </object>
+  <object id="255" name="Colisao_SolidWall" type="SolidWall" x="800" y="1024" width="32" height="32">
+  </object>
+  <object id="256" name="Colisao_SolidWall" type="SolidWall" x="1120" y="1024" width="32" height="32">
+  </object>
+  <object id="257" name="Colisao_SolidWall" type="SolidWall" x="64" y="1056" width="32" height="32">
+  </object>
+  <object id="259" name="Colisao_SolidWall" type="SolidWall" x="608" y="1056" width="32" height="32">
+  </object>
+  <object id="261" name="Colisao_SolidWall" type="SolidWall" x="640" y="1056" width="32" height="32">
+  </object>
+  <object id="263" name="Colisao_SolidWall" type="SolidWall" x="672" y="1056" width="32" height="32">
+  </object>
+  <object id="264" name="Colisao_SolidWall" type="SolidWall" x="800" y="1056" width="32" height="32">
+  </object>
+  <object id="265" name="Colisao_SolidWall" type="SolidWall" x="1088" y="1056" width="32" height="32">
+  </object>
+  <object id="266" name="Colisao_SolidWall" type="SolidWall" x="96" y="1088" width="32" height="32">
+  </object>
+  <object id="267" name="Colisao_SolidWall" type="SolidWall" x="352" y="1088" width="32" height="32">
+  </object>
+  <object id="268" name="Colisao_SolidWall" type="SolidWall" x="384" y="1088" width="32" height="32">
+  </object>
+  <object id="270" name="Colisao_SolidWall" type="SolidWall" x="704" y="1088" width="32" height="32">
+  </object>
+  <object id="271" name="Colisao_SolidWall" type="SolidWall" x="800" y="1088" width="32" height="32">
+  </object>
+  <object id="272" name="Colisao_SolidWall" type="SolidWall" x="1088" y="1088" width="32" height="32">
+  </object>
+  <object id="273" name="Colisao_SolidWall" type="SolidWall" x="128" y="1120" width="32" height="32">
+  </object>
+  <object id="274" name="Colisao_SolidWall" type="SolidWall" x="224" y="1120" width="32" height="32">
+  </object>
+  <object id="275" name="Colisao_SolidWall" type="SolidWall" x="416" y="1120" width="32" height="32">
+  </object>
+  <object id="276" name="Colisao_SolidWall" type="SolidWall" x="736" y="1120" width="32" height="32">
+  </object>
+  <object id="277" name="Colisao_SolidWall" type="SolidWall" x="800" y="1120" width="32" height="32">
+  </object>
+  <object id="278" name="Colisao_SolidWall" type="SolidWall" x="1056" y="1120" width="32" height="32">
+  </object>
+  <object id="279" name="Colisao_SolidWall" type="SolidWall" x="608" y="1152" width="32" height="32">
+  </object>
+  <object id="280" name="Colisao_SolidWall" type="SolidWall" x="704" y="1152" width="32" height="32">
+  </object>
+  <object id="281" name="Colisao_SolidWall" type="SolidWall" x="832" y="1152" width="32" height="32">
+  </object>
+  <object id="282" name="Colisao_SolidWall" type="SolidWall" x="992" y="1152" width="32" height="32">
+  </object>
+  <object id="284" name="Saida_Superficie" type="TeleportTrigger" x="320" y="256" width="32" height="32">
+   <properties>
+    <property name="destination_map" type="string" value="mundo_sobrevivencia.tmj"/>
+    <property name="spawn_x" type="int" value="38"/>
+    <property name="spawn_y" type="int" value="15"/>
+   </properties>
+  </object>
+  <object id="287" name="Colisao_Chest" type="Chest" x="256" y="320" width="64" height="32">
+  </object>
+  <object id="292" name="Colisao_Ore" type="Ore" x="480" y="480" width="32" height="32">
+  </object>
+  <object id="294" name="Colisao_Ore" type="Ore" x="512" y="448" width="32" height="32">
+  </object>
+  <object id="296" name="Colisao_Ore" type="Ore" x="800" y="576" width="32" height="32">
+  </object>
+  <object id="298" name="Colisao_Ore" type="Ore" x="832" y="704" width="32" height="32">
+  </object>
+  <object id="300" name="Colisao_Ore" type="Ore" x="1024" y="800" width="32" height="32">
+  </object>
+  <object id="302" name="Colisao_Ore" type="Ore" x="1088" y="832" width="32" height="32">
+  </object>
+  <object id="307" name="Colisao_Forge" type="Forge" x="896" y="864" width="64" height="64">
+  </object>
+  <object id="312" name="Colisao_Pillar" type="Pillar" x="832" y="832" width="64" height="64">
+  </object>
+  <object id="317" name="Colisao_Pillar" type="Pillar" x="1056" y="832" width="64" height="64">
+  </object>
+  <object id="320" name="Colisao_Chest" type="Chest" x="960" y="832" width="64" height="32">
+  </object>
+  <object id="325" name="Colisao_Monolith" type="Monolith" x="960" y="960" width="64" height="64">
+  </object>
+ </objectgroup>
+</map>

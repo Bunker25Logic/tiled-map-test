@@ -54,11 +54,34 @@ export default function Minimap({
     ctx.translate(-px, -py);
 
     // 1. Draw Tile Layers (Terrain, Ground, Paths)
+    const isCave = mapId.startsWith('caverna') || mapId.startsWith('catacumbas');
+
     for (const layer of mapData.layers) {
       if (layer.type !== 'tilelayer') continue;
 
       const layerName = (layer.name || '').toLowerCase();
       const isWaterLayer = layerName.includes('terreno') || layerName.includes('agua') || layerName.includes('water');
+
+      const drawTileColor = (gid: number, tileX: number, tileY: number) => {
+        if (isCave) {
+          ctx.fillStyle = '#292524'; // Piso de pedra subterrâneo
+        } else if (isWaterLayer) {
+          ctx.fillStyle = '#1e3a8a'; // Oceano / Água profunda
+        } else if (gid >= 1777 && gid < 2049) {
+          ctx.fillStyle = '#2563eb'; // Água (tileset agua)
+        } else if (tileX >= 1280 && tileY >= 1280) {
+          ctx.fillStyle = '#ca8a04'; // Deserto / Areia dourada (Sudeste)
+        } else if (tileX < 1280 && tileY >= 1280) {
+          ctx.fillStyle = '#14532d'; // Pântano / Floresta Escura (Sudoeste)
+        } else if (tileX >= 1280 && tileY < 1280) {
+          ctx.fillStyle = '#64748b'; // Pedreira / Montanha rochosa (Nordeste)
+        } else if (gid >= 531 && gid <= 560) {
+          ctx.fillStyle = '#854d0e'; // Estradas e caminhos de terra
+        } else {
+          ctx.fillStyle = '#15803d'; // Gramado verde da Vila (Noroeste)
+        }
+        ctx.fillRect(tileX, tileY, tw, th);
+      };
 
       if (layer.chunks) {
         for (const chunk of layer.chunks) {
@@ -69,28 +92,16 @@ export default function Minimap({
             for (let col = 0; col < chunk.width; col++) {
               const gid = chunk.data[row * chunk.width + col] & 0x1fffffff;
               if (gid === 0) continue;
-
-              const tileX = chunkX + col * tw;
-              const tileY = chunkY + row * th;
-
-              if (isWaterLayer) {
-                ctx.fillStyle = '#1e3a8a'; // Blue Ocean
-              } else if (gid >= 700 && gid <= 1200) {
-                ctx.fillStyle = '#2563eb'; // Water / Shore
-              } else if (gid >= 460 && gid <= 530 || tileX > 850) {
-                ctx.fillStyle = '#ca8a04'; // Golden Sand / Desert
-              } else if (gid >= 139 && gid <= 200) {
-                ctx.fillStyle = '#15803d'; // Forest / Green Grass
-              } else if (gid >= 531 && gid <= 560) {
-                ctx.fillStyle = '#854d0e'; // Dirt Road / Path
-              } else if (gid >= 1700) {
-                ctx.fillStyle = '#475569'; // Wall / Structure Tiles
-              } else {
-                ctx.fillStyle = '#166534'; // General Land
-              }
-
-              ctx.fillRect(tileX, tileY, tw, th);
+              drawTileColor(gid, chunkX + col * tw, chunkY + row * th);
             }
+          }
+        }
+      } else if (layer.data && layer.width && layer.height) {
+        for (let row = 0; row < layer.height; row++) {
+          for (let col = 0; col < layer.width; col++) {
+            const gid = layer.data[row * layer.width + col] & 0x1fffffff;
+            if (gid === 0) continue;
+            drawTileColor(gid, col * tw, row * th);
           }
         }
       }

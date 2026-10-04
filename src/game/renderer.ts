@@ -138,32 +138,51 @@ export function drawTileLayer(
  * that should be rendered on the ground under characters.
  */
 function isGroundDecal(obj: TiledObject, layerName: string, map: TiledMap): boolean {
-  if (layerName === 'muros') return false; // Walls layer is always vertical standing obstacles
+  const lName = (layerName || '').toLowerCase();
+  // Camadas de estruturas, casas, paredes, móveis e vegetação contêm objetos físicos que bloqueiam ou cobrem o jogador
+  if (
+    lName.includes('estrutura') ||
+    lName.includes('casa') ||
+    lName.includes('muro') ||
+    lName.includes('parede') ||
+    lName.includes('natureza') ||
+    lName.includes('vegetacao') ||
+    lName.includes('moveis')
+  ) {
+    const objType = (obj.type || '').toLowerCase();
+    const standingTypes = [
+      'wall', 'roof', 'door', 'caveentrance', 'rockwall', 'exitladder',
+      'mushroom', 'tree', 'boulder', 'cactus', 'ore',
+      'fountain', 'chest', 'bed', 'furniture', 'torch', 'forge', 'pillar',
+      'barrel', 'crate', 'woodlogs', 'monolith', 'sign', 'campfire'
+    ];
+    if (standingTypes.includes(objType)) {
+      return false;
+    }
+    // Se tiver nome estrutural ou peça de mobília/parede, também é objeto vertical
+    if (obj.name && !obj.name.toLowerCase().includes('flor') && !obj.name.toLowerCase().includes('musgo_chao')) {
+      return false;
+    }
+  }
+
   const gid = cleanGid(obj.gid || 0);
   const ts = getTilesetForGid(gid, map.tilesets);
-
-  // Standing walls, doors, town structures are NEVER flat ground decals
-  if (
-    ts &&
-    (ts.name === 'otsp_walls_01' ||
-      ts.name === 'otsp_walls_02' ||
-      ts.name === 'otsp_doors_01' ||
-      ts.name === 'Nordberg')
-  ) {
-    return false;
+  if (ts) {
+    const tsName = ts.name.toLowerCase();
+    if (
+      tsName.includes('wall') ||
+      tsName.includes('door') ||
+      tsName.includes('town') ||
+      tsName.includes('nordberg')
+    ) {
+      return false;
+    }
   }
 
   const w = obj.width || 32;
   const h = obj.height || 32;
-  // Multi-tile structures (trees, big rocks, houses) are vertical standing obstacles
   if (w > 32 || h > 32) return false;
 
-  // Roof / structural nature tiles (like chimney, roof trims) are standing objects
-  if (ts && ts.name === 'otsp_nature_01' && gid >= ts.firstgid + 300) {
-    return false;
-  }
-
-  // Small flowers, grass tufts, pebbles in decoracoes are flat ground decals
   return true;
 }
 

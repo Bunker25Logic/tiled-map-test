@@ -1,0 +1,5218 @@
+{
+  "columns": 16,
+  "image": "tiles/walls.png",
+  "imageheight": 2048,
+  "imagewidth": 512,
+  "margin": 0,
+  "name": "walls",
+  "spacing": 0,
+  "tilecount": 1024,
+  "tiledversion": "1.11.0",
+  "tileheight": 32,
+  "tilewidth": 32,
+  "tiles": [
+    {
+      "id": 0,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 27,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 29,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 30,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 31,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 32,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 33,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 34,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 35,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 36,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 37,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 38,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 39,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 40,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 41,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 42,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 43,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 44,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 45,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 46,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 47,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 48,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 49,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 50,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 51,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 52,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 53,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 54,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 55,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 56,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 57,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 58,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 59,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 60,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 61,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 62,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 63,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 64,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 65,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 66,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 67,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 68,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 69,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 70,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 71,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 72,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 73,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 74,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 75,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 76,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 77,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 78,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 79,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 80,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 81,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 82,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 83,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 84,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 85,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 86,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 87,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 88,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 89,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 90,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 91,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 92,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 93,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 94,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 95,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 96,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 97,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 98,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 99,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 100,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 101,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 102,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 103,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 104,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 105,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 106,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 107,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 108,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 109,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 110,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 111,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 112,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 113,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 114,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 115,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 116,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 117,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 118,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 119,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 120,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 121,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 122,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 123,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 124,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 125,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 126,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 127,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 128,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 129,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 130,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 131,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 132,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 133,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 134,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 135,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 136,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 137,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 138,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 139,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 140,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 141,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 142,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 143,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 144,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 145,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 146,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 147,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 148,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 149,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 150,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 151,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 152,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 153,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 154,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 155,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 156,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 157,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 158,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 159,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 160,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 161,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 162,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 163,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 164,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 165,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 166,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 167,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 168,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 169,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 170,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 171,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 172,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 173,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 174,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 175,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 176,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 177,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 178,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 179,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 180,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 181,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 182,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 183,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 184,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 185,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 186,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 187,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 188,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 189,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 190,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 191,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 192,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 193,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 194,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 195,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 196,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 197,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 198,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 199,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Parede",
+            "type": "Solido",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    }
+  ],
+  "transparentcolor": "#ff00ff",
+  "type": "tileset",
+  "version": "1.10"
+}

@@ -73,10 +73,11 @@ const GAME_CATEGORIES: Category[] = [
     emoji: '🗺️',
     color: '#64b5f6',
     paths: [
-      '/map1.tmj',
-      '/caverna-zona-1.tmj',
-      '/caverna2.tmj',
-      '/caverna 3 ilha 4 para ilha 5.tmj',
+      '/assets/maps/mundo_sobrevivencia.tmj',
+      '/assets/maps/caverna_minerios.tmj',
+      '/assets/maps/caverna_fungica.tmj',
+      '/assets/maps/catacumbas_deserto.tmj',
+      '/assets/maps/floresta_grande.tmj',
     ],
   },
   {

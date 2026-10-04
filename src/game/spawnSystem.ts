@@ -30,453 +30,367 @@ export interface SpawnPoint {
 type SpawnPointTemplate = Omit<SpawnPoint, 'currentMonsterId' | 'deathTimestamp'>;
 
 export const ZONE_SPAWNS_TEMPLATES: Record<string, SpawnPointTemplate[]> = {
-  // ── Caverna Subterrânea (Zona 1) ──────────────────────────────────────────
-  'caverna-zona-1': [
-    // Galeria dos Ecos (Entrada)
+  // ── Mundo Sobrevivência (Superfície - 80x80 / 2560x2560 px) ───────────────
+  'mundo_sobrevivencia': [
+    // ── Bioma 1: Vila, Fazendas e Planícies (Noroeste: x 100..1200, y 100..1200) ──
     {
-      id: 'c1_bat_1', zone: 'caverna-zona-1', monsterType: 'bat',
-      homeX: 180, homeY: 130, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 25,
-      habitatName: 'Galeria dos Ecos (Entrada)',
+      id: 'ms_dog_1', zone: 'mundo_sobrevivencia', monsterType: 'dog',
+      homeX: 520, homeY: 620, roamRadius: 45, maxChaseDistance: 160, respawnSeconds: 20,
+      habitatName: 'Perímetro da Vila',
     },
     {
-      id: 'c1_soni_1', zone: 'caverna-zona-1', monsterType: 'soni',
-      homeX: 230, homeY: 145, roamRadius: 45, maxChaseDistance: 240, respawnSeconds: 30,
-      habitatName: 'Galeria dos Ecos (Entrada)',
-    },
-    // Câmara dos Mortos-Vivos
-    {
-      id: 'c1_zombie_1', zone: 'caverna-zona-1', monsterType: 'zombie',
-      homeX: 380, homeY: 135, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 35,
-      habitatName: 'Câmara dos Mortos-Vivos',
+      id: 'ms_galinha_1', zone: 'mundo_sobrevivencia', monsterType: 'galinha',
+      homeX: 300, homeY: 590, roamRadius: 30, maxChaseDistance: 120, respawnSeconds: 15,
+      habitatName: 'Galinheiro da Fazenda',
     },
     {
-      id: 'c1_zombie_2', zone: 'caverna-zona-1', monsterType: 'zombie',
-      homeX: 440, homeY: 155, roamRadius: 50, maxChaseDistance: 260, respawnSeconds: 35,
-      habitatName: 'Câmara dos Mortos-Vivos',
-    },
-    // Acampamento Goblin
-    {
-      id: 'c1_goblin_1', zone: 'caverna-zona-1', monsterType: 'goblin',
-      homeX: 600, homeY: 130, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 30,
-      habitatName: 'Acampamento Goblin',
+      id: 'ms_ovelha_1', zone: 'mundo_sobrevivencia', monsterType: 'ovelha',
+      homeX: 360, homeY: 720, roamRadius: 40, maxChaseDistance: 140, respawnSeconds: 20,
+      habitatName: 'Pasto da Fazenda',
     },
     {
-      id: 'c1_goblin_2', zone: 'caverna-zona-1', monsterType: 'goblin',
-      homeX: 660, homeY: 150, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 30,
-      habitatName: 'Acampamento Goblin',
-    },
-    // Cripta das Sombras
-    {
-      id: 'c1_aparition_1', zone: 'caverna-zona-1', monsterType: 'aparition',
-      homeX: 810, homeY: 135, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 40,
-      habitatName: 'Cripta das Sombras',
+      id: 'ms_piggi_1', zone: 'mundo_sobrevivencia', monsterType: 'piggi',
+      homeX: 260, homeY: 680, roamRadius: 35, maxChaseDistance: 130, respawnSeconds: 20,
+      habitatName: 'Chiqueiro da Vila',
     },
     {
-      id: 'c1_trolol_1', zone: 'caverna-zona-1', monsterType: 'trolol',
-      homeX: 870, homeY: 150, roamRadius: 50, maxChaseDistance: 280, respawnSeconds: 45,
-      habitatName: 'Cripta das Sombras',
-    },
-    // Salão dos Monólitos
-    {
-      id: 'c1_centostone_1', zone: 'caverna-zona-1', monsterType: 'centostone',
-      homeX: 1020, homeY: 135, roamRadius: 50, maxChaseDistance: 260, respawnSeconds: 45,
-      habitatName: 'Salão dos Monólitos',
+      id: 'ms_dodo_1', zone: 'mundo_sobrevivencia', monsterType: 'dodo',
+      homeX: 680, homeY: 480, roamRadius: 40, maxChaseDistance: 150, respawnSeconds: 20,
+      habitatName: 'Prados da Vila',
     },
     {
-      id: 'c1_stonemonster_1', zone: 'caverna-zona-1', monsterType: 'stonemonster',
-      homeX: 1080, homeY: 150, roamRadius: 50, maxChaseDistance: 260, respawnSeconds: 50,
-      habitatName: 'Salão dos Monólitos',
+      id: 'ms_alce_1', zone: 'mundo_sobrevivencia', monsterType: 'alce',
+      homeX: 780, homeY: 350, roamRadius: 55, maxChaseDistance: 220, respawnSeconds: 30,
+      habitatName: 'Campos do Norte',
+    },
+    {
+      id: 'ms_goblin_1', zone: 'mundo_sobrevivencia', monsterType: 'goblin',
+      homeX: 850, homeY: 750, roamRadius: 50, maxChaseDistance: 220, respawnSeconds: 25,
+      habitatName: 'Bosque dos Goblins',
+    },
+    {
+      id: 'ms_goblin_2', zone: 'mundo_sobrevivencia', monsterType: 'goblin',
+      homeX: 920, homeY: 820, roamRadius: 45, maxChaseDistance: 220, respawnSeconds: 25,
+      habitatName: 'Bosque dos Goblins',
+    },
+    {
+      id: 'ms_duende_1', zone: 'mundo_sobrevivencia', monsterType: 'duende',
+      homeX: 720, homeY: 900, roamRadius: 50, maxChaseDistance: 200, respawnSeconds: 25,
+      habitatName: 'Bosque Verdejante',
+    },
+    {
+      id: 'ms_orc_1', zone: 'mundo_sobrevivencia', monsterType: 'orc',
+      homeX: 1050, homeY: 650, roamRadius: 55, maxChaseDistance: 240, respawnSeconds: 35,
+      habitatName: 'Guarnição Orc da Estrada',
+    },
+    {
+      id: 'ms_anao_1', zone: 'mundo_sobrevivencia', monsterType: 'anao',
+      homeX: 1100, homeY: 400, roamRadius: 50, maxChaseDistance: 220, respawnSeconds: 30,
+      habitatName: 'Acampamento dos Mineradores Anões',
+    },
+
+    // ── Bioma 2: Pedreira, Montanhas e Minas (Nordeste: x 1300..2500, y 100..1200) ──
+    {
+      id: 'ms_stonemonster_1', zone: 'mundo_sobrevivencia', monsterType: 'stonemonster',
+      homeX: 1450, homeY: 380, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 40,
+      habitatName: 'Pedreira Rochosa',
+    },
+    {
+      id: 'ms_centostone_1', zone: 'mundo_sobrevivencia', monsterType: 'centostone',
+      homeX: 1600, homeY: 480, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 40,
+      habitatName: 'Afloramento de Quartzo',
+    },
+    {
+      id: 'ms_trolol_1', zone: 'mundo_sobrevivencia', monsterType: 'trolol',
+      homeX: 1750, homeY: 350, roamRadius: 60, maxChaseDistance: 260, respawnSeconds: 45,
+      habitatName: 'Ravina dos Trolls',
+    },
+    {
+      id: 'ms_golen_1', zone: 'mundo_sobrevivencia', monsterType: 'golen',
+      homeX: 1900, homeY: 450, roamRadius: 50, maxChaseDistance: 260, respawnSeconds: 50,
+      habitatName: 'Posto Avançado da Pedreira',
+    },
+    {
+      id: 'ms_whitewolf_1', zone: 'mundo_sobrevivencia', monsterType: 'whitewolf',
+      homeX: 2100, homeY: 300, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 45,
+      habitatName: 'Picos Nevados',
+    },
+    {
+      id: 'ms_neveman_1', zone: 'mundo_sobrevivencia', monsterType: 'neveman',
+      homeX: 2300, homeY: 400, roamRadius: 55, maxChaseDistance: 270, respawnSeconds: 55,
+      habitatName: 'Cordilheira Gelada',
+    },
+    {
+      id: 'ms_centon_1', zone: 'mundo_sobrevivencia', monsterType: 'centon',
+      homeX: 2000, homeY: 750, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 40,
+      habitatName: 'Entorno da Caverna Fúngica',
+    },
+    {
+      id: 'ms_golen2_1', zone: 'mundo_sobrevivencia', monsterType: 'golen2',
+      homeX: 2350, homeY: 700, roamRadius: 55, maxChaseDistance: 270, respawnSeconds: 55,
+      habitatName: 'Guardião de Granito',
+    },
+
+    // ── Bioma 3: Pântano, Lago Sombrio e Cabana da Bruxa (Sudoeste: x 100..1200, y 1300..2500) ──
+    {
+      id: 'ms_lacost_1', zone: 'mundo_sobrevivencia', monsterType: 'lacost',
+      homeX: 350, homeY: 1550, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 35,
+      habitatName: 'Margem do Lago Sombrio',
+    },
+    {
+      id: 'ms_jacare_1', zone: 'mundo_sobrevivencia', monsterType: 'jacare',
+      homeX: 550, homeY: 1650, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 35,
+      habitatName: 'Pântano Profundo',
+    },
+    {
+      id: 'ms_serpent_1', zone: 'mundo_sobrevivencia', monsterType: 'serpent',
+      homeX: 700, homeY: 1500, roamRadius: 55, maxChaseDistance: 240, respawnSeconds: 30,
+      habitatName: 'Charco Nebuloso',
+    },
+    {
+      id: 'ms_zombie_1', zone: 'mundo_sobrevivencia', monsterType: 'zombie',
+      homeX: 420, homeY: 1850, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 35,
+      habitatName: 'Cemitério da Cabana da Bruxa',
+    },
+    {
+      id: 'ms_skeleton_1', zone: 'mundo_sobrevivencia', monsterType: 'skeleton',
+      homeX: 580, homeY: 1950, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 35,
+      habitatName: 'Cemitério da Cabana da Bruxa',
+    },
+    {
+      id: 'ms_aparition_1', zone: 'mundo_sobrevivencia', monsterType: 'aparition',
+      homeX: 380, homeY: 2150, roamRadius: 60, maxChaseDistance: 270, respawnSeconds: 40,
+      habitatName: 'Pântano dos Sussurros',
+    },
+    {
+      id: 'ms_centgreen_1', zone: 'mundo_sobrevivencia', monsterType: 'centgreen',
+      homeX: 850, homeY: 1900, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 40,
+      habitatName: 'Floresta de Esporos',
+    },
+    {
+      id: 'ms_biliblili_1', zone: 'mundo_sobrevivencia', monsterType: 'biliblili',
+      homeX: 950, homeY: 2200, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 35,
+      habitatName: 'Garganta Fúngica',
+    },
+
+    // ── Bioma 4: Deserto Dourado, Pirâmides e Catacumbas (Sudeste: x 1300..2500, y 1300..2500) ──
+    {
+      id: 'ms_hiena_1', zone: 'mundo_sobrevivencia', monsterType: 'hiena',
+      homeX: 1450, homeY: 1550, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 30,
+      habitatName: 'Dunas de Transição',
+    },
+    {
+      id: 'ms_scarnsabre_1', zone: 'mundo_sobrevivencia', monsterType: 'scarnsabre',
+      homeX: 1650, homeY: 1650, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 40,
+      habitatName: 'Garganta do Escorpião',
+    },
+    {
+      id: 'ms_skedesert_1', zone: 'mundo_sobrevivencia', monsterType: 'skedesert',
+      homeX: 1850, homeY: 1500, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 35,
+      habitatName: 'Arenas Escaldantes',
+    },
+    {
+      id: 'ms_mumia_1', zone: 'mundo_sobrevivencia', monsterType: 'mumia',
+      homeX: 1800, homeY: 2250, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 45,
+      habitatName: 'Perímetro do Santuário do Deserto',
+    },
+    {
+      id: 'ms_mummi_1', zone: 'mundo_sobrevivencia', monsterType: 'mummi',
+      homeX: 2000, homeY: 2350, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 45,
+      habitatName: 'Perímetro do Santuário do Deserto',
+    },
+    {
+      id: 'ms_mummi2_1', zone: 'mundo_sobrevivencia', monsterType: 'mummi2',
+      homeX: 2150, homeY: 2200, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 50,
+      habitatName: 'Entorno das Catacumbas',
+    },
+    {
+      id: 'ms_genie_1', zone: 'mundo_sobrevivencia', monsterType: 'genie',
+      homeX: 2350, homeY: 1950, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 65,
+      habitatName: 'Oásis Escondido dos Djinns',
+    },
+    {
+      id: 'ms_golen_magma_1', zone: 'mundo_sobrevivencia', monsterType: 'golen-magma',
+      homeX: 2400, homeY: 2300, roamRadius: 50, maxChaseDistance: 260, respawnSeconds: 70,
+      habitatName: 'Cratera Vulcânica do Deserto',
     },
   ],
 
-  // ── Caverna 2 (Atalho Ilha 4) ─────────────────────────────────────────────
-  'caverna2': [
+  // ── Caverna dos Minérios (40x40 / 1280x1280 px) ───────────────────────────
+  'caverna_minerios': [
     {
-      id: 'c2_bat_1', zone: 'caverna2', monsterType: 'bat',
-      homeX: 130, homeY: 110, roamRadius: 40, maxChaseDistance: 200, respawnSeconds: 25,
-      habitatName: 'Fosso dos Morcegos',
+      id: 'cm_bat_1', zone: 'caverna_minerios', monsterType: 'bat',
+      homeX: 380, homeY: 340, roamRadius: 50, maxChaseDistance: 220, respawnSeconds: 20,
+      habitatName: 'Túnel de Entrada',
     },
     {
-      id: 'c2_aparition_1', zone: 'caverna2', monsterType: 'aparition',
-      homeX: 210, homeY: 140, roamRadius: 45, maxChaseDistance: 220, respawnSeconds: 35,
-      habitatName: 'Passagem Assombrada',
+      id: 'cm_bat_2', zone: 'caverna_minerios', monsterType: 'bat',
+      homeX: 520, homeY: 380, roamRadius: 45, maxChaseDistance: 220, respawnSeconds: 20,
+      habitatName: 'Túnel de Entrada',
     },
     {
-      id: 'c2_stonemonster_1', zone: 'caverna2', monsterType: 'stonemonster',
-      homeX: 230, homeY: 115, roamRadius: 40, maxChaseDistance: 200, respawnSeconds: 45,
-      habitatName: 'Guardião Pétreo',
+      id: 'cm_goblin_1', zone: 'caverna_minerios', monsterType: 'goblin',
+      homeX: 480, homeY: 520, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 30,
+      habitatName: 'Acampamento dos Mineradores Goblin',
     },
     {
-      id: 'c2_soni_1', zone: 'caverna2', monsterType: 'soni',
-      homeX: 280, homeY: 100, roamRadius: 45, maxChaseDistance: 220, respawnSeconds: 30,
-      habitatName: 'Covil Subterrâneo',
+      id: 'cm_goblin_2', zone: 'caverna_minerios', monsterType: 'goblin',
+      homeX: 560, homeY: 560, roamRadius: 45, maxChaseDistance: 240, respawnSeconds: 30,
+      habitatName: 'Acampamento dos Mineradores Goblin',
     },
     {
-      id: 'c2_goblin_1', zone: 'caverna2', monsterType: 'goblin',
-      homeX: 350, homeY: 145, roamRadius: 45, maxChaseDistance: 220, respawnSeconds: 30,
-      habitatName: 'Posto Goblin',
-    },
-  ],
-
-  // ── Caverna 3 (Ilha 4 para Ilha 5 - Desafio Superior) ─────────────────────
-  'caverna3': [
-    {
-      id: 'c3_boss_bat_rei', zone: 'caverna3', monsterType: 'bat rei',
-      homeX: 140, homeY: 120, roamRadius: 60, maxChaseDistance: 320, respawnSeconds: 90,
-      habitatName: 'Trono do Rei Morcego (Chefe)',
+      id: 'cm_stonemonster_1', zone: 'caverna_minerios', monsterType: 'stonemonster',
+      homeX: 720, homeY: 450, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 40,
+      habitatName: 'Veio de Ferro Profundo',
     },
     {
-      id: 'c3_cavern_creature', zone: 'caverna3', monsterType: 'cavern creature',
-      homeX: 220, homeY: 140, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 45,
-      habitatName: 'Fosso das Profundezas',
+      id: 'cm_centostone_1', zone: 'caverna_minerios', monsterType: 'centostone',
+      homeX: 850, homeY: 520, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 45,
+      habitatName: 'Câmara dos Cristais',
     },
     {
-      id: 'c3_skeleton_1', zone: 'caverna3', monsterType: 'skeleton',
-      homeX: 300, homeY: 110, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 40,
-      habitatName: 'Câmara dos Ossos',
+      id: 'cm_trolol_1', zone: 'caverna_minerios', monsterType: 'trolol',
+      homeX: 680, homeY: 750, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 45,
+      habitatName: 'Lago Subterrâneo',
     },
     {
-      id: 'c3_draertis_1', zone: 'caverna3', monsterType: 'draertis_mini',
-      homeX: 380, homeY: 150, roamRadius: 55, maxChaseDistance: 280, respawnSeconds: 65,
-      habitatName: 'Ninho das Crias de Draertis',
+      id: 'cm_cavern_1', zone: 'caverna_minerios', monsterType: 'cavern creature',
+      homeX: 880, homeY: 780, roamRadius: 55, maxChaseDistance: 270, respawnSeconds: 50,
+      habitatName: 'Salão da Forja Profunda',
     },
     {
-      id: 'c3_fantasn_1', zone: 'caverna3', monsterType: 'fantasn',
-      homeX: 260, homeY: 130, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 35,
-      habitatName: 'Corredor Espectral',
+      id: 'cm_golen_1', zone: 'caverna_minerios', monsterType: 'golen',
+      homeX: 1020, homeY: 900, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 60,
+      habitatName: 'Cofre dos Minérios Ancestrais',
     },
   ],
 
-  // ── Superfície de Tibia (map1 - Ilhas 1 a 5) ──────────────────────────────
-  'map1': [
-    // ── ILHA 1 (Floresta & Ruínas) ──
-    // Bosque Sul (Animais Dóceis / Neutros - Seguro perto do Templo)
+  // ── Caverna Fúngica (40x40 / 1280x1280 px) ────────────────────────────────
+  'caverna_fungica': [
     {
-      id: 's_i1_esquilo_1', zone: 'map1', monsterType: 'esquilo',
-      homeX: -160, homeY: 140, roamRadius: 45, maxChaseDistance: 160, respawnSeconds: 25,
-      habitatName: 'Bosque das Bolotas (Ilha 1)',
+      id: 'cf_bat_1', zone: 'caverna_fungica', monsterType: 'bat',
+      homeX: 380, homeY: 350, roamRadius: 45, maxChaseDistance: 220, respawnSeconds: 20,
+      habitatName: 'Gruta dos Cogumelos Pequenos',
     },
     {
-      id: 's_i1_vead_1', zone: 'map1', monsterType: 'vead',
-      homeX: -220, homeY: 90, roamRadius: 50, maxChaseDistance: 180, respawnSeconds: 30,
-      habitatName: 'Clareira dos Cervos (Ilha 1)',
+      id: 'cf_soni_1', zone: 'caverna_fungica', monsterType: 'soni',
+      homeX: 500, homeY: 450, roamRadius: 50, maxChaseDistance: 230, respawnSeconds: 30,
+      habitatName: 'Bosque de Esporos Bioluminescentes',
     },
     {
-      id: 's_i1_alce_1', zone: 'map1', monsterType: 'alce',
-      homeX: -190, homeY: -70, roamRadius: 55, maxChaseDistance: 190, respawnSeconds: 30,
-      habitatName: 'Bosque Verdejante (Ilha 1)',
+      id: 'cf_centgreen_1', zone: 'caverna_fungica', monsterType: 'centgreen',
+      homeX: 650, homeY: 520, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 35,
+      habitatName: 'Alameda dos Cogumelos Gigantes',
     },
     {
-      id: 's_i1_piggi_1', zone: 'map1', monsterType: 'piggi',
-      homeX: -110, homeY: -150, roamRadius: 45, maxChaseDistance: 160, respawnSeconds: 25,
-      habitatName: 'Campina das Flores (Ilha 1)',
+      id: 'cf_aparition_1', zone: 'caverna_fungica', monsterType: 'aparition',
+      homeX: 800, homeY: 480, roamRadius: 60, maxChaseDistance: 260, respawnSeconds: 40,
+      habitatName: 'Rio Subterrâneo Bioluminescente',
     },
     {
-      id: 's_i1_dodo_1', zone: 'map1', monsterType: 'dodo',
-      homeX: 130, homeY: -170, roamRadius: 45, maxChaseDistance: 160, respawnSeconds: 25,
-      habitatName: 'Campina Oriental (Ilha 1)',
+      id: 'cf_creature_light_1', zone: 'caverna_fungica', monsterType: 'creature light',
+      homeX: 720, homeY: 720, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 45,
+      habitatName: 'Santuário de Alquimia Ancestral',
     },
     {
-      id: 's_i1_dog_1', zone: 'map1', monsterType: 'dog',
-      homeX: 150, homeY: 130, roamRadius: 45, maxChaseDistance: 160, respawnSeconds: 25,
-      habitatName: 'Colina do Sul (Ilha 1)',
+      id: 'cf_boss_bat_rei', zone: 'caverna_fungica', monsterType: 'bat rei',
+      homeX: 920, homeY: 820, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 90,
+      habitatName: 'Câmara do Rei Morcego dos Esporos (Chefe)',
     },
-    // Ruínas do Norte (Monstros Clássicos Iniciais)
-    {
-      id: 's_i1_orc_1', zone: 'map1', monsterType: 'orc',
-      homeX: -270, homeY: -310, roamRadius: 55, maxChaseDistance: 240, respawnSeconds: 35,
-      habitatName: 'Ruínas Orc (Ilha 1)',
-    },
-    {
-      id: 's_i1_duende_1', zone: 'map1', monsterType: 'duende',
-      homeX: -170, homeY: -350, roamRadius: 50, maxChaseDistance: 220, respawnSeconds: 30,
-      habitatName: 'Acampamento dos Duendes (Ilha 1)',
-    },
-    {
-      id: 's_i1_elf_1', zone: 'map1', monsterType: 'elf',
-      homeX: 70, homeY: -330, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 35,
-      habitatName: 'Santuário Élfico Antigo (Ilha 1)',
-    },
-    {
-      id: 's_i1_anao_1', zone: 'map1', monsterType: 'anao',
-      homeX: 190, homeY: -290, roamRadius: 50, maxChaseDistance: 230, respawnSeconds: 40,
-      habitatName: 'Mina dos Anões (Ilha 1)',
-    },
-    {
-      id: 's_i1_hiena_1', zone: 'map1', monsterType: 'hiena',
-      homeX: 210, homeY: -210, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 30,
-      habitatName: 'Terras Áridas (Ilha 1)',
-    },
-    {
-      id: 's_i1_pand_1', zone: 'map1', monsterType: 'pand',
-      homeX: -350, homeY: -110, roamRadius: 50, maxChaseDistance: 220, respawnSeconds: 40,
-      habitatName: 'Costa Ocidental (Ilha 1)',
-    },
+  ],
 
-    // ── ILHA 2 (Deserto de Areia & Pirâmides) ──
+  // ── Catacumbas do Deserto (40x40 / 1280x1280 px) ──────────────────────────
+  'catacumbas_deserto': [
     {
-      id: 's_i2_lacost_1', zone: 'map1', monsterType: 'lacost',
-      homeX: 960, homeY: -140, roamRadius: 55, maxChaseDistance: 240, respawnSeconds: 35,
-      habitatName: 'Oásis Seco (Ilha 2)',
+      id: 'cd_skedesert_1', zone: 'catacumbas_deserto', monsterType: 'skedesert',
+      homeX: 420, homeY: 360, roamRadius: 45, maxChaseDistance: 230, respawnSeconds: 25,
+      habitatName: 'Vestíbulo de Mármore',
     },
     {
-      id: 's_i2_serpent_1', zone: 'map1', monsterType: 'serpent',
-      homeX: 1110, homeY: -70, roamRadius: 50, maxChaseDistance: 230, respawnSeconds: 30,
-      habitatName: 'Dunas Escaldantes (Ilha 2)',
+      id: 'cd_skeleton_1', zone: 'catacumbas_deserto', monsterType: 'skeleton',
+      homeX: 550, homeY: 420, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 30,
+      habitatName: 'Corredor das Lápides',
     },
     {
-      id: 's_i2_scarnsabre_1', zone: 'map1', monsterType: 'scarnsabre',
-      homeX: 1260, homeY: -190, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 40,
-      habitatName: 'Garganta do Escorpião (Ilha 2)',
+      id: 'cd_mumia_1', zone: 'catacumbas_deserto', monsterType: 'mumia',
+      homeX: 680, homeY: 520, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 35,
+      habitatName: 'Câmara dos Sarcófagos',
     },
     {
-      id: 's_i2_skedesert_1', zone: 'map1', monsterType: 'skedesert',
-      homeX: 1390, homeY: -90, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 40,
-      habitatName: 'Túmulo dos Esquecidos (Ilha 2)',
+      id: 'cd_mummi2_1', zone: 'catacumbas_deserto', monsterType: 'mummi2',
+      homeX: 780, homeY: 620, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 45,
+      habitatName: 'Cripta dos Faraós Ancestrais',
     },
     {
-      id: 's_i2_mumia_1', zone: 'map1', monsterType: 'mumia',
-      homeX: 1140, homeY: 160, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 45,
-      habitatName: 'Pirâmide Sepulcral (Ilha 2)',
+      id: 'cd_fantasn_1', zone: 'catacumbas_deserto', monsterType: 'fantasn',
+      homeX: 600, homeY: 750, roamRadius: 60, maxChaseDistance: 270, respawnSeconds: 40,
+      habitatName: 'Salão Rúnico do Monólito',
     },
     {
-      id: 's_i2_mummi_1', zone: 'map1', monsterType: 'mummi',
-      homeX: 1290, homeY: 130, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 45,
-      habitatName: 'Pirâmide Sepulcral (Ilha 2)',
+      id: 'cd_genie_1', zone: 'catacumbas_deserto', monsterType: 'genie',
+      homeX: 880, homeY: 800, roamRadius: 60, maxChaseDistance: 290, respawnSeconds: 65,
+      habitatName: 'Câmara do Tesouro das Catacumbas',
     },
-    {
-      id: 's_i2_mummi2_1', zone: 'map1', monsterType: 'mummi2',
-      homeX: 1410, homeY: 210, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 50,
-      habitatName: 'Câmara dos Faraós (Ilha 2)',
-    },
-    {
-      id: 's_i2_genie_1', zone: 'map1', monsterType: 'genie',
-      homeX: 1040, homeY: 260, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 60,
-      habitatName: 'Lâmpada Ancestral (Ilha 2)',
-    },
-    {
-      id: 's_i2_golen_magma_1', zone: 'map1', monsterType: 'golen-magma',
-      homeX: 1210, homeY: 310, roamRadius: 50, maxChaseDistance: 260, respawnSeconds: 65,
-      habitatName: 'Cratera Ardente (Ilha 2)',
-    },
-    // Chefe do Deserto & Crias
-    {
-      id: 's_i2_boss_golen', zone: 'map1', monsterType: 'golen_chefe',
-      homeX: 1350, homeY: 280, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 90,
-      habitatName: 'Altar do Colosso Golen (Chefe do Deserto)',
-    },
-    {
-      id: 's_i2_mini_golen_1', zone: 'map1', monsterType: 'golen_mini',
-      homeX: 1310, homeY: 310, roamRadius: 45, maxChaseDistance: 240, respawnSeconds: 35,
-      habitatName: 'Guarda do Altar (Mini Golen)',
-    },
-    {
-      id: 's_i2_mini_golen_2', zone: 'map1', monsterType: 'golen_mini',
-      homeX: 1390, homeY: 250, roamRadius: 45, maxChaseDistance: 240, respawnSeconds: 35,
-      habitatName: 'Guarda do Altar (Mini Golen)',
-    },
+  ],
 
-    // ── ILHA 3 (Montanhas Rochosas) ──
+  // ── Floresta Grande (60x60 / 1920x1920 px) ────────────────────────────────
+  'floresta_grande': [
     {
-      id: 's_i3_whitewolf_1', zone: 'map1', monsterType: 'whitewolf',
-      homeX: -660, homeY: -1760, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 35,
-      habitatName: 'Alcateia dos Ventos (Ilha 3)',
+      id: 'fg_alce_1', zone: 'floresta_grande', monsterType: 'alce',
+      homeX: 850, homeY: 850, roamRadius: 60, maxChaseDistance: 240, respawnSeconds: 30,
+      habitatName: 'Clareira Central',
     },
     {
-      id: 's_i3_tiguersabre_1', zone: 'map1', monsterType: 'tiguersabre',
-      homeX: -460, homeY: -1860, roamRadius: 60, maxChaseDistance: 260, respawnSeconds: 40,
-      habitatName: 'Desfiladeiro Feroz (Ilha 3)',
+      id: 'fg_dodo_1', zone: 'floresta_grande', monsterType: 'dodo',
+      homeX: 950, homeY: 900, roamRadius: 40, maxChaseDistance: 160, respawnSeconds: 20,
+      habitatName: 'Clareira Central',
     },
     {
-      id: 's_i3_bufao_1', zone: 'map1', monsterType: 'bufao',
-      homeX: -310, homeY: -1710, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 45,
-      habitatName: 'Planalto dos Bisões (Ilha 3)',
+      id: 'fg_goblin_1', zone: 'floresta_grande', monsterType: 'goblin',
+      homeX: 650, homeY: 700, roamRadius: 50, maxChaseDistance: 220, respawnSeconds: 25,
+      habitatName: 'Bosque das Ameixeiras',
     },
     {
-      id: 's_i3_centgreen_1', zone: 'map1', monsterType: 'centgreen',
-      homeX: -560, homeY: -1610, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 45,
-      habitatName: 'Cordilheira Verde (Ilha 3)',
+      id: 'fg_orc_1', zone: 'floresta_grande', monsterType: 'orc',
+      homeX: 1200, homeY: 800, roamRadius: 55, maxChaseDistance: 240, respawnSeconds: 35,
+      habitatName: 'Acampamento da Árvore Dourada',
     },
     {
-      id: 's_i3_centongg_1', zone: 'map1', monsterType: 'centongg',
-      homeX: -710, homeY: -1560, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 45,
-      habitatName: 'Pico dos Titãs (Ilha 3)',
+      id: 'fg_duende_1', zone: 'floresta_grande', monsterType: 'duende',
+      homeX: 750, homeY: 1100, roamRadius: 50, maxChaseDistance: 220, respawnSeconds: 25,
+      habitatName: 'Pomar Silvestre',
     },
     {
-      id: 's_i3_centon_1', zone: 'map1', monsterType: 'centon',
-      homeX: -410, homeY: -1510, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 45,
-      habitatName: 'Passagem das Pedras (Ilha 3)',
-    },
-    {
-      id: 's_i3_lobisonem_1', zone: 'map1', monsterType: 'lobisonem',
-      homeX: -210, homeY: -1810, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 55,
-      habitatName: 'Toca do Lobisomem (Ilha 3)',
-    },
-    {
-      id: 's_i3_golen_1', zone: 'map1', monsterType: 'golen',
-      homeX: -160, homeY: -1610, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 60,
-      habitatName: 'Guardião de Rocha (Ilha 3)',
-    },
-    {
-      id: 's_i3_golen2_1', zone: 'map1', monsterType: 'golen2',
-      homeX: -260, homeY: -1960, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 65,
-      habitatName: 'Guardião de Rocha (Ilha 3)',
-    },
-    {
-      id: 's_i3_trolol_1', zone: 'map1', monsterType: 'trolol',
-      homeX: -510, homeY: -1910, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 70,
-      habitatName: 'Caverna do Trolol (Ilha 3)',
-    },
-    {
-      id: 's_i3_drago_1', zone: 'map1', monsterType: 'drago',
-      homeX: -560, homeY: -2010, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 100,
-      habitatName: 'Ninho do Dragão Vermelho (Ilha 3)',
-    },
-    // Chefe das Montanhas & Crias
-    {
-      id: 's_i3_boss_triar', zone: 'map1', monsterType: 'triardinguer_chefe',
-      homeX: -360, homeY: -2010, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 100,
-      habitatName: 'Pico do Titã Triardinguer (Chefe das Montanhas)',
-    },
-    {
-      id: 's_i3_mini_triar_1', zone: 'map1', monsterType: 'triardinguer_mini',
-      homeX: -320, homeY: -1980, roamRadius: 45, maxChaseDistance: 250, respawnSeconds: 40,
-      habitatName: 'Escolta do Pico (Mini Triardinguer)',
-    },
-    {
-      id: 's_i3_mini_triar_2', zone: 'map1', monsterType: 'triardinguer_mini',
-      homeX: -400, homeY: -2040, roamRadius: 45, maxChaseDistance: 250, respawnSeconds: 40,
-      habitatName: 'Escolta do Pico (Mini Triardinguer)',
-    },
-
-    // ── ILHA 4 (Santuário Místico) ──
-    {
-      id: 's_i4_fantasn_1', zone: 'map1', monsterType: 'fantasn',
-      homeX: 560, homeY: -1760, roamRadius: 55, maxChaseDistance: 240, respawnSeconds: 35,
-      habitatName: 'Vale dos Espectros (Ilha 4)',
-    },
-    {
-      id: 's_i4_aparition_1', zone: 'map1', monsterType: 'aparition',
-      homeX: 710, homeY: -1860, roamRadius: 55, maxChaseDistance: 250, respawnSeconds: 40,
-      habitatName: 'Vale dos Espectros (Ilha 4)',
-    },
-    {
-      id: 's_i4_thedeath_1', zone: 'map1', monsterType: 'thedeath',
-      homeX: 860, homeY: -1960, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 70,
-      habitatName: 'Altar da Morte (Ilha 4)',
-    },
-    {
-      id: 's_i4_medusa_1', zone: 'map1', monsterType: 'medusa',
-      homeX: 1010, homeY: -1810, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 75,
-      habitatName: 'Covil da Medusa (Ilha 4)',
-    },
-    // Chefe do Santuário Místico & Crias
-    {
-      id: 's_i4_boss_draertis', zone: 'map1', monsterType: 'draertis_chefe',
-      homeX: 1160, homeY: -1710, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 110,
-      habitatName: 'Torre do Arquimago Draertis (Chefe do Santuário)',
-    },
-    {
-      id: 's_i4_mini_draertis_1', zone: 'map1', monsterType: 'draertis_mini',
-      homeX: 1120, homeY: -1680, roamRadius: 45, maxChaseDistance: 260, respawnSeconds: 45,
-      habitatName: 'Sentinela do Altar (Mini Draertis)',
-    },
-    {
-      id: 's_i4_mini_draertis_2', zone: 'map1', monsterType: 'draertis_mini',
-      homeX: 1200, homeY: -1740, roamRadius: 45, maxChaseDistance: 260, respawnSeconds: 45,
-      habitatName: 'Sentinela do Altar (Mini Draertis)',
-    },
-    {
-      id: 's_i4_dragis_1', zone: 'map1', monsterType: 'dragis',
-      homeX: 1260, homeY: -1910, roamRadius: 60, maxChaseDistance: 290, respawnSeconds: 80,
-      habitatName: 'Pico dos Dragões Místicos (Ilha 4)',
-    },
-    {
-      id: 's_i4_magmal_1', zone: 'map1', monsterType: 'magmal',
-      homeX: 910, homeY: -1660, roamRadius: 50, maxChaseDistance: 250, respawnSeconds: 70,
-      habitatName: 'Fissura de Magma (Ilha 4)',
-    },
-    {
-      id: 's_i4_fera_1', zone: 'map1', monsterType: 'fera',
-      homeX: 660, homeY: -1610, roamRadius: 55, maxChaseDistance: 260, respawnSeconds: 60,
-      habitatName: 'Território das Feras (Ilha 4)',
-    },
-    {
-      id: 's_i4_golen_1', zone: 'map1', monsterType: 'golen',
-      homeX: 1110, homeY: -1560, roamRadius: 50, maxChaseDistance: 240, respawnSeconds: 60,
-      habitatName: 'Guardião do Santuário (Ilha 4)',
-    },
-    {
-      id: 's_i4_drago_1', zone: 'map1', monsterType: 'drago',
-      homeX: 810, homeY: -2060, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 100,
-      habitatName: 'Cume Dracônico (Ilha 4)',
-    },
-
-    // ── ILHA 5 (Terras Dracônicas - Endgame) ──
-    // Chefe Supremo dos Dragões & Crias
-    {
-      id: 's_i5_boss_dragis', zone: 'map1', monsterType: 'dragis_chefe',
-      homeX: 2010, homeY: -1910, roamRadius: 70, maxChaseDistance: 340, respawnSeconds: 120,
-      habitatName: 'Trono do Imperador Dragis (Chefe Supremo)',
-    },
-    {
-      id: 's_i5_mini_dragis_1', zone: 'map1', monsterType: 'dragis_mini',
-      homeX: 1960, homeY: -1880, roamRadius: 50, maxChaseDistance: 280, respawnSeconds: 50,
-      habitatName: 'Cria Dracônica (Mini Dragis)',
-    },
-    {
-      id: 's_i5_mini_dragis_2', zone: 'map1', monsterType: 'dragis_mini',
-      homeX: 2060, homeY: -1940, roamRadius: 50, maxChaseDistance: 280, respawnSeconds: 50,
-      habitatName: 'Cria Dracônica (Mini Dragis)',
-    },
-    {
-      id: 's_i5_mini_dragis_3', zone: 'map1', monsterType: 'dragis_mini',
-      homeX: 2020, homeY: -1850, roamRadius: 50, maxChaseDistance: 280, respawnSeconds: 50,
-      habitatName: 'Cria Dracônica (Mini Dragis)',
-    },
-    {
-      id: 's_i5_bat_rei_1', zone: 'map1', monsterType: 'bat rei',
-      homeX: 1910, homeY: -1660, roamRadius: 60, maxChaseDistance: 300, respawnSeconds: 70,
-      habitatName: 'Trono do Rei das Asas (Ilha 5)',
-    },
-    {
-      id: 's_i5_medusa_1', zone: 'map1', monsterType: 'medusa',
-      homeX: 2160, homeY: -1760, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 75,
-      habitatName: 'Templo Petrificado (Ilha 5)',
-    },
-    {
-      id: 's_i5_cavern_creature_1', zone: 'map1', monsterType: 'cavern creature',
-      homeX: 2310, homeY: -1860, roamRadius: 60, maxChaseDistance: 290, respawnSeconds: 80,
-      habitatName: 'Abismo de Sangue (Ilha 5)',
-    },
-    {
-      id: 's_i5_triron_1', zone: 'map1', monsterType: 'triron',
-      homeX: 1860, homeY: -2060, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 90,
-      habitatName: 'Baluarte dos Titãs de Ferro (Ilha 5)',
-    },
-    {
-      id: 's_i5_glacis_1', zone: 'map1', monsterType: 'glacis',
-      homeX: 2060, homeY: -2110, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 90,
-      habitatName: 'Geleira Eterna (Ilha 5)',
-    },
-    {
-      id: 's_i5_ins_1', zone: 'map1', monsterType: 'ins',
-      homeX: 2260, homeY: -2010, roamRadius: 60, maxChaseDistance: 300, respawnSeconds: 85,
-      habitatName: 'Ninho dos Insetóides do Vazio (Ilha 5)',
-    },
-    {
-      id: 's_i5_token_1', zone: 'map1', monsterType: 'token',
-      homeX: 2410, homeY: -1910, roamRadius: 65, maxChaseDistance: 320, respawnSeconds: 95,
-      habitatName: 'Fortaleza Esquecida (Ilha 5)',
+      id: 'fg_whitewolf_1', zone: 'floresta_grande', monsterType: 'whitewolf',
+      homeX: 1300, homeY: 1250, roamRadius: 60, maxChaseDistance: 280, respawnSeconds: 45,
+      habitatName: 'Floresta Profunda dos Carvalhos',
     },
   ],
 };
+
+// Aliases para retrocompatibilidade com zonas legadas
+ZONE_SPAWNS_TEMPLATES['map1'] = ZONE_SPAWNS_TEMPLATES['mundo_sobrevivencia'];
+ZONE_SPAWNS_TEMPLATES['caverna-zona-1'] = ZONE_SPAWNS_TEMPLATES['caverna_minerios'];
+ZONE_SPAWNS_TEMPLATES['caverna2'] = ZONE_SPAWNS_TEMPLATES['caverna_fungica'];
+ZONE_SPAWNS_TEMPLATES['caverna3'] = ZONE_SPAWNS_TEMPLATES['catacumbas_deserto'];
 
 /**
  * Cria instâncias clonadas com estado de runtime zerado para a zona fornecida.
  */
 export function createZoneSpawnPoints(zoneId: string): SpawnPoint[] {
-  const templates = ZONE_SPAWNS_TEMPLATES[zoneId] || ZONE_SPAWNS_TEMPLATES['map1'] || [];
+  const resolvedZone =
+    zoneId === 'map1' ? 'mundo_sobrevivencia' :
+    zoneId === 'caverna-zona-1' ? 'caverna_minerios' :
+    zoneId === 'caverna2' ? 'caverna_fungica' :
+    zoneId === 'caverna3' ? 'catacumbas_deserto' :
+    zoneId;
+
+  const templates =
+    ZONE_SPAWNS_TEMPLATES[resolvedZone] ||
+    ZONE_SPAWNS_TEMPLATES[zoneId] ||
+    ZONE_SPAWNS_TEMPLATES['mundo_sobrevivencia'] ||
+    [];
+
   return templates.map((t) => ({
     ...t,
     currentMonsterId: null,

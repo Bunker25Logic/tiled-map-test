@@ -1,0 +1,850 @@
+{
+  "columns": 16,
+  "image": "tiles/agua.png",
+  "imageheight": 544,
+  "imagewidth": 512,
+  "margin": 0,
+  "name": "agua",
+  "spacing": 0,
+  "tilecount": 272,
+  "tiledversion": "1.11.0",
+  "tileheight": 32,
+  "tilewidth": 32,
+  "tiles": [
+    {
+      "id": 0,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 27,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 29,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 30,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 31,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "Colisao_Agua",
+            "type": "Agua",
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "visible": true
+          }
+        ]
+      }
+    }
+  ],
+  "transparentcolor": "#ff00ff",
+  "type": "tileset",
+  "version": "1.10"
+}

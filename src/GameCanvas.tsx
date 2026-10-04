@@ -55,6 +55,7 @@ import {
   getNPCDirectionTowards,
   npcDirToNum,
 } from './game/npc';
+import { loadChromaKeyImage } from './game/imageLoader';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -358,6 +359,18 @@ export default function GameCanvas({
         npcImagesRef.current = npcImgs;
 
         if (isCancelled) return;
+
+        // Garante que todos os tilesets do mapa atual estejam carregados no cache
+        for (const ts of mapData.tilesets) {
+          if (!cached.tilesets[ts.name] && ts.image) {
+            try {
+              const loadedImg = await loadChromaKeyImage(ts.image, '#ff00ff');
+              cached.tilesets[ts.name] = loadedImg;
+            } catch (err) {
+              console.warn(`[GameCanvas] Falha ao carregar tileset ${ts.name}:`, err);
+            }
+          }
+        }
 
         // 2. Collision rects from Tiled map
         const colliders: Rect[] = buildCollisionRects(mapData);
@@ -802,8 +815,13 @@ export default function GameCanvas({
             const px = playerRef.current.x + HITBOX_W / 2;
             const py = playerRef.current.y + HITBOX_H / 2;
 
+            const isNpcInCurrentZone = (npc: NPCDef) =>
+              npc.mapId === mapId ||
+              ((npc.mapId === 'mundo_sobrevivencia' || npc.mapId === 'map1') &&
+               (mapId === 'mundo_sobrevivencia' || mapId === 'map1'));
+
             // Check NPC proximity first
-            const npcs = Object.values(NPCS_CONFIG).filter((n) => n.mapId === mapId);
+            const npcs = Object.values(NPCS_CONFIG).filter(isNpcInCurrentZone);
             const nearbyNPC = npcs.find((n) => Math.hypot(px - n.x, py - n.y) <= 65);
             if (nearbyNPC) {
               e.preventDefault();
@@ -1188,7 +1206,11 @@ export default function GameCanvas({
           setActiveNearbyPortal(nearbyPortal);
 
           // ── Proximity Detection for Interactive NPCs ────────────────────
-          const npcsInZone = Object.values(NPCS_CONFIG).filter((n) => n.mapId === mapId);
+          const isNpcInZone = (npc: NPCDef) =>
+            npc.mapId === mapId ||
+            ((npc.mapId === 'mundo_sobrevivencia' || npc.mapId === 'map1') &&
+             (mapId === 'mundo_sobrevivencia' || mapId === 'map1'));
+          const npcsInZone = Object.values(NPCS_CONFIG).filter(isNpcInZone);
           let nearbyNPC: NPCDef | null = null;
           for (const npc of npcsInZone) {
             const dist = Math.hypot(pxFootCenterX - npc.x, pyFootCenterY - npc.y);
@@ -1514,8 +1536,9 @@ export default function GameCanvas({
           // imageSmoothingEnabled=false evita borrão e brechas por interpolação bilinear
           ctx.imageSmoothingEnabled = false;
 
-          // Fundo escuro terroso natural para superfície e breu total para caverna
-          ctx.fillStyle = mapId.startsWith('caverna') ? '#000000' : '#182b13';
+          // Fundo escuro terroso natural para superfície e breu total para caverna/catacumbas
+          const isCaveOrUnderground = mapId.startsWith('caverna') || mapId.startsWith('catacumbas');
+          ctx.fillStyle = isCaveOrUnderground ? '#000000' : '#182b13';
           ctx.fillRect(0, 0, displayW, displayH);
 
           ctx.scale(scale, scale);
@@ -1811,7 +1834,7 @@ export default function GameCanvas({
           }
 
           // Add NPCs to depth sorting
-          const currentZoneNPCs = Object.values(NPCS_CONFIG).filter((n) => n.mapId === mapId);
+          const currentZoneNPCs = Object.values(NPCS_CONFIG).filter(isNpcInZone);
           for (const npc of currentZoneNPCs) {
             const npcBaseY = npc.y + npc.hitboxH;
             if (
@@ -2731,7 +2754,7 @@ export default function GameCanvas({
           }
 
           // 4. Cave Darkness & Torchlight (Centered directly on the player in screen coords)
-          if (mapId.startsWith('caverna')) {
+          if (isCaveOrUnderground) {
             ctx.save();
 
             const pScreenX = playerRef.current.x + HITBOX_W / 2 - camX;
@@ -2783,7 +2806,7 @@ export default function GameCanvas({
             propsRef.current.graphicStyle || 'modern-hd',
             worldViewW,
             worldViewH,
-            mapId.startsWith('caverna')
+            isCaveOrUnderground
           );
 
           // 6. Smooth Fade-in Transition Overlay
@@ -2945,7 +2968,11 @@ export default function GameCanvas({
     let enteredPortal = false;
 
     // Check if clicked near an NPC
-    const npcs = Object.values(NPCS_CONFIG).filter((n) => n.mapId === mapId);
+    const isNpcInZone = (npc: NPCDef) =>
+      npc.mapId === mapId ||
+      ((npc.mapId === 'mundo_sobrevivencia' || npc.mapId === 'map1') &&
+       (mapId === 'mundo_sobrevivencia' || mapId === 'map1'));
+    const npcs = Object.values(NPCS_CONFIG).filter(isNpcInZone);
     for (const npc of npcs) {
       const distClick = Math.hypot(clickWorldX - npc.x, clickWorldY - npc.y);
       const distPlayer = Math.hypot(playerRef.current.x - npc.x, playerRef.current.y - npc.y);

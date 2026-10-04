@@ -1,0 +1,16 @@
+{
+  "columns": 16,
+  "image": "tiles/chao.png",
+  "imageheight": 2016,
+  "imagewidth": 512,
+  "margin": 0,
+  "name": "chao",
+  "spacing": 0,
+  "tilecount": 1008,
+  "tiledversion": "1.11.0",
+  "tileheight": 32,
+  "tilewidth": 32,
+  "transparentcolor": "#ff00ff",
+  "type": "tileset",
+  "version": "1.10"
+}
